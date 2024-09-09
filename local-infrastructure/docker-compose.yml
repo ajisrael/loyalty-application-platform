@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  loyalty-mongodb:
+    image: mongo
+    container_name: loyalty_mongo_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  loyalty-postgres-db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=loyalty
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data-loyalty
+    deploy:
+      replicas: 1
+
+volumes:
+  mongodb_data:
+  postgres_data:
