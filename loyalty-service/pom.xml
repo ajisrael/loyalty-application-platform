@@ -36,6 +36,12 @@
 		    <artifactId>axon-spring-boot-starter</artifactId>
 		    <version>4.10.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.axonframework/axon-eventsourcing -->
+		<dependency>
+			<groupId>org.axonframework</groupId>
+			<artifactId>axon-eventsourcing</artifactId>
+			<version>4.10.0</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-netflix-eureka-client -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -53,6 +59,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.7.4</version>
 		</dependency>
 
 		<dependency>
