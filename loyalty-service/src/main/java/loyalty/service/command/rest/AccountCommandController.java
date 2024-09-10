@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/account")
 @Tag(name = "Loyalty Service Command API")
-public class CommandRestController {
+public class AccountCommandController {
 
     @Autowired
     private CommandGateway commandGateway;
 
-    @PostMapping("/account")
+    @PostMapping
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create account")
