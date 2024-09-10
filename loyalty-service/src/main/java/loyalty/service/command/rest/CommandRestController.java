@@ -14,25 +14,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("")
 @Tag(name = "Loyalty Service Command API")
 public class CommandRestController {
 
     @Autowired
     private CommandGateway commandGateway;
 
-    @GetMapping("hello")
-    @ResponseBody
-    @ResponseStatus(HttpStatus.CREATED)
-    public String hello() {
-        return "hello";
-    }
-
-    @PostMapping("account")
+    @PostMapping("/account")
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create account")
-    public AccountCreatedResponseModel createAccount(@RequestBody CreateAccountRequestModel createAccountRequestModel) {
+    public AccountCreatedResponseModel createAccount(@Valid @RequestBody CreateAccountRequestModel createAccountRequestModel) {
         CreateAccountCommand createAccountCommand = CreateAccountCommand.builder()
                 .accountId(UUID.randomUUID().toString())
                 .firstName(createAccountRequestModel.getFirstName())
