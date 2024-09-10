@@ -21,14 +21,14 @@ public class CommandRestController {
     @Autowired
     private CommandGateway commandGateway;
 
-    @GetMapping("/hello")
+    @GetMapping("hello")
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     public String hello() {
         return "hello";
     }
 
-    @PostMapping("/account")
+    @PostMapping("account")
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create account")
