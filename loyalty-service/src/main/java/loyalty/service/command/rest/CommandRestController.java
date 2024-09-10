@@ -33,7 +33,7 @@ public class CommandRestController {
                 .email(createAccountRequestModel.getEmail())
                 .build();
 
-        String accountId = createAccountCommand.getAccountId(); //commandGateway.sendAndWait(createAccountCommand);
+        String accountId = commandGateway.sendAndWait(createAccountCommand);
 
         return AccountCreatedResponseModel.builder().accountId(accountId).build();
     }
