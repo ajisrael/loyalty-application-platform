@@ -2,7 +2,11 @@ package loyalty.service.query.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import loyalty.service.core.rest.PageResponseType;
+import loyalty.service.core.rest.PaginationResponse;
+import loyalty.service.core.utils.PaginationUtility;
 import loyalty.service.query.queries.FindAccountQuery;
+import loyalty.service.query.queries.FindAllAccountsQuery;
 import loyalty.service.query.queryModels.AccountQueryModel;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -22,6 +26,21 @@ public class AccountQueryController {
 
     @Autowired
     QueryGateway queryGateway;
+
+    @GetMapping
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get accounts")
+    public CompletableFuture<PaginationResponse<AccountQueryModel>> getAccounts(
+            @RequestParam(defaultValue = DEFAULT_PAGE) int currentPage,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
+        FindAllAccountsQuery findAllAccountsQuery = FindAllAccountsQuery.builder()
+                .pageable(PaginationUtility.buildPageable(currentPage, pageSize))
+                .build();
+
+        return queryGateway.query(findAllAccountsQuery, new PageResponseType<>(AccountQueryModel.class))
+                .thenApply(PaginationUtility::toPageResponse);
+    }
 
     @GetMapping(params = "accountId")
     @ResponseBody

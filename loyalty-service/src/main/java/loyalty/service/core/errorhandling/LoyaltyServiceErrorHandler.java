@@ -14,6 +14,7 @@ import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Date;
 
@@ -32,6 +33,12 @@ public class LoyaltyServiceErrorHandler {
 
     @ExceptionHandler(value = {AccountNotFoundException.class})
     public ResponseEntity<Object> handleAccountNotFoundException(AccountNotFoundException exception, WebRequest webRequest) {
+        ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = {NoResourceFoundException.class})
+    public ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException exception, WebRequest webRequest) {
         ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }

@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 import static loyalty.service.core.constants.ExceptionMessages.*;
-import static loyalty.service.utils.Helper.throwExceptionIfParameterIsEmpty;
+import static loyalty.service.core.utils.Helper.throwExceptionIfParameterIsEmpty;
 
 @Getter
 @Builder

@@ -5,8 +5,10 @@ import loyalty.service.core.data.AccountEntity;
 import loyalty.service.core.data.AccountRepository;
 import loyalty.service.core.exceptions.AccountNotFoundException;
 import loyalty.service.query.queries.FindAccountQuery;
+import loyalty.service.query.queries.FindAllAccountsQuery;
 import loyalty.service.query.queryModels.AccountQueryModel;
 import org.axonframework.queryhandling.QueryHandler;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,6 +16,12 @@ import org.springframework.stereotype.Component;
 public class AccountQueryHandler {
 
     private final AccountRepository accountRepository;
+
+    @QueryHandler
+    public Page<AccountQueryModel> findAllAccounts(FindAllAccountsQuery query) {
+        return accountRepository.findAll(query.getPageable())
+                .map(this::convertAccountEntityToAccountQueryModel);
+    }
 
     @QueryHandler
     public AccountQueryModel findAccount(FindAccountQuery query) {

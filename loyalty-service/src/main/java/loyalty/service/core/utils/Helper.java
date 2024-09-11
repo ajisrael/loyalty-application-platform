@@ -1,4 +1,4 @@
-package loyalty.service.utils;
+package loyalty.service.core.utils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

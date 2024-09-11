@@ -17,7 +17,7 @@ import java.util.function.BiFunction;
 
 import static loyalty.service.core.constants.LogMessages.INTERCEPTED_COMMAND;
 import static loyalty.service.core.constants.ExceptionMessages.ACCOUNT_WITH_ID_DOES_NOT_EXIST;
-import static loyalty.service.utils.Helper.throwExceptionIfEntityDoesNotExist;
+import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExist;
 
 @Component
 public class UpdateAccountCommandInterceptor implements MessageDispatchInterceptor<CommandMessage<?>> {
