@@ -4,8 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import loyalty.service.command.commands.CreateAccountCommand;
+import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.command.rest.requests.CreateAccountRequestModel;
+import loyalty.service.command.rest.requests.UpdateAccountRequestModel;
 import loyalty.service.command.rest.responses.AccountCreatedResponseModel;
+import loyalty.service.command.rest.responses.AccountUpdatedResponseModel;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +39,21 @@ public class AccountCommandController {
         String accountId = commandGateway.sendAndWait(createAccountCommand);
 
         return AccountCreatedResponseModel.builder().accountId(accountId).build();
+    }
+
+    @PutMapping
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Update account")
+    public void updateAccount(@Valid @RequestBody UpdateAccountRequestModel updateAccountRequestModel) {
+        UpdateAccountCommand updateAccountCommand = UpdateAccountCommand.builder()
+                .accountId(updateAccountRequestModel.getAccountId())
+                .firstName(updateAccountRequestModel.getFirstName())
+                .lastName(updateAccountRequestModel.getLastName())
+                .email(updateAccountRequestModel.getEmail())
+                .build();
+
+        commandGateway.sendAndWait(updateAccountCommand);
     }
 }
 

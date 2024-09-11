@@ -1,6 +1,7 @@
 package loyalty.service.core.errorhandling;
 
 import loyalty.service.core.exceptions.AccountNotFoundException;
+import loyalty.service.core.exceptions.EmailExistsForAccountException;
 import loyalty.service.query.AccountEventsHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +36,15 @@ public class LoyaltyServiceErrorHandler {
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(value = {EmailExistsForAccountException.class})
+    public ResponseEntity<Object> handleEmailExistsForAccountException(EmailExistsForAccountException exception, WebRequest webRequest) {
+        ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(value = {UnsatisfiedServletRequestParameterException.class})
-    public ResponseEntity<Object> handleUnsatisfiedServletRequestParameterException(UnsatisfiedServletRequestParameterException exception, WebRequest webRequest) {
+    public ResponseEntity<Object> handleUnsatisfiedServletRequestParameterException(
+            UnsatisfiedServletRequestParameterException exception, WebRequest webRequest) {
         ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
