@@ -1,11 +1,15 @@
 package loyalty.service.core.errorhandling;
 
 import loyalty.service.core.exceptions.AccountNotFoundException;
+import loyalty.service.query.AccountEventsHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -14,6 +18,8 @@ import java.util.Date;
 
 @ControllerAdvice
 public class LoyaltyServiceErrorHandler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoyaltyServiceErrorHandler.class);
 
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
     public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException exception, WebRequest webRequest) {
@@ -29,8 +35,15 @@ public class LoyaltyServiceErrorHandler {
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(value = {UnsatisfiedServletRequestParameterException.class})
+    public ResponseEntity<Object> handleUnsatisfiedServletRequestParameterException(UnsatisfiedServletRequestParameterException exception, WebRequest webRequest) {
+        ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<Object> handleOtherExceptions(Exception exception, WebRequest webRequest) {
+        LOGGER.error(exception.getClass().toString());
         ErrorMessage errorMessage = new ErrorMessage(new Date(), exception.getLocalizedMessage());
         return new ResponseEntity<>(errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
