@@ -1,0 +1,1160 @@
+{
+	"info": {
+		"_postman_id": "1a764ba9-e657-4183-bbdb-e7cc8a082773",
+		"name": "Loyalty Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8822572"
+	},
+	"item": [
+		{
+			"name": "Tests",
+			"item": [
+				{
+					"name": "Create Account",
+					"item": [
+						{
+							"name": "SUCCESS",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status is 201 Created\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response body contains 'accountId' and it is a valid GUID\", function () {",
+											"    // Parse the response body as JSON",
+											"    var jsonData = pm.response.json();",
+											"",
+											"    // Regular expression to validate a GUID (UUID version 4)",
+											"    var guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;",
+											"",
+											"    // Check if 'accountId' exists and matches the GUID pattern",
+											"    pm.expect(jsonData).to.have.property('accountId');",
+											"    pm.expect(jsonData.accountId).to.match(guidRegex);",
+											"});",
+											"",
+											"// Parse the response body",
+											"var jsonData = pm.response.json();",
+											"",
+											"// Check if the response contains the 'accountId' property",
+											"if (jsonData.accountId) {",
+											"    // Set the 'accountId' in the Postman environment",
+											"    pm.environment.set(\"accountId\", jsonData.accountId);",
+											"    console.log(\"accountId saved to environment: \" + jsonData.accountId);",
+											"} else {",
+											"    console.error(\"accountId not found in the response body.\");",
+											"}",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Helper function to generate a random string of given length",
+											"function getRandomString(length) {",
+											"    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';",
+											"    var result = '';",
+											"    for (var i = 0; i < length; i++) {",
+											"        result += characters.charAt(Math.floor(Math.random() * characters.length));",
+											"    }",
+											"    return result;",
+											"}",
+											"",
+											"// Generate random firstName and lastName",
+											"var firstName = getRandomString(6); // e.g., Alex",
+											"var lastName = getRandomString(8);  // e.g., Israels",
+											"",
+											"// Generate a random email using the generated first and last name",
+											"var email = firstName.toLowerCase() + \".\" + lastName.toLowerCase() + \"@example.com\";",
+											"",
+											"// Set these values as environment variables so they can be used in the request body",
+											"pm.environment.set(\"firstName\", firstName);",
+											"pm.environment.set(\"lastName\", lastName);",
+											"pm.environment.set(\"email\", email);",
+											"",
+											"// Log generated values",
+											"console.log(\"Generated firstName: \" + firstName);",
+											"console.log(\"Generated lastName: \" + lastName);",
+											"console.log(\"Generated email: \" + email);",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"{{firstName}}\",\n    \"lastName\": \"{{lastName}}\",\n    \"email\": \"{{email}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FAIL: empty first name",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    pm.expect(responseJson).to.have.property(\"timestamp\");",
+											"    pm.expect(responseJson).to.have.property(\"message\");",
+											"});",
+											"",
+											"pm.test(\"Response message is correct\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson.message).to.eql(\"firstName is a required field\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"\",\n    \"lastName\": \"Israels\",\n    \"email\": \"email@email.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FAIL: empty last name",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    pm.expect(responseJson).to.have.property(\"timestamp\");",
+											"    pm.expect(responseJson).to.have.property(\"message\");",
+											"});",
+											"",
+											"pm.test(\"Response message is correct\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson.message).to.eql(\"lastName is a required field\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Alex\",\n    \"lastName\": \"\",\n    \"email\": \"email@email.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FAIL: empty email",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    pm.expect(responseJson).to.have.property(\"timestamp\");",
+											"    pm.expect(responseJson).to.have.property(\"message\");",
+											"});",
+											"",
+											"pm.test(\"Response message is correct\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson.message).to.eql(\"email is a required field\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Alex\",\n    \"lastName\": \"Israels\",\n    \"email\": \"\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FAIL: invalid email",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    pm.expect(responseJson).to.have.property(\"timestamp\");",
+											"    pm.expect(responseJson).to.have.property(\"message\");",
+											"});",
+											"",
+											"pm.test(\"Response message is correct\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson.message).to.eql(\"email must be a valid email address\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Alex\",\n    \"lastName\": \"Israels\",\n    \"email\": \"emailemailcom\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FAIL: email already exists",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    pm.expect(responseJson).to.have.property(\"timestamp\");",
+											"    pm.expect(responseJson).to.have.property(\"message\");",
+											"});",
+											"",
+											"pm.test(\"Response message is correct\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson.message).to.contains(\"Email \", \" already exists for an account\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Alex\",\n    \"lastName\": \"Israels\",\n    \"email\": \"{{email}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Update Account",
+					"item": [
+						{
+							"name": "SETUP",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status is 201 Created\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response body contains 'accountId' and it is a valid GUID\", function () {",
+											"    // Parse the response body as JSON",
+											"    var jsonData = pm.response.json();",
+											"",
+											"    // Regular expression to validate a GUID (UUID version 4)",
+											"    var guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;",
+											"",
+											"    // Check if 'accountId' exists and matches the GUID pattern",
+											"    pm.expect(jsonData).to.have.property('accountId');",
+											"    pm.expect(jsonData.accountId).to.match(guidRegex);",
+											"});",
+											"",
+											"// Parse the response body",
+											"var jsonData = pm.response.json();",
+											"",
+											"// Check if the response contains the 'accountId' property",
+											"if (jsonData.accountId) {",
+											"    // Set the 'accountId' in the Postman environment",
+											"    pm.environment.set(\"accountId\", jsonData.accountId);",
+											"    console.log(\"accountId saved to environment: \" + jsonData.accountId);",
+											"} else {",
+											"    console.error(\"accountId not found in the response body.\");",
+											"}",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Helper function to generate a random string of given length",
+											"function getRandomString(length) {",
+											"    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';",
+											"    var result = '';",
+											"    for (var i = 0; i < length; i++) {",
+											"        result += characters.charAt(Math.floor(Math.random() * characters.length));",
+											"    }",
+											"    return result;",
+											"}",
+											"",
+											"// Generate random firstName and lastName",
+											"var firstName = getRandomString(6); // e.g., Alex",
+											"var lastName = getRandomString(8);  // e.g., Israels",
+											"",
+											"// Generate a random email using the generated first and last name",
+											"var email = firstName.toLowerCase() + \".\" + lastName.toLowerCase() + \"@example.com\";",
+											"",
+											"// Set these values as environment variables so they can be used in the request body",
+											"pm.environment.set(\"firstName\", firstName);",
+											"pm.environment.set(\"lastName\", lastName);",
+											"pm.environment.set(\"email\", email);",
+											"",
+											"// Log generated values",
+											"console.log(\"Generated firstName: \" + firstName);",
+											"console.log(\"Generated lastName: \" + lastName);",
+											"console.log(\"Generated email: \" + email);",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"{{firstName}}\",\n    \"lastName\": \"{{lastName}}\",\n    \"email\": \"{{email}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SUCCESS",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Helper function to generate a random string of given length",
+											"function getRandomString(length) {",
+											"    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';",
+											"    var result = '';",
+											"    for (var i = 0; i < length; i++) {",
+											"        result += characters.charAt(Math.floor(Math.random() * characters.length));",
+											"    }",
+											"    return result;",
+											"}",
+											"",
+											"// Helper function to wait till account is created before updating",
+											"function checkAccountExists() {",
+											"    pm.sendRequest({",
+											"        url: `http://localhost:8082/loyalty-service/account?accountId=${accountId}`,",
+											"        method: 'GET'",
+											"    }, function (err, response) {",
+											"        if (response && response.status === 200) {",
+											"            console.log(\"Account exists, proceeding with update.\");",
+											"            pm.environment.set(\"accountExists\", true);",
+											"        } else {",
+											"            attempt++;",
+											"            console.log(`Attempt ${attempt}: Account not found yet, retrying...`);",
+											"            if (attempt < maxRetries) {",
+											"                setTimeout(checkAccountExists, 100); // Retry after 100ms",
+											"            } else {",
+											"                console.log(\"Account not found after max retries.\");",
+											"                pm.environment.set(\"accountExists\", false);",
+											"            }",
+											"        }",
+											"    });",
+											"}",
+											"",
+											"// Generate random firstName and lastName",
+											"var firstName = getRandomString(6); // e.g., Alex",
+											"var lastName = getRandomString(8);  // e.g., Israels",
+											"",
+											"// Generate a random email using the generated first and last name",
+											"var email = firstName.toLowerCase() + \".\" + lastName.toLowerCase() + \"@example.com\";",
+											"",
+											"// Set these values as environment variables so they can be used in the request body",
+											"pm.environment.set(\"firstName\", firstName);",
+											"pm.environment.set(\"lastName\", lastName);",
+											"pm.environment.set(\"email\", email);",
+											"",
+											"// Log generated values",
+											"console.log(\"Generated firstName: \" + firstName);",
+											"console.log(\"Generated lastName: \" + lastName);",
+											"console.log(\"Generated email: \" + email);",
+											"",
+											"const accountId = pm.environment.get(\"accountId\");",
+											"const maxRetries = 5;",
+											"let attempt = 0;",
+											"",
+											"checkAccountExists();",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status is 204 No Content\", function () {",
+											"    pm.response.to.have.status(204);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"accountId\": \"{{accountId}}\",\n    \"firstName\": \"{{firstName}}\",\n    \"lastName\": \"{{lastName}}\",\n    \"email\": \"{{email}}\"\n} ",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FAIL: empty accountId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    pm.expect(responseJson).to.have.property(\"timestamp\");",
+											"    pm.expect(responseJson).to.have.property(\"message\");",
+											"});",
+											"",
+											"pm.test(\"Response message is correct\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson.message).to.eql(\"accountId is a required field\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"accountId\": \"\",\n    \"firstName\": \"Alex\",\n    \"lastName\": \"Israels\",\n    \"email\": \"email@email.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FAIL: empty first name",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    pm.expect(responseJson).to.have.property(\"timestamp\");",
+											"    pm.expect(responseJson).to.have.property(\"message\");",
+											"});",
+											"",
+											"pm.test(\"Response message is correct\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson.message).to.eql(\"firstName is a required field\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"accountId\": \"{{accountId}}\",\n    \"firstName\": \"\",\n    \"lastName\": \"Israels\",\n    \"email\": \"email@email.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FAIL: empty last name",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    pm.expect(responseJson).to.have.property(\"timestamp\");",
+											"    pm.expect(responseJson).to.have.property(\"message\");",
+											"});",
+											"",
+											"pm.test(\"Response message is correct\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson.message).to.eql(\"lastName is a required field\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"accountId\": \"{{accountId}}\",\n    \"firstName\": \"Alex\",\n    \"lastName\": \"\",\n    \"email\": \"email@email.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FAIL: empty email",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    pm.expect(responseJson).to.have.property(\"timestamp\");",
+											"    pm.expect(responseJson).to.have.property(\"message\");",
+											"});",
+											"",
+											"pm.test(\"Response message is correct\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson.message).to.eql(\"email is a required field\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"accountId\": \"{{accountId}}\",\n    \"firstName\": \"Alex\",\n    \"lastName\": \"Israels\",\n    \"email\": \"\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FAIL: invalid email",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    pm.expect(responseJson).to.have.property(\"timestamp\");",
+											"    pm.expect(responseJson).to.have.property(\"message\");",
+											"});",
+											"",
+											"pm.test(\"Response message is correct\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson.message).to.eql(\"email must be a valid email address\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"accountId\": \"{{accountId}}\",\n    \"firstName\": \"Alex\",\n    \"lastName\": \"Israels\",\n    \"email\": \"emailemailcom\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get Account",
+					"item": [
+						{
+							"name": "SUCCESS",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    // Validate that the required properties are present in the response",
+											"    pm.expect(responseJson).to.have.property(\"accountId\");",
+											"    pm.expect(responseJson).to.have.property(\"firstName\");",
+											"    pm.expect(responseJson).to.have.property(\"lastName\");",
+											"    pm.expect(responseJson).to.have.property(\"email\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account?accountId={{accountId}}",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									],
+									"query": [
+										{
+											"key": "accountId",
+											"value": "{{accountId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FAIL: no matching account id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    // Validate that the required properties are present in the response",
+											"    pm.expect(responseJson).to.have.property(\"timestamp\");",
+											"    pm.expect(responseJson).to.have.property(\"message\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account?accountId=not-an-account-id",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									],
+									"query": [
+										{
+											"key": "accountId",
+											"value": "not-an-account-id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FAIL: no account id in request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    // Validate that the required properties are present in the response",
+											"    pm.expect(responseJson).to.have.property(\"timestamp\");",
+											"    pm.expect(responseJson).to.have.property(\"message\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account?",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": null
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Create Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Check if the response contains the 'accountId' property",
+							"if (jsonData.accountId) {",
+							"    // Set the 'accountId' in the Postman environment",
+							"    pm.environment.set(\"accountId\", jsonData.accountId);",
+							"    console.log(\"accountId saved to environment: \" + jsonData.accountId);",
+							"} else {",
+							"    console.error(\"accountId not found in the response body.\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\": \"Alex\",\n    \"lastName\": \"Israels\",\n    \"email\": \"email@email.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/loyalty-service/account",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"loyalty-service",
+						"account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Account",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"accountId\": \"{{accountId}}\",\n    \"firstName\": \"Alexander\",\n    \"lastName\": \"Israels\",\n    \"email\": \"email@email.com\"\n} ",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/loyalty-service/account",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"loyalty-service",
+						"account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Account",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8082/loyalty-service/account?accountId={{accountId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"loyalty-service",
+						"account"
+					],
+					"query": [
+						{
+							"key": "accountId",
+							"value": "{{accountId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
