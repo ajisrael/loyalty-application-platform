@@ -1,11 +1,11 @@
-package loyalty.service.command.rest.responses;
+package loyalty.service.core.events;
 
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class AccountUpdatedResponseModel {
+public class AccountDeletedEvent {
 
     private String accountId;
 }

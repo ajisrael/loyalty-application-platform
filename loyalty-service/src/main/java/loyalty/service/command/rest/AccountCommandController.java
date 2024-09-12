@@ -4,11 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import loyalty.service.command.commands.CreateAccountCommand;
+import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.command.rest.requests.CreateAccountRequestModel;
+import loyalty.service.command.rest.requests.DeleteAccountRequestModel;
 import loyalty.service.command.rest.requests.UpdateAccountRequestModel;
 import loyalty.service.command.rest.responses.AccountCreatedResponseModel;
-import loyalty.service.command.rest.responses.AccountUpdatedResponseModel;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,6 +56,16 @@ public class AccountCommandController {
 
         commandGateway.sendAndWait(updateAccountCommand);
     }
+
+    @DeleteMapping
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete account")
+    public void deleteAccount(@Valid @RequestBody DeleteAccountRequestModel deleteAccountRequestModel) {
+        DeleteAccountCommand deleteAccountCommand = DeleteAccountCommand.builder()
+                .accountId(deleteAccountRequestModel.getAccountId())
+                .build();
+
+        commandGateway.sendAndWait(deleteAccountCommand);
+    }
 }
-
-

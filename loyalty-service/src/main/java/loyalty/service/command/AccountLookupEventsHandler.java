@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import loyalty.service.core.data.AccountLookupEntity;
 import loyalty.service.core.data.AccountLookupRepository;
 import loyalty.service.core.events.AccountCreatedEvent;
+import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.AccountUpdatedEvent;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
@@ -40,11 +41,10 @@ public class AccountLookupEventsHandler {
         accountLookupRepository.save(accountLookupEntity);
     }
 
-    // TODO: implement remove account command
-//    @EventHandler
-//    public void on(AccountRemovedEvent event) {
-//        AccountLookupEntity accountLookupEntity = accountLookupRepository.findByAccountId(event.getAccountId());
-//        throwExceptionIfEntityDoesNotExist(accountLookupEntity, String.format(ACCOUNT_WITH_ID_DOES_NOT_EXIST, event.getAccountId()));
-//        accountLookupRepository.delete(accountLookupEntity);
-//    }
+    @EventHandler
+    public void on(AccountDeletedEvent event) {
+        AccountLookupEntity accountLookupEntity = accountLookupRepository.findByAccountId(event.getAccountId());
+        throwExceptionIfEntityDoesNotExist(accountLookupEntity, String.format(ACCOUNT_WITH_ID_DOES_NOT_EXIST, event.getAccountId()));
+        accountLookupRepository.delete(accountLookupEntity);
+    }
 }

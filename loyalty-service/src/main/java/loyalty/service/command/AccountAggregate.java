@@ -3,8 +3,10 @@ package loyalty.service.command;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import loyalty.service.command.commands.CreateAccountCommand;
+import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.core.events.AccountCreatedEvent;
+import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.AccountUpdatedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -47,6 +49,15 @@ public class AccountAggregate {
         AggregateLifecycle.apply(event);
     }
 
+    @CommandHandler
+    public void deleteAccount(DeleteAccountCommand command) {
+        AccountDeletedEvent event = AccountDeletedEvent.builder()
+                .accountId(command.getAccountId())
+                .build();
+
+        AggregateLifecycle.apply(event);
+    }
+
     @EventSourcingHandler
     public void on(AccountCreatedEvent event) {
         this.accountId = event.getAccountId();
@@ -60,5 +71,10 @@ public class AccountAggregate {
         this.firstName = event.getFirstName();
         this.lastName = event.getLastName();
         this.email = event.getEmail();
+    }
+
+    @EventSourcingHandler
+    public void on(AccountDeletedEvent event) {
+        AggregateLifecycle.markDeleted();
     }
 }

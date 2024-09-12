@@ -1,6 +1,7 @@
 package loyalty.service;
 
 import loyalty.service.command.interceptors.CreateAccountCommandInterceptor;
+import loyalty.service.command.interceptors.DeleteAccountCommandInterceptor;
 import loyalty.service.command.interceptors.UpdateAccountCommandInterceptor;
 import loyalty.service.core.errorhandling.LoyaltyServiceEventsErrorHandler;
 import org.axonframework.commandhandling.CommandBus;
@@ -26,6 +27,9 @@ public class LoyaltyServiceApplication {
 		);
 		commandBus.registerDispatchInterceptor(
 				context.getBean(UpdateAccountCommandInterceptor.class)
+		);
+		commandBus.registerDispatchInterceptor(
+				context.getBean(DeleteAccountCommandInterceptor.class)
 		);
 	}
 
