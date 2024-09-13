@@ -1,13 +1,12 @@
-package loyalty.service.query.queryHandlers;
+package loyalty.service.query.queryhandlers;
 
 import lombok.AllArgsConstructor;
 import loyalty.service.core.data.entities.LoyaltyBankEntity;
 import loyalty.service.core.data.repositories.LoyaltyBankRepository;
 import loyalty.service.core.exceptions.LoyaltyBankWithAccountIdNotFoundException;
-import loyalty.service.query.queries.FindAllAccountsQuery;
 import loyalty.service.query.queries.FindAllLoyaltyBanksQuery;
 import loyalty.service.query.queries.FindLoyaltyBankWithAccountIdQuery;
-import loyalty.service.query.queryModels.LoyaltyBankQueryModel;
+import loyalty.service.query.querymodels.LoyaltyBankQueryModel;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;

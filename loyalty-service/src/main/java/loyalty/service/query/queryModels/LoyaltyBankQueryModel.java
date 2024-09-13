@@ -1,4 +1,4 @@
-package loyalty.service.query.queryModels;
+package loyalty.service.query.querymodels;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

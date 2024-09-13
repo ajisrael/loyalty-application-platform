@@ -1,4 +1,4 @@
-package loyalty.service.query.queryHandlers;
+package loyalty.service.query.queryhandlers;
 
 import lombok.AllArgsConstructor;
 import loyalty.service.core.data.entities.AccountEntity;
@@ -6,7 +6,7 @@ import loyalty.service.core.data.repositories.AccountRepository;
 import loyalty.service.core.exceptions.AccountNotFoundException;
 import loyalty.service.query.queries.FindAccountQuery;
 import loyalty.service.query.queries.FindAllAccountsQuery;
-import loyalty.service.query.queryModels.AccountQueryModel;
+import loyalty.service.query.querymodels.AccountQueryModel;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;

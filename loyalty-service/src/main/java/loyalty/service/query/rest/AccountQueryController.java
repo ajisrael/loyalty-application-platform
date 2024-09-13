@@ -7,7 +7,7 @@ import loyalty.service.core.rest.PaginationResponse;
 import loyalty.service.core.utils.PaginationUtility;
 import loyalty.service.query.queries.FindAccountQuery;
 import loyalty.service.query.queries.FindAllAccountsQuery;
-import loyalty.service.query.queryModels.AccountQueryModel;
+import loyalty.service.query.querymodels.AccountQueryModel;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
