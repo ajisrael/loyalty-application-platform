@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/transaction")
 @Tag(name = "Loyalty Transactions Command API")
@@ -25,10 +23,10 @@ public class LoyaltyTransactionsCommandController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create pending transaction")
     public void createPendingTransaction(
-            @Valid @RequestBody CreatePendingTransactionRequestModel createPendingTransactionRequestModel) {
+            @Valid @RequestBody CreatePendingTransactionRequestModel request) {
         CreatePendingTransactionCommand createPendingTransactionCommand = CreatePendingTransactionCommand.builder()
-                .loyaltyBankId(createPendingTransactionRequestModel.getLoyaltyBankId())
-                .points(createPendingTransactionRequestModel.getPoints())
+                .loyaltyBankId(request.getLoyaltyBankId())
+                .points(request.getPoints())
                 .build();
 
         commandGateway.sendAndWait(createPendingTransactionCommand);

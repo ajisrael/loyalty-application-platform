@@ -3,7 +3,9 @@ package loyalty.service.command.aggregates;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import loyalty.service.command.commands.CreateLoyaltyBankCommand;
+import loyalty.service.command.commands.CreatePendingTransactionCommand;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
+import loyalty.service.core.events.PendingTransactionCreatedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -36,6 +38,25 @@ public class LoyaltyBankAggregate {
                 .build();
 
         AggregateLifecycle.apply(event);
+    }
+
+    @CommandHandler
+    public void on(CreatePendingTransactionCommand command) {
+        if (this.pending + command.getPoints() < 0) {
+            throw new IllegalStateException("Pending balance cannot be negative");
+        }
+
+        PendingTransactionCreatedEvent event = PendingTransactionCreatedEvent.builder()
+                .loyaltyBankId(command.getLoyaltyBankId())
+                .points(command.getPoints())
+                .build();
+
+        AggregateLifecycle.apply(event);
+    }
+
+    @EventSourcingHandler
+    public void on(PendingTransactionCreatedEvent event) {
+        this.pending += event.getPoints();
     }
 
     @EventSourcingHandler

@@ -1,9 +1,6 @@
 package loyalty.service.core.errorhandling;
 
-import loyalty.service.core.exceptions.AccountExistsWithLoyaltyBankException;
-import loyalty.service.core.exceptions.AccountNotFoundException;
-import loyalty.service.core.exceptions.EmailExistsForAccountException;
-import loyalty.service.core.exceptions.LoyaltyBankWithAccountIdNotFoundException;
+import loyalty.service.core.exceptions.*;
 import org.axonframework.eventsourcing.AggregateDeletedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +32,12 @@ public class LoyaltyServiceErrorHandler {
 
     @ExceptionHandler(value = {AccountNotFoundException.class})
     public ResponseEntity<Object> handleAccountNotFoundException(AccountNotFoundException exception, WebRequest webRequest) {
+        ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = {LoyaltyBankNotFoundException.class})
+    public ResponseEntity<Object> handleLoyaltyBankNotFoundException(LoyaltyBankNotFoundException exception, WebRequest webRequest) {
         ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
