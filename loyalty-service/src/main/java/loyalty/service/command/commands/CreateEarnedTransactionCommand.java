@@ -6,7 +6,7 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 @Getter
 @Builder
-public class CreatePendingTransactionCommand {
+public class CreateEarnedTransactionCommand {
 
     @TargetAggregateIdentifier
     private String loyaltyBankId;

@@ -2,8 +2,10 @@ package loyalty.service.command.aggregates;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import loyalty.service.command.commands.CreateEarnedTransactionCommand;
 import loyalty.service.command.commands.CreateLoyaltyBankCommand;
 import loyalty.service.command.commands.CreatePendingTransactionCommand;
+import loyalty.service.core.events.EarnedTransactionCreatedEvent;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
 import loyalty.service.core.events.PendingTransactionCreatedEvent;
 import loyalty.service.core.exceptions.IllegalLoyaltyBankStateException;
@@ -13,6 +15,7 @@ import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
+import static loyalty.service.core.constants.DomainConstants.EARNED;
 import static loyalty.service.core.constants.DomainConstants.PENDING;
 
 @Aggregate
@@ -57,9 +60,22 @@ public class LoyaltyBankAggregate {
         AggregateLifecycle.apply(event);
     }
 
-    @EventSourcingHandler
-    public void on(PendingTransactionCreatedEvent event) {
-        this.pending += event.getPoints();
+    @CommandHandler
+    public void on(CreateEarnedTransactionCommand command) {
+        if (this.pending - command.getPoints() < 0) {
+            throw new IllegalLoyaltyBankStateException(PENDING);
+        }
+
+        if (this.earned + command.getPoints() < 0) {
+            throw new IllegalLoyaltyBankStateException(EARNED);
+        }
+
+        EarnedTransactionCreatedEvent event = EarnedTransactionCreatedEvent.builder()
+                .loyaltyBankId(command.getLoyaltyBankId())
+                .points(command.getPoints())
+                .build();
+
+        AggregateLifecycle.apply(event);
     }
 
     @EventSourcingHandler
@@ -70,5 +86,16 @@ public class LoyaltyBankAggregate {
         this.earned = event.getEarned();
         this.reserved = event.getReserved();
         this.redeemed = event.getRedeemed();
+    }
+
+    @EventSourcingHandler
+    public void on(PendingTransactionCreatedEvent event) {
+        this.pending += event.getPoints();
+    }
+
+    @EventSourcingHandler
+    public void on(EarnedTransactionCreatedEvent event) {
+        this.pending -= event.getPoints();
+        this.earned += event.getPoints();
     }
 }

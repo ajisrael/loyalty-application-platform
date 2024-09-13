@@ -7,7 +7,7 @@ import loyalty.service.core.validation.NonZeroPoints;
 
 @Getter
 @NoArgsConstructor
-public class CreatePendingTransactionRequestModel {
+public class CreateLoyaltyTransactionRequestModel {
 
     @NotBlank(message = "loyaltyBankId is a required field")
     private String loyaltyBankId;
