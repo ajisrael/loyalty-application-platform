@@ -28,8 +28,8 @@ public class LoyaltyBankAggregate {
     private String accountId;
     private int pending;
     private int earned;
-    private int reserved;
-    private int redeemed;
+    private int authorized;
+    private int captured;
 
 
     @CommandHandler
@@ -39,8 +39,8 @@ public class LoyaltyBankAggregate {
                 .accountId(command.getAccountId())
                 .pending(0)
                 .earned(0)
-                .reserved(0)
-                .redeemed(0)
+                .authorized(0)
+                .captured(0)
                 .build();
 
         AggregateLifecycle.apply(event);
@@ -84,8 +84,8 @@ public class LoyaltyBankAggregate {
         this.accountId = event.getAccountId();
         this.pending = event.getPending();
         this.earned = event.getEarned();
-        this.reserved = event.getReserved();
-        this.redeemed = event.getRedeemed();
+        this.authorized = event.getAuthorized();
+        this.captured = event.getCaptured();
     }
 
     @EventSourcingHandler

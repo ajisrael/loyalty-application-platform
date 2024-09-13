@@ -11,7 +11,7 @@ public class LoyaltyBankQueryModel {
     private String accountId;
     private int pending;
     private int earned;
-    private int reserved;
-    private int redeemed;
+    private int authorized;
+    private int captured;
     private int available;
 }

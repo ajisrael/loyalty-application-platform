@@ -33,14 +33,14 @@ public class LoyaltyBankQueryHandler {
 
     private LoyaltyBankQueryModel convertLoyaltyBankEntityToLoyaltyBankQueryModel(LoyaltyBankEntity loyaltyBankEntity) {
         int available =
-                loyaltyBankEntity.getEarned() - loyaltyBankEntity.getReserved() - loyaltyBankEntity.getRedeemed();
+                loyaltyBankEntity.getEarned() - loyaltyBankEntity.getAuthorized() - loyaltyBankEntity.getCaptured();
         return new LoyaltyBankQueryModel(
                 loyaltyBankEntity.getLoyaltyBankId(),
                 loyaltyBankEntity.getAccountId(),
                 loyaltyBankEntity.getPending(),
                 loyaltyBankEntity.getEarned(),
-                loyaltyBankEntity.getRedeemed(),
-                loyaltyBankEntity.getReserved(),
+                loyaltyBankEntity.getCaptured(),
+                loyaltyBankEntity.getAuthorized(),
                 available
         );
     }
