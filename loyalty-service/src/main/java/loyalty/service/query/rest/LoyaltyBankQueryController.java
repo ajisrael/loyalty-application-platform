@@ -7,6 +7,7 @@ import loyalty.service.core.rest.PaginationResponse;
 import loyalty.service.core.utils.PaginationUtility;
 import loyalty.service.query.queries.FindAccountQuery;
 import loyalty.service.query.queries.FindAllAccountsQuery;
+import loyalty.service.query.queries.FindAllLoyaltyBanksQuery;
 import loyalty.service.query.queries.FindLoyaltyBankWithAccountIdQuery;
 import loyalty.service.query.queryModels.AccountQueryModel;
 import loyalty.service.query.queryModels.LoyaltyBankQueryModel;
@@ -29,20 +30,20 @@ public class LoyaltyBankQueryController {
     @Autowired
     QueryGateway queryGateway;
 
-//    @GetMapping
-//    @ResponseBody
-//    @ResponseStatus(HttpStatus.OK)
-//    @Operation(summary = "Get loyalty banks")
-//    public CompletableFuture<PaginationResponse<LoyaltyBankQueryModel>> getLoyaltyBanks(
-//            @RequestParam(defaultValue = DEFAULT_PAGE) int currentPage,
-//            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
-//        FindAllLoyaltyBanksQuery findAllLoyaltyBanksQuery = FindAllLoyaltyBanksQuery.builder()
-//                .pageable(PaginationUtility.buildPageable(currentPage, pageSize))
-//                .build();
-//
-//        return queryGateway.query(findAllLoyaltyBanksQuery, new PageResponseType<>(LoyaltyBankQueryModel.class))
-//                .thenApply(PaginationUtility::toPageResponse);
-//    }
+    @GetMapping
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get loyalty banks")
+    public CompletableFuture<PaginationResponse<LoyaltyBankQueryModel>> getLoyaltyBanks(
+            @RequestParam(defaultValue = DEFAULT_PAGE) int currentPage,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
+        FindAllLoyaltyBanksQuery findAllLoyaltyBanksQuery = FindAllLoyaltyBanksQuery.builder()
+                .pageable(PaginationUtility.buildPageable(currentPage, pageSize))
+                .build();
+
+        return queryGateway.query(findAllLoyaltyBanksQuery, new PageResponseType<>(LoyaltyBankQueryModel.class))
+                .thenApply(PaginationUtility::toPageResponse);
+    }
 
     @GetMapping(params = "accountId")
     @ResponseBody
