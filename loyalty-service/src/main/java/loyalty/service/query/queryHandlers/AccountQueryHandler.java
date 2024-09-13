@@ -1,4 +1,4 @@
-package loyalty.service.query;
+package loyalty.service.query.queryHandlers;
 
 import lombok.AllArgsConstructor;
 import loyalty.service.core.data.AccountEntity;

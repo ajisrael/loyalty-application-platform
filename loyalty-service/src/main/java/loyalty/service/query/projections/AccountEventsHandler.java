@@ -1,4 +1,4 @@
-package loyalty.service.query;
+package loyalty.service.query.projections;
 
 import loyalty.service.core.data.AccountEntity;
 import loyalty.service.core.data.AccountRepository;
