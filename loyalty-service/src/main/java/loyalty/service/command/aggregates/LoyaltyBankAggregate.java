@@ -6,11 +6,14 @@ import loyalty.service.command.commands.CreateLoyaltyBankCommand;
 import loyalty.service.command.commands.CreatePendingTransactionCommand;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
 import loyalty.service.core.events.PendingTransactionCreatedEvent;
+import loyalty.service.core.exceptions.IllegalLoyaltyBankStateException;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
+
+import static loyalty.service.core.constants.DomainConstants.PENDING;
 
 @Aggregate
 @NoArgsConstructor
@@ -43,7 +46,7 @@ public class LoyaltyBankAggregate {
     @CommandHandler
     public void on(CreatePendingTransactionCommand command) {
         if (this.pending + command.getPoints() < 0) {
-            throw new IllegalStateException("Pending balance cannot be negative");
+            throw new IllegalLoyaltyBankStateException(PENDING);
         }
 
         PendingTransactionCreatedEvent event = PendingTransactionCreatedEvent.builder()

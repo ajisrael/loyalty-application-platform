@@ -29,4 +29,5 @@ public class ExceptionMessages {
 
     public static final String EMAIL_ALREADY_EXISTS_FOR_AN_ACCOUNT = "Email %s already exists for an account";
     public static final String ACCOUNT_ID_ALREADY_HAS_LOYALTY_BANK = "AccountId %s already has a loyalty bank";
+    public static final String LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE = "%s balance cannot be negative";
 }

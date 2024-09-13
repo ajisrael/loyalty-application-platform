@@ -30,5 +30,7 @@ public class LoyaltyTransactionsCommandController {
                 .build();
 
         commandGateway.sendAndWait(createPendingTransactionCommand);
+
+        // TODO: generate request ids for idempotency
     }
 }
