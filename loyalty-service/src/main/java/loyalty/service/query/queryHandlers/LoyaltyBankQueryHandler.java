@@ -39,8 +39,8 @@ public class LoyaltyBankQueryHandler {
                 loyaltyBankEntity.getAccountId(),
                 loyaltyBankEntity.getPending(),
                 loyaltyBankEntity.getEarned(),
-                loyaltyBankEntity.getCaptured(),
                 loyaltyBankEntity.getAuthorized(),
+                loyaltyBankEntity.getCaptured(),
                 available
         );
     }

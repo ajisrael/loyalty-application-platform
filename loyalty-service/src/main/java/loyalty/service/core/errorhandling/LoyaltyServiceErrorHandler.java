@@ -91,6 +91,12 @@ public class LoyaltyServiceErrorHandler {
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    @ExceptionHandler(value = {InsufficientPointsException.class})
+    public ResponseEntity<Object> handleInsufficientPointsException(InsufficientPointsException exception, WebRequest webRequest) {
+        ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<Object> handleOtherExceptions(Exception exception, WebRequest webRequest) {
         LOGGER.error(exception.getClass().toString());

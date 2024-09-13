@@ -9,6 +9,7 @@ import loyalty.service.core.events.LoyaltyBankCreatedEvent;
 import loyalty.service.core.events.transactions.PendingTransactionCreatedEvent;
 import loyalty.service.core.events.transactions.CapturedTransactionCreatedEvent;
 import loyalty.service.core.exceptions.IllegalLoyaltyBankStateException;
+import loyalty.service.core.exceptions.InsufficientPointsException;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -82,6 +83,9 @@ public class LoyaltyBankAggregate {
         if (this.authorized + command.getPoints() < 0) {
             throw new IllegalLoyaltyBankStateException(AUTHORIZED);
         }
+        if (this.earned - this.authorized - this.captured < command.getPoints()) {
+            throw new InsufficientPointsException();
+        }
 
         AuthorizedTransactionCreatedEvent event = AuthorizedTransactionCreatedEvent.builder()
                 .loyaltyBankId(command.getLoyaltyBankId())
@@ -127,5 +131,16 @@ public class LoyaltyBankAggregate {
     public void on(EarnedTransactionCreatedEvent event) {
         this.pending -= event.getPoints();
         this.earned += event.getPoints();
+    }
+
+    @EventSourcingHandler
+    public void on(AuthorizedTransactionCreatedEvent event) {
+        this.authorized += event.getPoints();
+    }
+
+    @EventSourcingHandler
+    public void on(CapturedTransactionCreatedEvent event) {
+        this.authorized -= event.getPoints();
+        this.captured += event.getPoints();
     }
 }
