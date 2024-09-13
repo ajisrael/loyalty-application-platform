@@ -1,8 +1,8 @@
 package loyalty.service.command.interceptors;
 
 import loyalty.service.command.commands.DeleteAccountCommand;
-import loyalty.service.core.data.AccountLookupEntity;
-import loyalty.service.core.data.AccountLookupRepository;
+import loyalty.service.core.data.entities.AccountLookupEntity;
+import loyalty.service.core.data.repositories.AccountLookupRepository;
 import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.MessageDispatchInterceptor;

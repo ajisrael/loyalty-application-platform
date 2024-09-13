@@ -6,6 +6,7 @@ public class DomainConstants {
         throw new IllegalStateException("Constants class");
     }
     public static final String ACCOUNT = "Account";
+    public static final String LOYALTY_BANK = "Loyalty Bank";
 
     public static final String DEFAULT_PAGE = "0";
     public static final String DEFAULT_PAGE_SIZE = "20";

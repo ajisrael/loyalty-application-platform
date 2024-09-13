@@ -1,8 +1,8 @@
-package loyalty.service.command;
+package loyalty.service.command.projections;
 
 import lombok.AllArgsConstructor;
-import loyalty.service.core.data.AccountLookupEntity;
-import loyalty.service.core.data.AccountLookupRepository;
+import loyalty.service.core.data.entities.AccountLookupEntity;
+import loyalty.service.core.data.repositories.AccountLookupRepository;
 import loyalty.service.core.events.AccountCreatedEvent;
 import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.AccountUpdatedEvent;
@@ -26,8 +26,6 @@ public class AccountLookupEventsHandler {
         accountLookupRepository.save(
                 new AccountLookupEntity(
                         event.getAccountId(),
-                        event.getFirstName(),
-                        event.getLastName(),
                         event.getEmail()
                 )
         );

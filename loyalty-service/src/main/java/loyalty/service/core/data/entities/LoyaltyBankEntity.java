@@ -1,6 +1,5 @@
-package loyalty.service.core.data;
+package loyalty.service.core.data.entities;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
@@ -9,13 +8,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @EqualsAndHashCode
-@Document(collection = "accounts")
-public class AccountEntity {
+@Document(collection = "loyalty_banks")
+public class LoyaltyBankEntity {
 
     @Id
-    private String accountId;
-    private String firstName;
-    private String lastName;
+    private String loyaltyBankId;
     @Indexed(unique = true)
-    private String email;
+    private String accountId;
+    private int pending;
+    private int earned;
+    private int reserved;
+    private int redeemed;
 }

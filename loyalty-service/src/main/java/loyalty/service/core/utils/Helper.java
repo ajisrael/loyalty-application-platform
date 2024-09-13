@@ -1,8 +1,5 @@
 package loyalty.service.core.utils;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public class Helper {
@@ -11,7 +8,8 @@ public class Helper {
         return string == null || string.isBlank();
     }
 
-    public static void throwExceptionIfParameterIsEmpty(String string, String message) {
+    // TODO: Check all usages of this method to see if they should be throwing a custom exception
+    public static void throwExceptionIfParameterIsNullOrBlank(String string, String message) {
         if (isNullOrBlank(string)) {
             throw new IllegalArgumentException(message);
         }
@@ -50,27 +48,6 @@ public class Helper {
     public static void throwExceptionIfEntityDoesExist(Object entity, String message) {
         if (entity != null) {
             throw new IllegalArgumentException(message);
-        }
-    }
-
-    public static String calculateSHA256Hash(String input) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] encodedHash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
-
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : encodedHash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) {
-                    hexString.append('0');
-                }
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            // Handle the exception accordingly
-            e.printStackTrace();
-            return null;
         }
     }
 }

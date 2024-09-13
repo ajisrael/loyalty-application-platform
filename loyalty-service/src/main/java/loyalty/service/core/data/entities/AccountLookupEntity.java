@@ -1,4 +1,4 @@
-package loyalty.service.core.data;
+package loyalty.service.core.data.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,10 +18,6 @@ public class AccountLookupEntity {
     @Id
     @Column(name = "account_id", unique = true)
     private String accountId;
-    @Column(name = "first_name")
-    private String firstName;
-    @Column(name = "last_name")
-    private String lastName;
     @Column(name = "email", unique = true)
     private String email;
 }

@@ -1,23 +1,31 @@
-package loyalty.service.command;
+package loyalty.service.command.aggregates;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import loyalty.service.command.commands.CreateAccountCommand;
+import loyalty.service.command.commands.CreateLoyaltyBankCommand;
 import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.core.events.AccountCreatedEvent;
 import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.AccountUpdatedEvent;
 import org.axonframework.commandhandling.CommandHandler;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.UUID;
 
 @Aggregate
 @NoArgsConstructor
 @Getter
 public class AccountAggregate {
+
+    @Autowired
+    private CommandGateway commandGateway;
 
     @AggregateIdentifier
     private String accountId;

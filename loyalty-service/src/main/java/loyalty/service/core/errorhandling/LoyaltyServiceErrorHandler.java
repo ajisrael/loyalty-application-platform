@@ -1,7 +1,9 @@
 package loyalty.service.core.errorhandling;
 
+import loyalty.service.core.exceptions.AccountExistsWithLoyaltyBankException;
 import loyalty.service.core.exceptions.AccountNotFoundException;
 import loyalty.service.core.exceptions.EmailExistsForAccountException;
+import loyalty.service.core.exceptions.LoyaltyBankWithAccountIdNotFoundException;
 import org.axonframework.eventsourcing.AggregateDeletedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,12 @@ public class LoyaltyServiceErrorHandler {
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(value = {LoyaltyBankWithAccountIdNotFoundException.class})
+    public ResponseEntity<Object> handleLoyaltyBankWithAccountIdNotFoundException(LoyaltyBankWithAccountIdNotFoundException exception, WebRequest webRequest) {
+        ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(value = {AggregateDeletedException.class})
     public ResponseEntity<Object> handleAggregateDeletedException(AggregateDeletedException exception, WebRequest webRequest) {
         ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
@@ -51,6 +59,12 @@ public class LoyaltyServiceErrorHandler {
 
     @ExceptionHandler(value = {EmailExistsForAccountException.class})
     public ResponseEntity<Object> handleEmailExistsForAccountException(EmailExistsForAccountException exception, WebRequest webRequest) {
+        ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = {AccountExistsWithLoyaltyBankException.class})
+    public ResponseEntity<Object> handleAccountExistsWithLoyaltyBankException(AccountExistsWithLoyaltyBankException exception, WebRequest webRequest) {
         ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }

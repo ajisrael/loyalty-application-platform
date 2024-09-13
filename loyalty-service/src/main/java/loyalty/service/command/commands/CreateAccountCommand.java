@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 import static loyalty.service.core.constants.ExceptionMessages.*;
-import static loyalty.service.core.utils.Helper.throwExceptionIfParameterIsEmpty;
+import static loyalty.service.core.utils.Helper.throwExceptionIfParameterIsNullOrBlank;
 
 @Getter
 @Builder
@@ -21,9 +21,9 @@ public class CreateAccountCommand {
     // private String contractId;
 
     public void validate() {
-        throwExceptionIfParameterIsEmpty(this.getAccountId(), ACCOUNT_ID_CANNOT_BE_EMPTY);
-        throwExceptionIfParameterIsEmpty(this.getFirstName(), FIRST_NAME_CANNOT_BE_EMPTY);
-        throwExceptionIfParameterIsEmpty(this.getLastName(), LAST_NAME_CANNOT_BE_EMPTY);
-        throwExceptionIfParameterIsEmpty(this.getEmail(), EMAIL_CANNOT_BE_EMPTY);
+        throwExceptionIfParameterIsNullOrBlank(this.getAccountId(), ACCOUNT_ID_CANNOT_BE_EMPTY);
+        throwExceptionIfParameterIsNullOrBlank(this.getFirstName(), FIRST_NAME_CANNOT_BE_EMPTY);
+        throwExceptionIfParameterIsNullOrBlank(this.getLastName(), LAST_NAME_CANNOT_BE_EMPTY);
+        throwExceptionIfParameterIsNullOrBlank(this.getEmail(), EMAIL_CANNOT_BE_EMPTY);
     }
 }

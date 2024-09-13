@@ -1,8 +1,8 @@
 package loyalty.service.command.interceptors;
 
 import loyalty.service.command.commands.CreateAccountCommand;
-import loyalty.service.core.data.AccountLookupEntity;
-import loyalty.service.core.data.AccountLookupRepository;
+import loyalty.service.core.data.entities.AccountLookupEntity;
+import loyalty.service.core.data.repositories.AccountLookupRepository;
 import loyalty.service.core.exceptions.EmailExistsForAccountException;
 import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.messaging.MessageDispatchInterceptor;
