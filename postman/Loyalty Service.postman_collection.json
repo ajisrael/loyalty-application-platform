@@ -1625,6 +1625,254 @@
 					]
 				},
 				{
+					"name": "Get Loyalty Bank",
+					"item": [
+						{
+							"name": "SETUP",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status is 201 Created\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response body contains 'accountId' and it is a valid GUID\", function () {",
+											"    // Parse the response body as JSON",
+											"    var jsonData = pm.response.json();",
+											"",
+											"    // Regular expression to validate a GUID (UUID version 4)",
+											"    var guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;",
+											"",
+											"    // Check if 'accountId' exists and matches the GUID pattern",
+											"    pm.expect(jsonData).to.have.property('accountId');",
+											"    pm.expect(jsonData.accountId).to.match(guidRegex);",
+											"});",
+											"",
+											"// Parse the response body",
+											"var jsonData = pm.response.json();",
+											"",
+											"// Check if the response contains the 'accountId' property",
+											"if (jsonData.accountId) {",
+											"    // Set the 'accountId' in the Postman environment",
+											"    pm.environment.set(\"accountId\", jsonData.accountId);",
+											"    console.log(\"accountId saved to environment: \" + jsonData.accountId);",
+											"} else {",
+											"    console.error(\"accountId not found in the response body.\");",
+											"}",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Helper function to generate a random string of given length",
+											"function getRandomString(length) {",
+											"    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';",
+											"    var result = '';",
+											"    for (var i = 0; i < length; i++) {",
+											"        result += characters.charAt(Math.floor(Math.random() * characters.length));",
+											"    }",
+											"    return result;",
+											"}",
+											"",
+											"// Generate random firstName and lastName",
+											"var firstName = getRandomString(6); // e.g., Alex",
+											"var lastName = getRandomString(8);  // e.g., Israels",
+											"",
+											"// Generate a random email using the generated first and last name",
+											"var email = firstName.toLowerCase() + \".\" + lastName.toLowerCase() + \"@example.com\";",
+											"",
+											"// Set these values as environment variables so they can be used in the request body",
+											"pm.environment.set(\"firstName\", firstName);",
+											"pm.environment.set(\"lastName\", lastName);",
+											"pm.environment.set(\"email\", email);",
+											"",
+											"// Log generated values",
+											"console.log(\"Generated firstName: \" + firstName);",
+											"console.log(\"Generated lastName: \" + lastName);",
+											"console.log(\"Generated email: \" + email);",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"{{firstName}}\",\n    \"lastName\": \"{{lastName}}\",\n    \"email\": \"{{email}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SUCCESS",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    // Validate that the required properties are present in the response",
+											"    pm.expect(responseJson).to.have.property(\"loyaltyBankId\");",
+											"    pm.expect(responseJson).to.have.property(\"accountId\");",
+											"    pm.expect(responseJson).to.have.property(\"pending\");",
+											"    pm.expect(responseJson).to.have.property(\"earned\");",
+											"    pm.expect(responseJson).to.have.property(\"reserved\");",
+											"    pm.expect(responseJson).to.have.property(\"redeemed\");",
+											"    pm.expect(responseJson).to.have.property(\"available\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Helper function to wait till account is created before updating",
+											"function checkAccountExists() {",
+											"    pm.sendRequest({",
+											"        url: `http://localhost:8082/loyalty-service/account?accountId=${accountId}`,",
+											"        method: 'GET'",
+											"    }, function (err, response) {",
+											"        if (response && response.status === 200) {",
+											"            console.log(\"Account exists, proceeding with update.\");",
+											"            pm.environment.set(\"accountExists\", true);",
+											"        } else {",
+											"            attempt++;",
+											"            console.log(`Attempt ${attempt}: Account not found yet, retrying...`);",
+											"            if (attempt < maxRetries) {",
+											"                setTimeout(checkAccountExists, 100); // Retry after 100ms",
+											"            } else {",
+											"                console.log(\"Account not found after max retries.\");",
+											"                pm.environment.set(\"accountExists\", false);",
+											"            }",
+											"        }",
+											"    });",
+											"}",
+											"",
+											"const accountId = pm.environment.get(\"accountId\");",
+											"const maxRetries = 5;",
+											"let attempt = 0;",
+											"",
+											"checkAccountExists();"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/bank?accountId={{accountId}}",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"bank"
+									],
+									"query": [
+										{
+											"key": "accountId",
+											"value": "{{accountId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FAIL: no matching account id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Response body has required keys\", function () {",
+											"    const responseJson = pm.response.json();",
+											"    ",
+											"    // Validate that the required properties are present in the response",
+											"    pm.expect(responseJson).to.have.property(\"timestamp\");",
+											"    pm.expect(responseJson).to.have.property(\"message\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/loyalty-service/bank?accountId=not-an-account-id",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"loyalty-service",
+										"bank"
+									],
+									"query": [
+										{
+											"key": "accountId",
+											"value": "not-an-account-id"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "Get Accounts",
 					"item": [
 						{
@@ -1919,6 +2167,32 @@
 					"path": [
 						"loyalty-service",
 						"account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Loyalty Bank",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8082/loyalty-service/bank?accountId={{accountId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"loyalty-service",
+						"bank"
+					],
+					"query": [
+						{
+							"key": "accountId",
+							"value": "{{accountId}}"
+						}
 					]
 				}
 			},
