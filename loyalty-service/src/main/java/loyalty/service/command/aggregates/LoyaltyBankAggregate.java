@@ -2,12 +2,12 @@ package loyalty.service.command.aggregates;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import loyalty.service.command.commands.CreateEarnedTransactionCommand;
-import loyalty.service.command.commands.CreateLoyaltyBankCommand;
-import loyalty.service.command.commands.CreatePendingTransactionCommand;
-import loyalty.service.core.events.EarnedTransactionCreatedEvent;
+import loyalty.service.command.commands.*;
+import loyalty.service.core.events.transactions.AuthorizedTransactionCreatedEvent;
+import loyalty.service.core.events.transactions.EarnedTransactionCreatedEvent;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
-import loyalty.service.core.events.PendingTransactionCreatedEvent;
+import loyalty.service.core.events.transactions.PendingTransactionCreatedEvent;
+import loyalty.service.core.events.transactions.CapturedTransactionCreatedEvent;
 import loyalty.service.core.exceptions.IllegalLoyaltyBankStateException;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -15,8 +15,7 @@ import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
-import static loyalty.service.core.constants.DomainConstants.EARNED;
-import static loyalty.service.core.constants.DomainConstants.PENDING;
+import static loyalty.service.core.constants.DomainConstants.*;
 
 @Aggregate
 @NoArgsConstructor
@@ -71,6 +70,37 @@ public class LoyaltyBankAggregate {
         }
 
         EarnedTransactionCreatedEvent event = EarnedTransactionCreatedEvent.builder()
+                .loyaltyBankId(command.getLoyaltyBankId())
+                .points(command.getPoints())
+                .build();
+
+        AggregateLifecycle.apply(event);
+    }
+
+    @CommandHandler
+    public void on(CreateAuthorizedTransactionCommand command) {
+        if (this.authorized + command.getPoints() < 0) {
+            throw new IllegalLoyaltyBankStateException(AUTHORIZED);
+        }
+
+        AuthorizedTransactionCreatedEvent event = AuthorizedTransactionCreatedEvent.builder()
+                .loyaltyBankId(command.getLoyaltyBankId())
+                .points(command.getPoints())
+                .build();
+
+        AggregateLifecycle.apply(event);
+    }
+
+    @CommandHandler
+    public void on(CreateCapturedTransactionCommand command) {
+        if (this.authorized - command.getPoints() < 0) {
+            throw new IllegalLoyaltyBankStateException(AUTHORIZED);
+        }
+        if (this.captured + command.getPoints() < 0) {
+            throw new IllegalLoyaltyBankStateException(CAPTURED);
+        }
+
+        CapturedTransactionCreatedEvent event = CapturedTransactionCreatedEvent.builder()
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .points(command.getPoints())
                 .build();

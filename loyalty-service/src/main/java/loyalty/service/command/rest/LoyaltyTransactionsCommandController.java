@@ -24,28 +24,60 @@ public class LoyaltyTransactionsCommandController {
     @Operation(summary = "Create pending transaction")
     public void createPendingTransaction(
             @Valid @RequestBody CreateLoyaltyTransactionRequestModel request) {
-        CreatePendingTransactionCommand createPendingTransactionCommand = CreatePendingTransactionCommand.builder()
+        CreatePendingTransactionCommand command = CreatePendingTransactionCommand.builder()
                 .loyaltyBankId(request.getLoyaltyBankId())
                 .points(request.getPoints())
                 .build();
 
-        commandGateway.sendAndWait(createPendingTransactionCommand);
+        commandGateway.sendAndWait(command);
 
         // TODO: generate request ids for idempotency
     }
 
-    @PostMapping("/earned")
+    @PostMapping("/earn")
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create earned transaction")
     public void createEarnedTransaction(
             @Valid @RequestBody CreateLoyaltyTransactionRequestModel request) {
-        CreateEarnedTransactionCommand createEarnedTransactionCommand = CreateEarnedTransactionCommand.builder()
+        CreateEarnedTransactionCommand command = CreateEarnedTransactionCommand.builder()
                 .loyaltyBankId(request.getLoyaltyBankId())
                 .points(request.getPoints())
                 .build();
 
-        commandGateway.sendAndWait(createEarnedTransactionCommand);
+        commandGateway.sendAndWait(command);
+
+        // TODO: generate request ids for idempotency
+    }
+
+    @PostMapping("/authorize")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create authorize transaction")
+    public void createAuthorizeTransaction(
+            @Valid @RequestBody CreateLoyaltyTransactionRequestModel request) {
+        CreateAuthorizedTransactionCommand command = CreateAuthorizedTransactionCommand.builder()
+                .loyaltyBankId(request.getLoyaltyBankId())
+                .points(request.getPoints())
+                .build();
+
+        commandGateway.sendAndWait(command);
+
+        // TODO: generate request ids for idempotency
+    }
+
+    @PostMapping("/capture")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create capture transaction")
+    public void createCaptureTransaction(
+            @Valid @RequestBody CreateLoyaltyTransactionRequestModel request) {
+        CreateCapturedTransactionCommand command = CreateCapturedTransactionCommand.builder()
+                .loyaltyBankId(request.getLoyaltyBankId())
+                .points(request.getPoints())
+                .build();
+
+        commandGateway.sendAndWait(command);
 
         // TODO: generate request ids for idempotency
     }
