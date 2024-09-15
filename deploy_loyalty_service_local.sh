@@ -26,6 +26,11 @@ if [ "$RESET" = true ]; then
 fi
 
 if [ "$BUILD" = true ]; then
+    echo "Building discovery-server"
+    cd ./discovery-server
+
+    mvn clean package -Dmaven.test.skip=true
+
     # Check if JAR file exists
     if [ ! -f target/DiscoveryServer-0.0.1-SNAPSHOT.jar ]; then
 	echo "Error: JAR file not found for discovery-server"
