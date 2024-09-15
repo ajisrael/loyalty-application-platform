@@ -14,8 +14,6 @@ services:
     container_name: api-gateway
     ports:
       - "8082:8082"
-    environment:
-      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
     networks:
       - loyalty-network
     depends_on:
@@ -24,10 +22,6 @@ services:
   loyalty-service:
     build: ./loyalty-service
     container_name: loyalty-service
-    environment:
-      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
-      - MONGO_DB_HOST=mongo
-      - POSTGRES_DB_HOST=postgres
     ports:
       - "0:8080"  # This will assign random ports on the host machine for each instance
     networks:
