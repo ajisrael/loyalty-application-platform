@@ -1,0 +1,72 @@
+version: '3.9'
+
+services:
+  eureka-server:
+    build: ./discovery-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - loyalty-network
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8082:8082"
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    networks:
+      - loyalty-network
+    depends_on:
+      - eureka-server
+
+  loyalty-service:
+    build: ./loyalty-service
+    container_name: loyalty-service
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+      - MONGO_DB_HOST=mongo
+      - POSTGRES_DB_HOST=postgres
+    ports:
+      - "0:8080"  # This will assign random ports on the host machine for each instance
+    networks:
+      - loyalty-network
+    depends_on:
+      - eureka-server
+      - loyalty-mongo-db
+      - loyalty-postgres-db
+
+  loyalty-mongo-db:
+    image: mongo
+    container_name: loyalty_mongo_db
+    ports:
+      - "27017:27017"
+    networks:
+      - loyalty-network
+    volumes:
+      - mongodb_data:/data/db
+
+  loyalty-postgres-db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=loyalty
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data-loyalty
+    networks:
+      - loyalty-network
+    deploy:
+      replicas: 1
+
+volumes:
+  mongodb_data:
+  postgres_data:
+
+networks:
+  loyalty-network:
+    driver: bridge
+
