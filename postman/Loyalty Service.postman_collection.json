@@ -2317,6 +2317,28 @@
 		},
 		{
 			"name": "Get Loyalty Bank",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Check if the response contains the 'accountId' property",
+							"if (jsonData.loyaltyBankId) {",
+							"    // Set the 'accountId' in the Postman environment",
+							"    pm.environment.set(\"loyaltyBankId\", jsonData.loyaltyBankId);",
+							"    console.log(\"loyaltyBankId saved to environment: \" + jsonData.loyaltyBankId);",
+							"} else {",
+							"    console.error(\"loyaltyBankId not found in the response body.\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -2356,6 +2378,126 @@
 					"path": [
 						"loyalty-service",
 						"bank"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pending Transaction",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"loyaltyBankId\": \"{{loyaltyBankId}}\",\n    \"points\": 1000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/loyalty-service/transaction/pending",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"loyalty-service",
+						"transaction",
+						"pending"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Earned Transaction",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"loyaltyBankId\": \"{{loyaltyBankId}}\",\n    \"points\": 1000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/loyalty-service/transaction/earn",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"loyalty-service",
+						"transaction",
+						"earn"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authorize Transaction",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"loyaltyBankId\": \"{{loyaltyBankId}}\",\n    \"points\": 100\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/loyalty-service/transaction/authorize",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"loyalty-service",
+						"transaction",
+						"authorize"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Capture Transaction",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"loyaltyBankId\": \"{{loyaltyBankId}}\",\n    \"points\": 100\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/loyalty-service/transaction/capture",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"loyalty-service",
+						"transaction",
+						"capture"
 					]
 				}
 			},
