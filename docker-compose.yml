@@ -5,7 +5,7 @@ services:
     build: ./discovery-server
     container_name: eureka-server
     ports:
-      - "8761:8761"
+      - "8083:8761"
     networks:
       - loyalty-network
 
