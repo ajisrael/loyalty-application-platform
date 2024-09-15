@@ -23,6 +23,8 @@ done
 if [ "$RESET" = true ]; then
     echo "Tearing down containers and volumes..."
     docker compose down --volumes
+else
+    docker compose down
 fi
 
 if [ "$BUILD" = true ]; then
