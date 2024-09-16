@@ -82,6 +82,10 @@ else
 fi
 
 echo "Bringing up containers..."
-docker compose up --build -d
+if [ "$BUILD" = true ] || [ "$BUILD_ALL" = true ]; then
+  docker compose up --build -d
+else
+  docker compose up -d
+fi
 
 echo "Docker containers deployed successfully."
