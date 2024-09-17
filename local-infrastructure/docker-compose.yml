@@ -1,15 +1,15 @@
 version: '3.9'
 
 services:
-  loyalty-mongodb:
+  local-mongodb:
     image: mongo
-    container_name: loyalty_mongo_db
+    container_name: local_mongo_db
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
 
-  loyalty-postgres-db:
+  local-postgres-db:
     image: postgres
     environment:
       - POSTGRES_DB=loyalty
