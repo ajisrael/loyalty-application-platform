@@ -2,11 +2,8 @@ package loyalty.service.query.projections;
 
 import loyalty.service.core.data.entities.LoyaltyBankEntity;
 import loyalty.service.core.data.repositories.LoyaltyBankRepository;
-import loyalty.service.core.events.transactions.AuthorizedTransactionCreatedEvent;
-import loyalty.service.core.events.transactions.CapturedTransactionCreatedEvent;
-import loyalty.service.core.events.transactions.EarnedTransactionCreatedEvent;
+import loyalty.service.core.events.transactions.*;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
-import loyalty.service.core.events.transactions.PendingTransactionCreatedEvent;
 import loyalty.service.core.exceptions.LoyaltyBankNotFoundException;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
@@ -81,6 +78,19 @@ public class LoyaltyBankEventsHandler {
         if (loyaltyBankEntityOptional.isPresent()) {
             LoyaltyBankEntity loyaltyBankEntity = loyaltyBankEntityOptional.get();
             loyaltyBankEntity.setAuthorized(loyaltyBankEntity.getAuthorized() + event.getPoints());
+            loyaltyBankRepository.save(loyaltyBankEntity);
+        } else {
+            throw new LoyaltyBankNotFoundException(event.getLoyaltyBankId());
+        }
+    }
+
+    @EventHandler
+    public void on(VoidTransactionCreatedEvent event) {
+        Optional<LoyaltyBankEntity> loyaltyBankEntityOptional = loyaltyBankRepository.findByLoyaltyBankId(event.getLoyaltyBankId());
+
+        if (loyaltyBankEntityOptional.isPresent()) {
+            LoyaltyBankEntity loyaltyBankEntity = loyaltyBankEntityOptional.get();
+            loyaltyBankEntity.setAuthorized(loyaltyBankEntity.getAuthorized() - event.getPoints());
             loyaltyBankRepository.save(loyaltyBankEntity);
         } else {
             throw new LoyaltyBankNotFoundException(event.getLoyaltyBankId());

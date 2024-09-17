@@ -3,11 +3,9 @@ package loyalty.service.command.aggregates;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import loyalty.service.command.commands.*;
-import loyalty.service.core.events.transactions.AuthorizedTransactionCreatedEvent;
-import loyalty.service.core.events.transactions.EarnedTransactionCreatedEvent;
+import loyalty.service.command.commands.transactions.*;
+import loyalty.service.core.events.transactions.*;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
-import loyalty.service.core.events.transactions.PendingTransactionCreatedEvent;
-import loyalty.service.core.events.transactions.CapturedTransactionCreatedEvent;
 import loyalty.service.core.exceptions.IllegalLoyaltyBankStateException;
 import loyalty.service.core.exceptions.InsufficientPointsException;
 import org.axonframework.commandhandling.CommandHandler;
@@ -96,6 +94,20 @@ public class LoyaltyBankAggregate {
     }
 
     @CommandHandler
+    public void on(CreateVoidTransactionCommand command) {
+        if (this.authorized - command.getPoints() < 0) {
+            throw new IllegalLoyaltyBankStateException(AUTHORIZED);
+        }
+
+        VoidTransactionCreatedEvent event = VoidTransactionCreatedEvent.builder()
+                .loyaltyBankId(command.getLoyaltyBankId())
+                .points(command.getPoints())
+                .build();
+
+        AggregateLifecycle.apply(event);
+    }
+
+    @CommandHandler
     public void on(CreateCapturedTransactionCommand command) {
         if (this.authorized - command.getPoints() < 0) {
             throw new IllegalLoyaltyBankStateException(AUTHORIZED);
@@ -136,6 +148,11 @@ public class LoyaltyBankAggregate {
     @EventSourcingHandler
     public void on(AuthorizedTransactionCreatedEvent event) {
         this.authorized += event.getPoints();
+    }
+
+    @EventSourcingHandler
+    public void on(VoidTransactionCreatedEvent event) {
+        this.authorized -= event.getPoints();
     }
 
     @EventSourcingHandler

@@ -1,4 +1,4 @@
-package loyalty.service.command.commands;
+package loyalty.service.command.commands.transactions;
 
 import lombok.Builder;
 import lombok.Getter;

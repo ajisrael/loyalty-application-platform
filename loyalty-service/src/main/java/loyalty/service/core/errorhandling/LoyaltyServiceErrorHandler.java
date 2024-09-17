@@ -2,6 +2,7 @@ package loyalty.service.core.errorhandling;
 
 import loyalty.service.core.exceptions.*;
 import org.axonframework.eventsourcing.AggregateDeletedException;
+import org.axonframework.modelling.command.AggregateNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -50,6 +51,12 @@ public class LoyaltyServiceErrorHandler {
 
     @ExceptionHandler(value = {AggregateDeletedException.class})
     public ResponseEntity<Object> handleAggregateDeletedException(AggregateDeletedException exception, WebRequest webRequest) {
+        ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = {AggregateNotFoundException.class})
+    public ResponseEntity<Object> handleAggregateNotFoundException(AggregateNotFoundException exception, WebRequest webRequest) {
         ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }

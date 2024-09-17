@@ -1,12 +1,12 @@
 package loyalty.service.command.commands.transactions;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 @Getter
-@Builder
-public class CreateAuthorizedTransactionCommand {
+@SuperBuilder
+public abstract class AbstractTransactionCommand {
 
     @TargetAggregateIdentifier
     private String loyaltyBankId;

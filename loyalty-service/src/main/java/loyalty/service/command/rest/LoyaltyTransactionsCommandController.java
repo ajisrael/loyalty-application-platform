@@ -3,7 +3,7 @@ package loyalty.service.command.rest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import loyalty.service.command.commands.*;
+import loyalty.service.command.commands.transactions.*;
 import loyalty.service.command.rest.requests.CreateLoyaltyTransactionRequestModel;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +57,22 @@ public class LoyaltyTransactionsCommandController {
     public void createAuthorizeTransaction(
             @Valid @RequestBody CreateLoyaltyTransactionRequestModel request) {
         CreateAuthorizedTransactionCommand command = CreateAuthorizedTransactionCommand.builder()
+                .loyaltyBankId(request.getLoyaltyBankId())
+                .points(request.getPoints())
+                .build();
+
+        commandGateway.sendAndWait(command);
+
+        // TODO: generate request ids for idempotency
+    }
+
+    @PostMapping("/void")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create void transaction")
+    public void createVoidTransaction(
+            @Valid @RequestBody CreateLoyaltyTransactionRequestModel request) {
+        CreateVoidTransactionCommand command = CreateVoidTransactionCommand.builder()
                 .loyaltyBankId(request.getLoyaltyBankId())
                 .points(request.getPoints())
                 .build();
