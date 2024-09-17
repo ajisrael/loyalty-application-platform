@@ -77,6 +77,20 @@ public class LoyaltyBankAggregate {
     }
 
     @CommandHandler
+    public void on(CreateAwardedTransactionCommand command) {
+        if (this.earned + command.getPoints() < 0) {
+            throw new IllegalLoyaltyBankStateException(EARNED);
+        }
+
+        AwardedTransactionCreatedEvent event = AwardedTransactionCreatedEvent.builder()
+                .loyaltyBankId(command.getLoyaltyBankId())
+                .points(command.getPoints())
+                .build();
+
+        AggregateLifecycle.apply(event);
+    }
+
+    @CommandHandler
     public void on(CreateAuthorizedTransactionCommand command) {
         if (this.authorized + command.getPoints() < 0) {
             throw new IllegalLoyaltyBankStateException(AUTHORIZED);

@@ -50,6 +50,22 @@ public class LoyaltyTransactionsCommandController {
         // TODO: generate request ids for idempotency
     }
 
+    @PostMapping("/award")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create awarded transaction")
+    public void createAwardedTransaction(
+            @Valid @RequestBody CreateLoyaltyTransactionRequestModel request) {
+        CreateAwardedTransactionCommand command = CreateAwardedTransactionCommand.builder()
+                .loyaltyBankId(request.getLoyaltyBankId())
+                .points(request.getPoints())
+                .build();
+
+        commandGateway.sendAndWait(command);
+
+        // TODO: generate request ids for idempotency
+    }
+
     @PostMapping("/authorize")
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
