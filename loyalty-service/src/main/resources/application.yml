@@ -30,9 +30,9 @@ spring:
     hibernate:
       ddl-auto: update
       show-sql: 'true'
-    datasource:
-      url: jdbc:postgresql://localhost:5432/postgres
-      username: postgres
-      password: postgres
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
   main:
     banner-mode: 'off'
