@@ -17,6 +17,10 @@ import org.springframework.context.ApplicationContext;
 @SpringBootApplication
 public class LoyaltyCommandApiApplication {
 
+	// TODO: update loyalty bank to have a name
+	// TODO: update loyalty bank and account relationship to have multiple banks for an account so long as the name is unique
+	// TODO: handle account deleted command for loyalty banks. Will probably have to create expiration transaction(s)
+
 	public static void main(String[] args) {
 		SpringApplication.run(LoyaltyCommandApiApplication.class, args);
 	}
@@ -41,9 +45,9 @@ public class LoyaltyCommandApiApplication {
 	@Autowired
 	public void configure(EventProcessingConfigurer configurer) {
 		// TODO: Save group strings to constants
-		configurer.registerListenerInvocationErrorHandler("account-group",
+		configurer.registerListenerInvocationErrorHandler("account-lookup-group",
 				configuration -> new LoyaltyServiceEventsErrorHandler());
-		configurer.registerListenerInvocationErrorHandler("loyalty-bank-group",
+		configurer.registerListenerInvocationErrorHandler("loyalty-bank-lookup-group",
 				configuration -> new LoyaltyServiceEventsErrorHandler());
 	}
 }

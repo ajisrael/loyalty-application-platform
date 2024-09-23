@@ -19,9 +19,21 @@ services:
     depends_on:
       - eureka-server
 
-  loyalty-service:
-    build: ./loyalty-service
-    container_name: loyalty-service
+  loyalty-command-api:
+    build: ./loyalty-command-api
+    container_name: loyalty-command-api
+    ports:
+      - "0:8080"  # This will assign random ports on the host machine for each instance
+    networks:
+      - loyalty-network
+    depends_on:
+      - eureka-server
+      - loyalty-mongo-db
+      - loyalty-postgres-db
+
+  loyalty-query-api:
+    build: ./loyalty-query-api
+    container_name: loyalty-query-api
     ports:
       - "0:8080"  # This will assign random ports on the host machine for each instance
     networks:

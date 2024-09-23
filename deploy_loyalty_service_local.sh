@@ -36,14 +36,40 @@ else
 fi
 
 if [ "$BUILD" = true ] || [ "$BUILD_ALL" = true ]; then
-    echo "Building loyalty-service"
-    cd ./loyalty-service || exit 1
+    echo "Building loyalty-service-core"
+    cd ./loyalty-service-core || exit 1
+
+    mvn clean install -Dmaven.test.skip=true
+
+    # Check if JAR file exists in local Maven repository
+    if [ ! -f ~/.m2/repository/loyalty/service/core/loyalty-service-core/0.0.1-SNAPSHOT/loyalty-service-core-0.0.1-SNAPSHOT.jar ]; then
+      echo "Error: JAR file not found for loyalty-service-core"
+      exit 1
+    fi
+
+    cd ..
+
+    echo "Building loyalty-command-api"
+    cd ./loyalty-command-api || exit 1
 
     mvn clean package -Dmaven.test.skip=true
 
     # Check if JAR file exists
-    if [ ! -f target/loyalty-service-0.0.1-SNAPSHOT.jar ]; then
-      echo "Error: JAR file not found for loyalty-service"
+    if [ ! -f target/loyalty-command-api-0.0.1-SNAPSHOT.jar ]; then
+      echo "Error: JAR file not found for loyalty-command-api"
+      exit 1
+    fi
+
+    cd ..
+
+    echo "Building loyalty-query-api"
+    cd ./loyalty-query-api || exit 1
+
+    mvn clean package -Dmaven.test.skip=true
+
+    # Check if JAR file exists
+    if [ ! -f target/loyalty-query-api-0.0.1-SNAPSHOT.jar ]; then
+      echo "Error: JAR file not found for loyalty-query-api"
       exit 1
     fi
 

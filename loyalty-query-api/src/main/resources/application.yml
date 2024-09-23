@@ -1,8 +1,15 @@
 axon:
   axonserver:
     enabled: 'false'
+  eventstore:
+    jdbc:
+      initialize-schema: never # 'always' for Command API, 'never' for Query API
   eventhandling:
     processors:
+      account-group:
+        mode: tracking
+      loyalty-bank-group:
+        mode: tracking
       tracking:
         token-store:
           enabled: 'true'

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-@ProcessingGroup("loyalty-bank-group")
+@ProcessingGroup("loyalty-bank-lookup-group")
 public class LoyaltyBankLookupEventsHandler {
 
     private LoyaltyBankLookupRepository loyaltyBankLookupRepository;

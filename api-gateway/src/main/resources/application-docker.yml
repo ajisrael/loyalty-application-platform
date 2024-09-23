@@ -2,3 +2,5 @@ eureka:
   client:
     service-url:
       defaultZone: http://eureka-server:8761/eureka
+    registry-fetch-interval-seconds: 5
+    heartbeat-interval-seconds: 5

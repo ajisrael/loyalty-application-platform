@@ -3,10 +3,18 @@ axon:
     enabled: 'false'
   eventhandling:
     processors:
+      account-lookup-group:
+        mode: tracking
+      loyalty-bank-lookup-group:
+        mode: tracking
       tracking:
         token-store:
           enabled: 'true'
           storage-token: 'true'
+  eventstore:
+    jdbc:
+      initialize-schema: always # 'always' for Command API, 'never' for Query API
+
 eureka:
   client:
     service-url:
