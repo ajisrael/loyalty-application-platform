@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @AllArgsConstructor
@@ -29,10 +30,13 @@ public class LoyaltyBankQueryHandler {
 
     @QueryHandler
     public List<LoyaltyBankQueryModel> findLoyaltyBanksWithAccountId(FindLoyaltyBanksWithAccountIdQuery query) {
-        List<LoyaltyBankEntity> loyaltyBankEntities = loyaltyBankRepository.findByAccountId(query.getAccountId()).orElseThrow(
-                () -> new NoLoyaltyBanksForAccountFoundException(query.getAccountId()));
+        Optional<List<LoyaltyBankEntity>> loyaltyBankEntitiesOptional = loyaltyBankRepository.findByAccountId(query.getAccountId());
 
-        return loyaltyBankEntities.stream()
+        if (loyaltyBankEntitiesOptional.isEmpty() || loyaltyBankEntitiesOptional.get().isEmpty()) {
+            throw new NoLoyaltyBanksForAccountFoundException(query.getAccountId());
+        }
+
+        return loyaltyBankEntitiesOptional.get().stream()
                 .map(this::convertLoyaltyBankEntityToLoyaltyBankQueryModel)
                 .toList();
     }

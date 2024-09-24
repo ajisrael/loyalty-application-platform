@@ -4,8 +4,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import loyalty.service.command.commands.*;
 import loyalty.service.command.commands.transactions.*;
+import loyalty.service.core.events.LoyaltyBankDeletedEvent;
+import loyalty.service.core.events.AllPointsExpiredEvent;
 import loyalty.service.core.events.transactions.*;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
+import loyalty.service.core.exceptions.FailedToExpireLoyaltyPointsException;
 import loyalty.service.core.exceptions.IllegalLoyaltyBankStateException;
 import loyalty.service.core.exceptions.InsufficientPointsException;
 import org.axonframework.commandhandling.CommandHandler;
@@ -97,7 +100,7 @@ public class LoyaltyBankAggregate {
         if (this.authorized + command.getPoints() < 0) {
             throw new IllegalLoyaltyBankStateException(AUTHORIZED);
         }
-        if (this.earned - this.authorized - this.captured < command.getPoints()) {
+        if (this.getAvailablePoints() < command.getPoints()) {
             throw new InsufficientPointsException();
         }
 
@@ -140,6 +143,31 @@ public class LoyaltyBankAggregate {
         AggregateLifecycle.apply(event);
     }
 
+    @CommandHandler
+    public void on(ExpireAllPointsCommand command) {
+        AllPointsExpiredEvent event = AllPointsExpiredEvent.builder()
+                .loyaltyBankId(command.getLoyaltyBankId())
+                .accountId(this.accountId)
+                .pendingPointsRemoved(this.pending)
+                .authorizedPointsVoided(this.authorized)
+                .availablePointsCaptured(this.getAvailablePoints())
+                .build();
+
+        AggregateLifecycle.apply(event);
+    }
+
+    @CommandHandler
+    public void on(DeleteLoyaltyBankCommand command) {
+        throwExceptionIfLoyaltyBankStillHasAvailablePoints();
+
+        LoyaltyBankDeletedEvent event = LoyaltyBankDeletedEvent.builder()
+                .loyaltyBankId(command.getLoyaltyBankId())
+                .accountId(this.accountId)
+                .build();
+
+        AggregateLifecycle.apply(event);
+    }
+
     @EventSourcingHandler
     public void on(LoyaltyBankCreatedEvent event) {
         this.loyaltyBankId = event.getLoyaltyBankId();
@@ -176,5 +204,30 @@ public class LoyaltyBankAggregate {
     public void on(CapturedTransactionCreatedEvent event) {
         this.authorized -= event.getPoints();
         this.captured += event.getPoints();
+    }
+
+    @EventSourcingHandler
+    public void on(AllPointsExpiredEvent event) {
+        this.pending -= event.getPendingPointsRemoved();
+        this.authorized -= event.getAuthorizedPointsVoided();
+        this.captured += event.getAvailablePointsCaptured();
+
+        // Should never throw
+        throwExceptionIfLoyaltyBankStillHasAvailablePoints();
+    }
+
+    @EventSourcingHandler
+    public void on(LoyaltyBankDeletedEvent event) {
+        AggregateLifecycle.markDeleted();
+    }
+
+    private int getAvailablePoints() {
+        return this.earned - this.authorized - this.captured;
+    }
+
+    private void throwExceptionIfLoyaltyBankStillHasAvailablePoints() {
+        if (this.pending != 0 && this.authorized != 0 && this.earned != this.captured) {
+            throw new FailedToExpireLoyaltyPointsException(this.loyaltyBankId);
+        }
     }
 }

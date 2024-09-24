@@ -1,9 +1,9 @@
 package loyalty.service.core.exceptions;
 
-import static loyalty.service.core.constants.ExceptionMessages.LOYALTY_BANK_WITH_ACCOUNT_ID_DOES_NOT_EXIST;
+import static loyalty.service.core.constants.ExceptionMessages.THERE_ARE_NO_LOYALTY_BANKS_WITH_ACCOUNT_ID;
 
 public class NoLoyaltyBanksForAccountFoundException extends RuntimeException {
     public NoLoyaltyBanksForAccountFoundException(String accountId) {
-        super(String.format(LOYALTY_BANK_WITH_ACCOUNT_ID_DOES_NOT_EXIST, accountId));
+        super(String.format(THERE_ARE_NO_LOYALTY_BANKS_WITH_ACCOUNT_ID, accountId));
     }
 }

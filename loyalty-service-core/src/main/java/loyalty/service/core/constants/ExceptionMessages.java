@@ -26,9 +26,10 @@ public class ExceptionMessages {
     public static final String ACCOUNT_WITH_ID_OR_EMAIL_ALREADY_EXISTS = String.format(ENTITY_WITH_ID_ALREADY_EXISTS, ACCOUNT, "%s");
     public static final String ACCOUNT_WITH_ID_DOES_NOT_EXIST = String.format(ENTITY_WITH_ID_DOES_NOT_EXIST, ACCOUNT, "%s");
     public static final String LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST = String.format(ENTITY_WITH_ID_DOES_NOT_EXIST, LOYALTY_BANK, "%s");
-    public static final String LOYALTY_BANK_WITH_ACCOUNT_ID_DOES_NOT_EXIST = String.format("%s with account id %s does not exist", LOYALTY_BANK, "%s");
+    public static final String THERE_ARE_NO_LOYALTY_BANKS_WITH_ACCOUNT_ID = "There are no loyalty banks with account id %s";
 
     public static final String EMAIL_ALREADY_EXISTS_FOR_AN_ACCOUNT = "Email %s already exists for an account";
     public static final String ACCOUNT_ID_ALREADY_HAS_LOYALTY_BANK = "AccountId %s already has a loyalty bank with %s";
     public static final String LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE = "%s balance cannot be negative";
+    public static final String FAILED_TO_EXPIRE_LOYALTY_POINTS = "Failed to expire points in loyalty bank %s";
 }
