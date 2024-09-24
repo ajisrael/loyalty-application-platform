@@ -1,8 +1,8 @@
 package loyalty.service.command.interceptors;
 
 import loyalty.service.command.commands.CreateLoyaltyBankCommand;
-import loyalty.service.core.data.entities.LoyaltyBankLookupEntity;
-import loyalty.service.core.data.repositories.LoyaltyBankLookupRepository;
+import loyalty.service.command.data.entities.LoyaltyBankLookupEntity;
+import loyalty.service.command.data.repositories.LoyaltyBankLookupRepository;
 import loyalty.service.core.exceptions.AccountExistsWithLoyaltyBankException;
 import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.messaging.MessageDispatchInterceptor;

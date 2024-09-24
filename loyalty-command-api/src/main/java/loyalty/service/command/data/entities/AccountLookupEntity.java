@@ -1,4 +1,4 @@
-package loyalty.service.core.data.entities;
+package loyalty.service.command.data.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

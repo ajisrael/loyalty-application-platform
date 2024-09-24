@@ -1,6 +1,6 @@
-package loyalty.service.core.data.repositories;
+package loyalty.service.command.data.repositories;
 
-import loyalty.service.core.data.entities.AccountLookupEntity;
+import loyalty.service.command.data.entities.AccountLookupEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AccountLookupRepository extends JpaRepository<AccountLookupEntity, String> {

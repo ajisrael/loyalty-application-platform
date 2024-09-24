@@ -1,6 +1,6 @@
-package loyalty.service.core.data.repositories;
+package loyalty.service.command.data.repositories;
 
-import loyalty.service.core.data.entities.LoyaltyBankLookupEntity;
+import loyalty.service.command.data.entities.LoyaltyBankLookupEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LoyaltyBankLookupRepository extends JpaRepository<LoyaltyBankLookupEntity, String> {

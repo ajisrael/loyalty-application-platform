@@ -1,8 +1,8 @@
 package loyalty.service.command.projections;
 
 import lombok.AllArgsConstructor;
-import loyalty.service.core.data.entities.AccountLookupEntity;
-import loyalty.service.core.data.repositories.AccountLookupRepository;
+import loyalty.service.command.data.entities.AccountLookupEntity;
+import loyalty.service.command.data.repositories.AccountLookupRepository;
 import loyalty.service.core.events.AccountCreatedEvent;
 import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.AccountUpdatedEvent;
