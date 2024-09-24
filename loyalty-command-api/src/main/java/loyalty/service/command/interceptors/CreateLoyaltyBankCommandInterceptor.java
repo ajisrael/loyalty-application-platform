@@ -39,11 +39,17 @@ public class CreateLoyaltyBankCommandInterceptor implements MessageDispatchInter
                 createLoyaltyBankCommand.validate();
 
                 String accountId = createLoyaltyBankCommand.getAccountId();
+                String businessName = createLoyaltyBankCommand.getBusinessName();
 
-                LoyaltyBankLookupEntity loyaltyBankLookupEntity = loyaltyBankLookupRepository.findByAccountId(accountId);
+                List<LoyaltyBankLookupEntity> loyaltyBankLookupEntities = loyaltyBankLookupRepository.findByAccountId(accountId);
 
-                if (loyaltyBankLookupEntity != null) {
-                    throw new AccountExistsWithLoyaltyBankException(accountId);
+                // TODO: throw exception if account id does not exist
+
+                boolean businessAlreadyAssignedToAccount = loyaltyBankLookupEntities.stream()
+                        .anyMatch(entity -> entity.getBusinessName().equals(businessName));
+
+                if (businessAlreadyAssignedToAccount) {
+                    throw new AccountExistsWithLoyaltyBankException(accountId, businessName);
                 }
             }
 

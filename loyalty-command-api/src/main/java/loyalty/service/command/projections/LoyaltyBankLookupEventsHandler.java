@@ -20,7 +20,8 @@ public class LoyaltyBankLookupEventsHandler {
         loyaltyBankLookupRepository.save(
                 new LoyaltyBankLookupEntity(
                         event.getLoyaltyBankId(),
-                        event.getAccountId()
+                        event.getAccountId(),
+                        event.getBusinessName()
                 )
         );
     }

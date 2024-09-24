@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class FindLoyaltyBankWithAccountIdQuery {
+public class FindLoyaltyBankQuery {
 
-    private String accountId;
+    private String loyaltyBankId;
 }

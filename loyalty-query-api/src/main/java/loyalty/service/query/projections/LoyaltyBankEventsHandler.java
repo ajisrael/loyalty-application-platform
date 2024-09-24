@@ -39,9 +39,9 @@ public class LoyaltyBankEventsHandler {
 
     @EventHandler
     public void on(LoyaltyBankCreatedEvent event) {
-        LoyaltyBankEntity accountEntity = new LoyaltyBankEntity();
-        BeanUtils.copyProperties(event, accountEntity);
-        loyaltyBankRepository.save(accountEntity);
+        LoyaltyBankEntity loyaltyBankEntity = new LoyaltyBankEntity();
+        BeanUtils.copyProperties(event, loyaltyBankEntity);
+        loyaltyBankRepository.save(loyaltyBankEntity);
     }
 
     @EventHandler

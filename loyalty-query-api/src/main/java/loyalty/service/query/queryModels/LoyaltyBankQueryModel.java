@@ -9,6 +9,7 @@ public class LoyaltyBankQueryModel {
 
     private String loyaltyBankId;
     private String accountId;
+    private String businessName;
     private int pending;
     private int earned;
     private int authorized;

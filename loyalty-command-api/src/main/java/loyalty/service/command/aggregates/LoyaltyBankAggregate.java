@@ -24,6 +24,7 @@ public class LoyaltyBankAggregate {
     @AggregateIdentifier
     private String loyaltyBankId;
     private String accountId;
+    private String businessName;
     private int pending;
     private int earned;
     private int authorized;
@@ -35,6 +36,7 @@ public class LoyaltyBankAggregate {
         LoyaltyBankCreatedEvent event = LoyaltyBankCreatedEvent.builder()
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .accountId(command.getAccountId())
+                .businessName(command.getBusinessName())
                 .pending(0)
                 .earned(0)
                 .authorized(0)
@@ -142,6 +144,7 @@ public class LoyaltyBankAggregate {
     public void on(LoyaltyBankCreatedEvent event) {
         this.loyaltyBankId = event.getLoyaltyBankId();
         this.accountId = event.getAccountId();
+        this.businessName = event.getBusinessName();
         this.pending = event.getPending();
         this.earned = event.getEarned();
         this.authorized = event.getAuthorized();

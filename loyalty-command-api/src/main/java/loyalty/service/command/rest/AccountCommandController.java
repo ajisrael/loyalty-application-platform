@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import loyalty.service.command.commands.CreateAccountCommand;
-import loyalty.service.command.commands.CreateLoyaltyBankCommand;
 import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.command.rest.requests.CreateAccountRequestModel;
@@ -30,7 +29,7 @@ public class AccountCommandController {
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create account")
-    public AccountCreatedResponseModel createAccountAndLoyaltyBank(@Valid @RequestBody CreateAccountRequestModel createAccountRequestModel) {
+    public AccountCreatedResponseModel createAccount(@Valid @RequestBody CreateAccountRequestModel createAccountRequestModel) {
         CreateAccountCommand createAccountCommand = CreateAccountCommand.builder()
                 .accountId(UUID.randomUUID().toString())
                 .firstName(createAccountRequestModel.getFirstName())
@@ -39,13 +38,6 @@ public class AccountCommandController {
                 .build();
 
         String accountId = commandGateway.sendAndWait(createAccountCommand);
-
-        CreateLoyaltyBankCommand createLoyaltyBankCommand = CreateLoyaltyBankCommand.builder()
-                .loyaltyBankId(UUID.randomUUID().toString())
-                .accountId(accountId)
-                .build();
-
-        commandGateway.sendAndWait(createLoyaltyBankCommand);
 
         return AccountCreatedResponseModel.builder().accountId(accountId).build();
     }
