@@ -7,4 +7,7 @@ public class LogMessages {
     }
 
     public static final String INTERCEPTED_COMMAND = "Intercepted command: %s";
+
+    public static final String SENDING_COMMAND_FOR_ENTITY = "Sending command %s for %s %s";
+    public static final String SENDING_COMMAND_FOR_ACCOUNT = String.format(SENDING_COMMAND_FOR_ENTITY, "%s", "account", "%s");
 }

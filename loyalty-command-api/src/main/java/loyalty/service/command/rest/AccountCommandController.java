@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_ACCOUNT;
+
 @RestController
 @RequestMapping("/account")
 @Tag(name = "Loyalty Service Command API")
@@ -37,20 +39,21 @@ public class AccountCommandController {
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create account")
-    public AccountCreatedResponseModel createAccount(@Valid @RequestBody CreateAccountRequestModel createAccountRequestModel) {
-        CreateAccountCommand createAccountCommand = CreateAccountCommand.builder()
+    public AccountCreatedResponseModel createAccount(@Valid @RequestBody CreateAccountRequestModel request) {
+        CreateAccountCommand command = CreateAccountCommand.builder()
                 .requestId(UUID.randomUUID().toString())
                 .accountId(UUID.randomUUID().toString())
-                .firstName(createAccountRequestModel.getFirstName())
-                .lastName(createAccountRequestModel.getLastName())
-                .email(createAccountRequestModel.getEmail())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
                 .build();
 
-        Marker marker = MarkerGenerator.generateMarker(createAccountCommand);
+        LOGGER.info(
+                MarkerGenerator.generateMarker(command),
+                String.format(SENDING_COMMAND_FOR_ACCOUNT, command.getClass().getSimpleName(), command.getAccountId())
+        );
 
-        LOGGER.info(marker, String.format("Sending CreateAccountCommand for account %s", createAccountCommand.getAccountId()));
-
-        String accountId = commandGateway.sendAndWait(createAccountCommand);
+        String accountId = commandGateway.sendAndWait(command);
 
         return AccountCreatedResponseModel.builder().accountId(accountId).build();
     }
@@ -59,26 +62,38 @@ public class AccountCommandController {
     @ResponseBody
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update account")
-    public void updateAccount(@Valid @RequestBody UpdateAccountRequestModel updateAccountRequestModel) {
-        UpdateAccountCommand updateAccountCommand = UpdateAccountCommand.builder()
-                .accountId(updateAccountRequestModel.getAccountId())
-                .firstName(updateAccountRequestModel.getFirstName())
-                .lastName(updateAccountRequestModel.getLastName())
-                .email(updateAccountRequestModel.getEmail())
+    public void updateAccount(@Valid @RequestBody UpdateAccountRequestModel request) {
+        UpdateAccountCommand command = UpdateAccountCommand.builder()
+                .requestId(UUID.randomUUID().toString())
+                .accountId(request.getAccountId())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
                 .build();
 
-        commandGateway.sendAndWait(updateAccountCommand);
+        LOGGER.info(
+                MarkerGenerator.generateMarker(command),
+                String.format(SENDING_COMMAND_FOR_ACCOUNT, command.getClass().getSimpleName(), command.getAccountId())
+        );
+
+        commandGateway.sendAndWait(command);
     }
 
     @DeleteMapping
     @ResponseBody
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete account")
-    public void deleteAccount(@Valid @RequestBody DeleteAccountRequestModel deleteAccountRequestModel) {
-        DeleteAccountCommand deleteAccountCommand = DeleteAccountCommand.builder()
-                .accountId(deleteAccountRequestModel.getAccountId())
+    public void deleteAccount(@Valid @RequestBody DeleteAccountRequestModel request) {
+        DeleteAccountCommand command = DeleteAccountCommand.builder()
+                .requestId(UUID.randomUUID().toString())
+                .accountId(request.getAccountId())
                 .build();
 
-        commandGateway.sendAndWait(deleteAccountCommand);
+        LOGGER.info(
+                MarkerGenerator.generateMarker(command),
+                String.format(SENDING_COMMAND_FOR_ACCOUNT, command.getClass().getSimpleName(), command.getAccountId())
+        );
+
+        commandGateway.sendAndWait(command);
     }
 }

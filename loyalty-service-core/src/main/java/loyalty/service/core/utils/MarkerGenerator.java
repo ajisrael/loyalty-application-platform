@@ -24,7 +24,7 @@ public class MarkerGenerator {
             // Traverse the class hierarchy, starting from the given object's class
             Class<?> currentClass = object.getClass();
 
-            while (currentClass != null) {
+            while (currentClass != null && !currentClass.equals(Object.class)) {
                 // Use JavaBeans Introspector to get property descriptors for the current class
                 for (PropertyDescriptor propertyDescriptor : Introspector.getBeanInfo(currentClass, Object.class).getPropertyDescriptors()) {
                     Method getter = propertyDescriptor.getReadMethod(); // Get the getter method
@@ -42,12 +42,12 @@ public class MarkerGenerator {
                 currentClass = currentClass.getSuperclass(); // Move to the superclass
             }
         } catch (Exception e) {
-                LOGGER.error(
-                        String.format("Failed to generate marker for %s. Reason: %s",
-                                Object.class.getSimpleName(),
-                                e.getLocalizedMessage()
-                        )
-                );
+            LOGGER.error(
+                    String.format("Failed to generate marker for %s. Reason: %s",
+                            object.getClass().getSimpleName(),  // Correct class name
+                            e.getLocalizedMessage()
+                    )
+            );
         }
 
         return marker;
