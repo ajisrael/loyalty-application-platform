@@ -11,6 +11,7 @@ import loyalty.service.command.rest.requests.CreateAccountRequestModel;
 import loyalty.service.command.rest.requests.DeleteAccountRequestModel;
 import loyalty.service.command.rest.requests.UpdateAccountRequestModel;
 import loyalty.service.command.rest.responses.AccountCreatedResponseModel;
+import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.slf4j.Logger;
@@ -45,7 +46,7 @@ public class AccountCommandController {
                 .email(createAccountRequestModel.getEmail())
                 .build();
 
-        Marker marker = Markers.append("requestId", createAccountCommand.getRequestId());
+        Marker marker = MarkerGenerator.generateMarker(createAccountCommand);
 
         LOGGER.info(marker, String.format("Sending CreateAccountCommand for account %s", createAccountCommand.getAccountId()));
 
