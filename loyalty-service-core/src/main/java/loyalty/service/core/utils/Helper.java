@@ -4,6 +4,10 @@ import java.util.List;
 
 public class Helper {
 
+    private Helper() {
+        throw new IllegalStateException("utility class");
+    }
+
     public static boolean isNullOrBlank(String string) {
         return string == null || string.isBlank();
     }
