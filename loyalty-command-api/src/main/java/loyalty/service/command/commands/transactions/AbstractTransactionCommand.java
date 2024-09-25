@@ -7,7 +7,7 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 @Getter
 @SuperBuilder
-public abstract class AbstractTransactionCommand {
+public abstract class AbstractTransactionCommand extends AbstractCommand {
 
     @TargetAggregateIdentifier
     private String loyaltyBankId;

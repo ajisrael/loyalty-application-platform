@@ -10,4 +10,5 @@ public class LogMessages {
 
     public static final String SENDING_COMMAND_FOR_ENTITY = "Sending command %s for %s %s";
     public static final String SENDING_COMMAND_FOR_ACCOUNT = String.format(SENDING_COMMAND_FOR_ENTITY, "%s", "account", "%s");
+    public static final String SENDING_COMMAND_FOR_LOYALTY_BANK = String.format(SENDING_COMMAND_FOR_ENTITY, "%s", "loyalty bank", "%s");
 }
