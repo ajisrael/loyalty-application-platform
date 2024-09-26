@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_ACCOUNT;
 import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_LOYALTY_BANK;
 
 @RestController
@@ -43,7 +44,7 @@ public class LoyaltyBankCommandController {
 
         LOGGER.info(
                 MarkerGenerator.generateMarker(command),
-                String.format(SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId())
+                SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId()
         );
 
         String loyaltyBankId = commandGateway.sendAndWait(command);

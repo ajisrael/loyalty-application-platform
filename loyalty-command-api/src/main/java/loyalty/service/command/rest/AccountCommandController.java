@@ -50,7 +50,7 @@ public class AccountCommandController {
 
         LOGGER.info(
                 MarkerGenerator.generateMarker(command),
-                String.format(SENDING_COMMAND_FOR_ACCOUNT, command.getClass().getSimpleName(), command.getAccountId())
+                SENDING_COMMAND_FOR_ACCOUNT, command.getClass().getSimpleName(), command.getAccountId()
         );
 
         String accountId = commandGateway.sendAndWait(command);
@@ -73,7 +73,7 @@ public class AccountCommandController {
 
         LOGGER.info(
                 MarkerGenerator.generateMarker(command),
-                String.format(SENDING_COMMAND_FOR_ACCOUNT, command.getClass().getSimpleName(), command.getAccountId())
+                SENDING_COMMAND_FOR_ACCOUNT, command.getClass().getSimpleName(), command.getAccountId()
         );
 
         commandGateway.sendAndWait(command);
@@ -91,7 +91,7 @@ public class AccountCommandController {
 
         LOGGER.info(
                 MarkerGenerator.generateMarker(command),
-                String.format(SENDING_COMMAND_FOR_ACCOUNT, command.getClass().getSimpleName(), command.getAccountId())
+                SENDING_COMMAND_FOR_ACCOUNT, command.getClass().getSimpleName(), command.getAccountId()
         );
 
         commandGateway.sendAndWait(command);
