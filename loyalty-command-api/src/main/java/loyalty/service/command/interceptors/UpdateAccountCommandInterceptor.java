@@ -3,23 +3,23 @@ package loyalty.service.command.interceptors;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.command.data.entities.AccountLookupEntity;
 import loyalty.service.command.data.repositories.AccountLookupRepository;
+import loyalty.service.core.exceptions.AccountNotFoundException;
 import loyalty.service.core.exceptions.EmailExistsForAccountException;
 import loyalty.service.core.utils.MarkerGenerator;
+import net.logstash.logback.marker.Markers;
 import org.axonframework.commandhandling.CommandMessage;
-import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.MessageDispatchInterceptor;
-import org.axonframework.queryhandling.QueryGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Marker;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.BiFunction;
 
-import static loyalty.service.core.constants.LogMessages.INTERCEPTED_COMMAND;
-import static loyalty.service.core.constants.ExceptionMessages.ACCOUNT_WITH_ID_DOES_NOT_EXIST;
-import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExist;
+import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
+import static loyalty.service.core.constants.LogMessages.*;
 
 @Component
 public class UpdateAccountCommandInterceptor implements MessageDispatchInterceptor<CommandMessage<?>> {
@@ -32,36 +32,50 @@ public class UpdateAccountCommandInterceptor implements MessageDispatchIntercept
         this.accountLookupRepository = accountLookupRepository;
     }
 
+    @Nonnull
     @Override
     public BiFunction<Integer, CommandMessage<?>, CommandMessage<?>> handle(
-            List<? extends CommandMessage<?>> messages) {
-        return (index, command) -> {
+            @Nonnull List<? extends CommandMessage<?>> messages) {
+        return (index, genericCommand) -> {
 
-            if (UpdateAccountCommand.class.equals(command.getPayloadType())) {
-                LOGGER.info(
-                        MarkerGenerator.generateMarker(command),
-                        String.format(INTERCEPTED_COMMAND, command.getClass().getSimpleName())
-                );
+            if (UpdateAccountCommand.class.equals(genericCommand.getPayloadType())) {
+                UpdateAccountCommand command = (UpdateAccountCommand) genericCommand.getPayload();
 
-                UpdateAccountCommand updateAccountCommand = (UpdateAccountCommand) command.getPayload();
+                String commandName = command.getClass().getSimpleName();
+                LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
 
-                updateAccountCommand.validate();
+                command.validate();
 
-                String accountId = updateAccountCommand.getAccountId();
+                String accountId = command.getAccountId();
                 AccountLookupEntity accountLookupEntity = accountLookupRepository.findByAccountId(accountId);
 
-                throwExceptionIfEntityDoesNotExist(accountLookupEntity,
-                        String.format(ACCOUNT_WITH_ID_DOES_NOT_EXIST, accountId));
+                if (accountLookupEntity == null) {
+                    LOGGER.info(
+                            Markers.append(REQUEST_ID, command.getRequestId()),
+                            ACCOUNT_NOT_FOUND_CANCELLING_COMMAND, accountId, commandName
+                    );
 
-                String email = updateAccountCommand.getEmail();
+                    throw new AccountNotFoundException(accountId);
+                }
+
+                String email = command.getEmail();
                 AccountLookupEntity emailAccountLookupEntity = accountLookupRepository.findByEmail(email);
 
                 if (emailAccountLookupEntity != null && !emailAccountLookupEntity.getAccountId().equals(accountId)) {
+                    Marker marker = MarkerGenerator.generateMarker(emailAccountLookupEntity);
+                    marker.add(Markers.append(REQUEST_ID, command.getRequestId()));
+                    LOGGER.info(
+                            marker,
+                            EMAIL_FOUND_ON_ANOTHER_ACCOUNT_CANCELLING_COMMAND,
+                            emailAccountLookupEntity.getAccountId(),
+                            commandName
+                    );
+
                     throw new EmailExistsForAccountException(email);
                 }
             }
 
-            return command;
+            return genericCommand;
         };
     }
 }

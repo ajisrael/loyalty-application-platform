@@ -12,6 +12,8 @@ public class DomainConstants {
     public static final String AUTHORIZED = "Authorized";
     public static final String CAPTURED = "Captured";
 
+    public static final String REQUEST_ID = "requestId";
+
     public static final String DEFAULT_PAGE = "0";
     public static final String DEFAULT_PAGE_SIZE = "20";
 }
