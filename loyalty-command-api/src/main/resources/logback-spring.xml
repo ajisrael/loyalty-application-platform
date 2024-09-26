@@ -30,4 +30,9 @@
     <root level="info">
         <appender-ref ref="Console"/>
     </root>
+
+    <!-- Suppress warnings from AnnotationTypeMapping -->
+    <logger name="org.springframework.core.annotation.AnnotationTypeMapping" level="ERROR"/>
+    <!-- Suppress axoniq add-->
+    <logger name="org.axonframework.config.AxonIQConsoleModule" level="ERROR"/>
 </configuration>
