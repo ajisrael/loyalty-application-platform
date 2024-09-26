@@ -23,6 +23,6 @@ public class LogHelper {
 
     public static void logEventProcessed(Logger logger, AbstractEvent event) {
         Marker marker = MarkerGenerator.generateMarker(event);
-        logger.info(marker, "{} processed", event.getClass().getSimpleName());
+        logger.debug(marker, "{} processed", event.getClass().getSimpleName());
     }
 }
