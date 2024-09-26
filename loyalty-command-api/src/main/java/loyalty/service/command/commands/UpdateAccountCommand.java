@@ -20,7 +20,9 @@ public class UpdateAccountCommand extends AbstractCommand {
     // TODO: figure out contract id datastructure
     // private String contractId;
 
+    @Override
     public void validate() {
+        super.validate();
         throwExceptionIfParameterIsNullOrBlank(this.getAccountId(), ACCOUNT_ID_CANNOT_BE_EMPTY);
         throwExceptionIfParameterIsNullOrBlank(this.getFirstName(), FIRST_NAME_CANNOT_BE_EMPTY);
         throwExceptionIfParameterIsNullOrBlank(this.getLastName(), LAST_NAME_CANNOT_BE_EMPTY);

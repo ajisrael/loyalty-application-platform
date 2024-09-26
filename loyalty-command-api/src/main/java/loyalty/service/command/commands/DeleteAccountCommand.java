@@ -14,7 +14,9 @@ public class DeleteAccountCommand extends AbstractCommand {
     @TargetAggregateIdentifier
     private String accountId;
 
+    @Override
     public void validate() {
+        super.validate();
         throwExceptionIfParameterIsNullOrBlank(this.getAccountId(), ACCOUNT_ID_CANNOT_BE_EMPTY);
     }
 }

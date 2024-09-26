@@ -20,6 +20,8 @@ public class ExceptionMessages {
     public static final String EMAIL_CANNOT_BE_EMPTY = String.format(PARAMETER_CANNOT_BE_EMPTY, "email");
     public static final String LOYALTY_BANK_ID_CANNOT_BE_EMPTY = String.format(PARAMETER_CANNOT_BE_EMPTY, "loyaltyBankId");
     public static final String BUSINESS_NAME_CANNOT_BE_EMPTY = String.format(PARAMETER_CANNOT_BE_EMPTY, "businessName");
+    public static final String REQUEST_ID_CANNOT_BE_EMPTY = String.format(PARAMETER_CANNOT_BE_EMPTY, "requestId");
+    public static final String POINTS_CANNOT_BE_LTE_ZERO = "points cannot be less than or equal to zero";
 
 
     public static final String ACCOUNT_WITH_ID_ALREADY_EXISTS = String.format(ENTITY_WITH_ID_ALREADY_EXISTS, ACCOUNT, "%s");

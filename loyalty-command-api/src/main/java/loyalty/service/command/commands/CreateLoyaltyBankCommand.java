@@ -16,7 +16,10 @@ public class CreateLoyaltyBankCommand extends AbstractCommand {
     private String accountId;
     private String businessName;
 
+
+    @Override
     public void validate() {
+        super.validate();
         throwExceptionIfParameterIsNullOrBlank(this.getLoyaltyBankId(), LOYALTY_BANK_ID_CANNOT_BE_EMPTY);
         throwExceptionIfParameterIsNullOrBlank(this.getAccountId(), ACCOUNT_ID_CANNOT_BE_EMPTY);
         throwExceptionIfParameterIsNullOrBlank(this.getBusinessName(), BUSINESS_NAME_CANNOT_BE_EMPTY);

@@ -31,6 +31,12 @@ public class Helper {
         }
     }
 
+    public static void throwExceptionIfParameterIsNegativeOrZero(Integer integer, String message) {
+        if (integer <= 0) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
     public static void throwExceptionIfParameterIsNegative(Double doubleValue, String message) {
         if (doubleValue < 0.0) {
             throw new IllegalArgumentException(message);

@@ -1,11 +1,11 @@
 package loyalty.service.core.events;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
-public class AccountDeletedEvent {
+@SuperBuilder
+public class AccountDeletedEvent extends AbstractEvent {
 
     private String accountId;
 }

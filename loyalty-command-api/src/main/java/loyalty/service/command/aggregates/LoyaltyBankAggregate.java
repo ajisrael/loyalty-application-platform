@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import loyalty.service.command.commands.*;
 import loyalty.service.command.commands.transactions.*;
+import loyalty.service.command.utils.LogHelper;
 import loyalty.service.core.events.LoyaltyBankDeletedEvent;
 import loyalty.service.core.events.AllPointsExpiredEvent;
 import loyalty.service.core.events.transactions.*;
@@ -16,6 +17,8 @@ import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static loyalty.service.core.constants.DomainConstants.*;
 
@@ -23,6 +26,8 @@ import static loyalty.service.core.constants.DomainConstants.*;
 @NoArgsConstructor
 @Getter
 public class LoyaltyBankAggregate {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(LoyaltyBankAggregate.class);
 
     @AggregateIdentifier
     private String loyaltyBankId;
@@ -37,6 +42,7 @@ public class LoyaltyBankAggregate {
     @CommandHandler
     public LoyaltyBankAggregate(CreateLoyaltyBankCommand command) {
         LoyaltyBankCreatedEvent event = LoyaltyBankCreatedEvent.builder()
+                .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .accountId(command.getAccountId())
                 .businessName(command.getBusinessName())
@@ -45,6 +51,8 @@ public class LoyaltyBankAggregate {
                 .authorized(0)
                 .captured(0)
                 .build();
+
+        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
 
         AggregateLifecycle.apply(event);
     }
@@ -56,9 +64,12 @@ public class LoyaltyBankAggregate {
         }
 
         PendingTransactionCreatedEvent event = PendingTransactionCreatedEvent.builder()
+                .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .points(command.getPoints())
                 .build();
+
+        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
 
         AggregateLifecycle.apply(event);
     }
@@ -74,9 +85,12 @@ public class LoyaltyBankAggregate {
         }
 
         EarnedTransactionCreatedEvent event = EarnedTransactionCreatedEvent.builder()
+                .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .points(command.getPoints())
                 .build();
+
+        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
 
         AggregateLifecycle.apply(event);
     }
@@ -88,9 +102,12 @@ public class LoyaltyBankAggregate {
         }
 
         AwardedTransactionCreatedEvent event = AwardedTransactionCreatedEvent.builder()
+                .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .points(command.getPoints())
                 .build();
+
+        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
 
         AggregateLifecycle.apply(event);
     }
@@ -105,9 +122,12 @@ public class LoyaltyBankAggregate {
         }
 
         AuthorizedTransactionCreatedEvent event = AuthorizedTransactionCreatedEvent.builder()
+                .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .points(command.getPoints())
                 .build();
+
+        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
 
         AggregateLifecycle.apply(event);
     }
@@ -119,9 +139,12 @@ public class LoyaltyBankAggregate {
         }
 
         VoidTransactionCreatedEvent event = VoidTransactionCreatedEvent.builder()
+                .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .points(command.getPoints())
                 .build();
+
+        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
 
         AggregateLifecycle.apply(event);
     }
@@ -136,9 +159,12 @@ public class LoyaltyBankAggregate {
         }
 
         CapturedTransactionCreatedEvent event = CapturedTransactionCreatedEvent.builder()
+                .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .points(command.getPoints())
                 .build();
+
+        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
 
         AggregateLifecycle.apply(event);
     }
@@ -146,12 +172,15 @@ public class LoyaltyBankAggregate {
     @CommandHandler
     public void on(ExpireAllPointsCommand command) {
         AllPointsExpiredEvent event = AllPointsExpiredEvent.builder()
+                .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .accountId(this.accountId)
                 .pendingPointsRemoved(this.pending)
                 .authorizedPointsVoided(this.authorized)
                 .availablePointsCaptured(this.getAvailablePoints())
                 .build();
+
+        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
 
         AggregateLifecycle.apply(event);
     }
@@ -161,9 +190,12 @@ public class LoyaltyBankAggregate {
         throwExceptionIfLoyaltyBankStillHasAvailablePoints();
 
         LoyaltyBankDeletedEvent event = LoyaltyBankDeletedEvent.builder()
+                .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .accountId(this.accountId)
                 .build();
+
+        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
 
         AggregateLifecycle.apply(event);
     }
@@ -177,33 +209,45 @@ public class LoyaltyBankAggregate {
         this.earned = event.getEarned();
         this.authorized = event.getAuthorized();
         this.captured = event.getCaptured();
+
+        LogHelper.logEventProcessed(LOGGER, event);
     }
 
     @EventSourcingHandler
     public void on(PendingTransactionCreatedEvent event) {
         this.pending += event.getPoints();
+
+        LogHelper.logEventProcessed(LOGGER, event);
     }
 
     @EventSourcingHandler
     public void on(EarnedTransactionCreatedEvent event) {
         this.pending -= event.getPoints();
         this.earned += event.getPoints();
+
+        LogHelper.logEventProcessed(LOGGER, event);
     }
 
     @EventSourcingHandler
     public void on(AuthorizedTransactionCreatedEvent event) {
         this.authorized += event.getPoints();
+
+        LogHelper.logEventProcessed(LOGGER, event);
     }
 
     @EventSourcingHandler
     public void on(VoidTransactionCreatedEvent event) {
         this.authorized -= event.getPoints();
+
+        LogHelper.logEventProcessed(LOGGER, event);
     }
 
     @EventSourcingHandler
     public void on(CapturedTransactionCreatedEvent event) {
         this.authorized -= event.getPoints();
         this.captured += event.getPoints();
+
+        LogHelper.logEventProcessed(LOGGER, event);
     }
 
     @EventSourcingHandler
@@ -214,11 +258,15 @@ public class LoyaltyBankAggregate {
 
         // Should never throw
         throwExceptionIfLoyaltyBankStillHasAvailablePoints();
+
+        LogHelper.logEventProcessed(LOGGER, event);
     }
 
     @EventSourcingHandler
     public void on(LoyaltyBankDeletedEvent event) {
         AggregateLifecycle.markDeleted();
+
+        LogHelper.logEventProcessed(LOGGER, event);
     }
 
     private int getAvailablePoints() {

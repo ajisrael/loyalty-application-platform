@@ -1,11 +1,12 @@
 package loyalty.service.core.events;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
-public class AllPointsExpiredEvent {
+@SuperBuilder
+public class AllPointsExpiredEvent extends AbstractEvent {
+
     private String loyaltyBankId;
     private String accountId;
     private int pendingPointsRemoved;
