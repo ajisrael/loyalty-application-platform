@@ -6,4 +6,5 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 public class CapturedTransactionCreatedEvent extends AbstractTransactionEvent {
+    private String paymentId;
 }

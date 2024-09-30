@@ -123,6 +123,7 @@ public class LoyaltyBankAggregate {
 
         AuthorizedTransactionCreatedEvent event = AuthorizedTransactionCreatedEvent.builder()
                 .requestId(command.getRequestId())
+                .paymentId(command.getPaymentId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .points(command.getPoints())
                 .build();
@@ -140,6 +141,7 @@ public class LoyaltyBankAggregate {
 
         VoidTransactionCreatedEvent event = VoidTransactionCreatedEvent.builder()
                 .requestId(command.getRequestId())
+                .paymentId(command.getPaymentId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .points(command.getPoints())
                 .build();
@@ -160,6 +162,7 @@ public class LoyaltyBankAggregate {
 
         CapturedTransactionCreatedEvent event = CapturedTransactionCreatedEvent.builder()
                 .requestId(command.getRequestId())
+                .paymentId(command.getPaymentId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .points(command.getPoints())
                 .build();
@@ -224,6 +227,13 @@ public class LoyaltyBankAggregate {
     public void on(EarnedTransactionCreatedEvent event) {
         this.pending -= event.getPoints();
         this.earned += event.getPoints();
+
+        LogHelper.logEventProcessed(LOGGER, event);
+    }
+
+    @EventSourcingHandler
+    public void on(AwardedTransactionCreatedEvent event) {
+        this.earned = event.getPoints();
 
         LogHelper.logEventProcessed(LOGGER, event);
     }

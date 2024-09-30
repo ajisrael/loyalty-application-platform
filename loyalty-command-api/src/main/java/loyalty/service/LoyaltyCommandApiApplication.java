@@ -48,5 +48,7 @@ public class LoyaltyCommandApiApplication {
 				configuration -> new LoyaltyServiceEventsErrorHandler());
 		configurer.registerListenerInvocationErrorHandler("loyalty-bank-lookup-group",
 				configuration -> new LoyaltyServiceEventsErrorHandler());
+		configurer.registerListenerInvocationErrorHandler("redemption-tracker-group",
+				configuration -> new LoyaltyServiceEventsErrorHandler());
 	}
 }

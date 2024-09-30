@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import loyalty.service.command.commands.transactions.*;
+import loyalty.service.command.rest.requests.CreateLoyaltyRedemptionTransactionRequestModel;
 import loyalty.service.command.rest.requests.CreateLoyaltyTransactionRequestModel;
+import loyalty.service.command.rest.responses.RedemptionTransactionCreatedResponseModel;
 import loyalty.service.command.rest.responses.TransactionCreatedResponseModel;
 import loyalty.service.core.utils.MarkerGenerator;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -44,7 +46,7 @@ public class LoyaltyTransactionsCommandController {
 
         LOGGER.info(
                 MarkerGenerator.generateMarker(command),
-                String.format(SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId())
+                SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId()
         );
 
         commandGateway.sendAndWait(command);
@@ -68,7 +70,7 @@ public class LoyaltyTransactionsCommandController {
 
         LOGGER.info(
                 MarkerGenerator.generateMarker(command),
-                String.format(SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId())
+                SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId()
         );
 
         commandGateway.sendAndWait(command);
@@ -92,7 +94,7 @@ public class LoyaltyTransactionsCommandController {
 
         LOGGER.info(
                 MarkerGenerator.generateMarker(command),
-                String.format(SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId())
+                SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId()
         );
 
         commandGateway.sendAndWait(command);
@@ -104,43 +106,46 @@ public class LoyaltyTransactionsCommandController {
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create authorize transaction")
-    public TransactionCreatedResponseModel createAuthorizeTransaction(
+    public RedemptionTransactionCreatedResponseModel createAuthorizeTransaction(
             @Valid @RequestBody CreateLoyaltyTransactionRequestModel request) {
         String requestId = UUID.randomUUID().toString();
+        String paymentId = UUID.randomUUID().toString();
 
         CreateAuthorizedTransactionCommand command = CreateAuthorizedTransactionCommand.builder()
                 .requestId(requestId)
+                .paymentId(paymentId)
                 .loyaltyBankId(request.getLoyaltyBankId())
                 .points(request.getPoints())
                 .build();
 
         LOGGER.info(
                 MarkerGenerator.generateMarker(command),
-                String.format(SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId())
+                SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId()
         );
 
         commandGateway.sendAndWait(command);
 
-        return TransactionCreatedResponseModel.builder().requestId(requestId).build();
+        return RedemptionTransactionCreatedResponseModel.builder().requestId(requestId).paymentId(paymentId).build();
     }
 
-    @PostMapping("/TransactionCreatedResponseModel")
+    @PostMapping("/void")
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Create TransactionCreatedResponseModel transaction")
+    @Operation(summary = "Create void transaction")
     public TransactionCreatedResponseModel createVoidTransaction(
-            @Valid @RequestBody CreateLoyaltyTransactionRequestModel request) {
+            @Valid @RequestBody CreateLoyaltyRedemptionTransactionRequestModel request) {
         String requestId = UUID.randomUUID().toString();
 
         CreateVoidTransactionCommand command = CreateVoidTransactionCommand.builder()
                 .requestId(requestId)
+                .paymentId(request.getPaymentId())
                 .loyaltyBankId(request.getLoyaltyBankId())
                 .points(request.getPoints())
                 .build();
 
         LOGGER.info(
                 MarkerGenerator.generateMarker(command),
-                String.format(SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId())
+                SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId()
         );
 
         commandGateway.sendAndWait(command);
@@ -153,18 +158,19 @@ public class LoyaltyTransactionsCommandController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create capture transaction")
     public TransactionCreatedResponseModel createCaptureTransaction(
-            @Valid @RequestBody CreateLoyaltyTransactionRequestModel request) {
+            @Valid @RequestBody CreateLoyaltyRedemptionTransactionRequestModel request) {
         String requestId = UUID.randomUUID().toString();
 
         CreateCapturedTransactionCommand command = CreateCapturedTransactionCommand.builder()
                 .requestId(requestId)
+                .paymentId(request.getPaymentId())
                 .loyaltyBankId(request.getLoyaltyBankId())
                 .points(request.getPoints())
                 .build();
 
         LOGGER.info(
                 MarkerGenerator.generateMarker(command),
-                String.format(SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId())
+                SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId()
         );
 
         commandGateway.sendAndWait(command);

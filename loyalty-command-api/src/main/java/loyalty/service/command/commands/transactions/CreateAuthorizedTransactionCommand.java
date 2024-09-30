@@ -6,4 +6,5 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 public class CreateAuthorizedTransactionCommand extends AbstractTransactionCommand  {
+    private String paymentId;
 }
