@@ -8,7 +8,7 @@ import java.util.Date;
 @Getter
 @AllArgsConstructor
 public class ErrorMessage {
-
+    // TODO: add parameter for requestid
     private final Date timestamp;
     private final String message;
 }

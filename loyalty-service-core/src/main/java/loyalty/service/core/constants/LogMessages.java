@@ -12,6 +12,7 @@ public class LogMessages {
     public static final String SENDING_COMMAND_FOR_LOYALTY_BANK = String.format(SENDING_COMMAND_FOR_ENTITY, "{}", "loyalty bank", "{}");
     public static final String EMAIL_FOUND_ON_ANOTHER_ACCOUNT_CANCELLING_COMMAND = "Existing email found on account {}. cancelling command {}";
     public static final String ACCOUNT_NOT_FOUND_CANCELLING_COMMAND = "Account {} does not exist, cancelling command {}";
+    public static final String PAYMENT_ID_NOT_FOUND_CANCELLING_COMMAND = "Payment id {} does not exist, cancelling command {}";
     public static final String ACCOUNT_ALREADY_ENROLLED_IN_BUSINESS_CANCELLING_COMMAND = "Account {} already enrolled in business {}, cancelling command {}";
     public static final String VALIDATING_COMMAND = "Validating command {}";
 

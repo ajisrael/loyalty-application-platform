@@ -7,6 +7,7 @@ public class DomainConstants {
     }
     public static final String ACCOUNT = "Account";
     public static final String LOYALTY_BANK = "Loyalty Bank";
+    public static final String PAYMENT_ID = "Payment id";
     public static final String PENDING = "Pending";
     public static final String EARNED = "Earned";
     public static final String AUTHORIZED = "Authorized";

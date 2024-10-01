@@ -49,6 +49,12 @@ public class LoyaltyServiceErrorHandler {
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(value = {PaymentIdNotFoundException.class})
+    public ResponseEntity<Object> handleLoyaltyBankWithAccountIdNotFoundException(PaymentIdNotFoundException exception, WebRequest webRequest) {
+        ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(value = {AggregateDeletedException.class})
     public ResponseEntity<Object> handleAggregateDeletedException(AggregateDeletedException exception, WebRequest webRequest) {
         ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
@@ -100,6 +106,12 @@ public class LoyaltyServiceErrorHandler {
 
     @ExceptionHandler(value = {InsufficientPointsException.class})
     public ResponseEntity<Object> handleInsufficientPointsException(InsufficientPointsException exception, WebRequest webRequest) {
+        ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(value = {ExcessiveVoidPointsException.class})
+    public ResponseEntity<Object> handleExcessiveVoidPointsException(ExcessiveVoidPointsException exception, WebRequest webRequest) {
         ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
