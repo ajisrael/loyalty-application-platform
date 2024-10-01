@@ -42,6 +42,9 @@ public class LoyaltyCommandApiApplication {
 		commandBus.registerDispatchInterceptor(
 				context.getBean(CreateVoidTransactionCommandInterceptor.class)
 		);
+		commandBus.registerDispatchInterceptor(
+				context.getBean(CreateCaptureTransactionCommandInterceptor.class)
+		);
 	}
 
 	@Autowired

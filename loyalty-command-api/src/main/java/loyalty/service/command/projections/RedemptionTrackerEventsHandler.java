@@ -24,6 +24,8 @@ public class RedemptionTrackerEventsHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RedemptionTrackerEventsHandler.class);
 
+    // TODO: add error handlers like in query projections
+
     @EventHandler
     public void on(AuthorizedTransactionCreatedEvent event) {
         RedemptionTrackerEntity redemptionTracker = new RedemptionTrackerEntity(
