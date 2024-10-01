@@ -1,5 +1,6 @@
 package loyalty.service.command.interceptors;
 
+import lombok.RequiredArgsConstructor;
 import loyalty.service.command.commands.CreateLoyaltyBankCommand;
 import loyalty.service.command.data.entities.AccountLookupEntity;
 import loyalty.service.command.data.entities.LoyaltyBankLookupEntity;
@@ -23,18 +24,13 @@ import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.LogMessages.*;
 
 @Component
+@RequiredArgsConstructor
 public class CreateLoyaltyBankCommandInterceptor implements MessageDispatchInterceptor<CommandMessage<?>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateLoyaltyBankCommandInterceptor.class);
 
     private final AccountLookupRepository accountLookupRepository;
     private final LoyaltyBankLookupRepository loyaltyBankLookupRepository;
-
-    public CreateLoyaltyBankCommandInterceptor(
-            AccountLookupRepository accountLookupRepository, LoyaltyBankLookupRepository loyaltyBankLookupRepository) {
-        this.accountLookupRepository = accountLookupRepository;
-        this.loyaltyBankLookupRepository = loyaltyBankLookupRepository;
-    }
 
     @Nonnull
     @Override
@@ -47,8 +43,6 @@ public class CreateLoyaltyBankCommandInterceptor implements MessageDispatchInter
 
                 String commandName = command.getClass().getSimpleName();
                 LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
-
-                command.validate();
 
                 String accountId = command.getAccountId();
                 AccountLookupEntity accountLookupEntity = accountLookupRepository.findByAccountId(accountId);

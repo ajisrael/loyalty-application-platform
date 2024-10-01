@@ -1,5 +1,6 @@
 package loyalty.service.command.interceptors;
 
+import lombok.RequiredArgsConstructor;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.command.data.entities.AccountLookupEntity;
 import loyalty.service.command.data.repositories.AccountLookupRepository;
@@ -22,15 +23,12 @@ import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.LogMessages.*;
 
 @Component
+@RequiredArgsConstructor
 public class UpdateAccountCommandInterceptor implements MessageDispatchInterceptor<CommandMessage<?>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAccountCommandInterceptor.class);
 
     private final AccountLookupRepository accountLookupRepository;
-
-    public UpdateAccountCommandInterceptor(AccountLookupRepository accountLookupRepository) {
-        this.accountLookupRepository = accountLookupRepository;
-    }
 
     @Nonnull
     @Override
@@ -43,8 +41,6 @@ public class UpdateAccountCommandInterceptor implements MessageDispatchIntercept
 
                 String commandName = command.getClass().getSimpleName();
                 LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
-
-                command.validate();
 
                 String accountId = command.getAccountId();
                 AccountLookupEntity accountLookupEntity = accountLookupRepository.findByAccountId(accountId);

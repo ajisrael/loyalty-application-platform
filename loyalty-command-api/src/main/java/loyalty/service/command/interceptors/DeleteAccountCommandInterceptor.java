@@ -1,5 +1,6 @@
 package loyalty.service.command.interceptors;
 
+import lombok.RequiredArgsConstructor;
 import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.data.entities.AccountLookupEntity;
 import loyalty.service.command.data.repositories.AccountLookupRepository;
@@ -21,15 +22,12 @@ import static loyalty.service.core.constants.LogMessages.ACCOUNT_NOT_FOUND_CANCE
 import static loyalty.service.core.constants.LogMessages.INTERCEPTED_COMMAND;
 
 @Component
+@RequiredArgsConstructor
 public class DeleteAccountCommandInterceptor implements MessageDispatchInterceptor<CommandMessage<?>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeleteAccountCommandInterceptor.class);
 
     private final AccountLookupRepository accountLookupRepository;
-
-    public DeleteAccountCommandInterceptor(AccountLookupRepository accountLookupRepository) {
-        this.accountLookupRepository = accountLookupRepository;
-    }
 
     @Nonnull
     @Override
@@ -42,8 +40,6 @@ public class DeleteAccountCommandInterceptor implements MessageDispatchIntercept
 
                 String commandName = command.getClass().getSimpleName();
                 LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
-
-                command.validate();
 
                 String accountId = command.getAccountId();
                 AccountLookupEntity accountLookupEntity = accountLookupRepository.findByAccountId(accountId);

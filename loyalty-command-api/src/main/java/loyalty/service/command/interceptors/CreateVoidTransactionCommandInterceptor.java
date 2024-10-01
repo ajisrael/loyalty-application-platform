@@ -1,5 +1,6 @@
 package loyalty.service.command.interceptors;
 
+import lombok.RequiredArgsConstructor;
 import loyalty.service.command.commands.transactions.CreateVoidTransactionCommand;
 import loyalty.service.command.data.entities.RedemptionTrackerEntity;
 import loyalty.service.command.data.repositories.RedemptionTrackerRepository;
@@ -22,15 +23,12 @@ import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.LogMessages.*;
 
 @Component
+@RequiredArgsConstructor
 public class CreateVoidTransactionCommandInterceptor implements MessageDispatchInterceptor<CommandMessage<?>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateVoidTransactionCommandInterceptor.class);
 
     private final RedemptionTrackerRepository redemptionTrackerRepository;
-
-    public CreateVoidTransactionCommandInterceptor(RedemptionTrackerRepository redemptionTrackerRepository) {
-        this.redemptionTrackerRepository = redemptionTrackerRepository;
-    }
 
     @Nonnull
     @Override
@@ -43,8 +41,6 @@ public class CreateVoidTransactionCommandInterceptor implements MessageDispatchI
 
                 String commandName = command.getClass().getSimpleName();
                 LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
-
-                command.validate();
 
                 String paymentId = command.getPaymentId();
                 RedemptionTrackerEntity redemptionTrackerEntity = redemptionTrackerRepository.findByPaymentId(paymentId);

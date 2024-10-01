@@ -1,5 +1,6 @@
 package loyalty.service.command.interceptors;
 
+import lombok.RequiredArgsConstructor;
 import loyalty.service.command.commands.CreateAccountCommand;
 import loyalty.service.command.data.entities.AccountLookupEntity;
 import loyalty.service.command.data.repositories.AccountLookupRepository;
@@ -22,16 +23,12 @@ import static loyalty.service.core.constants.LogMessages.EMAIL_FOUND_ON_ANOTHER_
 import static loyalty.service.core.constants.LogMessages.INTERCEPTED_COMMAND;
 
 @Component
+@RequiredArgsConstructor
 public class CreateAccountCommandInterceptor implements MessageDispatchInterceptor<CommandMessage<?>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateAccountCommandInterceptor.class);
 
-    // TODO: autowire
     private final AccountLookupRepository accountLookupRepository;
-
-    public CreateAccountCommandInterceptor(AccountLookupRepository accountLookupRepository) {
-        this.accountLookupRepository = accountLookupRepository;
-    }
 
     @Nonnull
     @Override
@@ -44,8 +41,6 @@ public class CreateAccountCommandInterceptor implements MessageDispatchIntercept
 
                 String commandName = command.getClass().getSimpleName();
                 LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
-
-                command.validate();
 
                 String email = command.getEmail();
                 AccountLookupEntity accountLookupEntity = accountLookupRepository.findByEmail(email);

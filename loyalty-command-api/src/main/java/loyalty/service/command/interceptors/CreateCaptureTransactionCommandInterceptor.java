@@ -1,5 +1,6 @@
 package loyalty.service.command.interceptors;
 
+import lombok.RequiredArgsConstructor;
 import loyalty.service.command.commands.transactions.CreateCapturedTransactionCommand;
 import loyalty.service.command.data.entities.RedemptionTrackerEntity;
 import loyalty.service.command.data.repositories.RedemptionTrackerRepository;
@@ -23,15 +24,12 @@ import static loyalty.service.core.constants.LogMessages.INTERCEPTED_COMMAND;
 import static loyalty.service.core.constants.LogMessages.PAYMENT_ID_NOT_FOUND_CANCELLING_COMMAND;
 
 @Component
+@RequiredArgsConstructor
 public class CreateCaptureTransactionCommandInterceptor implements MessageDispatchInterceptor<CommandMessage<?>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateCaptureTransactionCommandInterceptor.class);
 
     private final RedemptionTrackerRepository redemptionTrackerRepository;
-
-    public CreateCaptureTransactionCommandInterceptor(RedemptionTrackerRepository redemptionTrackerRepository) {
-        this.redemptionTrackerRepository = redemptionTrackerRepository;
-    }
 
     @Nonnull
     @Override
