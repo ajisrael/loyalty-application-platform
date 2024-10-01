@@ -8,6 +8,7 @@ import loyalty.service.core.events.LoyaltyBankDeletedEvent;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
+import org.axonframework.messaging.interceptors.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,16 @@ public class LoyaltyBankLookupEventsHandler {
     private LoyaltyBankLookupRepository loyaltyBankLookupRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoyaltyBankLookupEventsHandler.class);
+
+    @ExceptionHandler(resultType = Exception.class)
+    public void handle(Exception exception) throws Exception {
+        throw exception;
+    }
+
+    @ExceptionHandler(resultType = IllegalArgumentException.class)
+    public void handle(IllegalArgumentException exception) {
+        LOGGER.error(exception.getLocalizedMessage());
+    }
 
     @EventHandler
     public void on(LoyaltyBankCreatedEvent event) {
