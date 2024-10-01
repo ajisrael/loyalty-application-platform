@@ -3,16 +3,22 @@ package loyalty.service.command.projections;
 import lombok.AllArgsConstructor;
 import loyalty.service.command.data.entities.RedemptionTrackerEntity;
 import loyalty.service.command.data.repositories.RedemptionTrackerRepository;
+import loyalty.service.core.events.LoyaltyBankDeletedEvent;
 import loyalty.service.core.events.transactions.AuthorizedTransactionCreatedEvent;
 import loyalty.service.core.events.transactions.CapturedTransactionCreatedEvent;
 import loyalty.service.core.events.transactions.VoidTransactionCreatedEvent;
 import loyalty.service.core.utils.MarkerGenerator;
+import net.logstash.logback.marker.Markers;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 
 
 @Component
@@ -37,7 +43,10 @@ public class RedemptionTrackerEventsHandler {
 
         redemptionTrackerRepository.save(redemptionTracker);
 
-        LOGGER.info(MarkerGenerator.generateMarker(redemptionTracker), "Authorize transaction tracked");
+        Marker marker = MarkerGenerator.generateMarker(redemptionTracker);
+        marker.add(Markers.append(REQUEST_ID,event.getRequestId()));
+
+        LOGGER.info(marker, "Authorize transaction tracked");
     }
 
     @EventHandler
@@ -53,6 +62,7 @@ public class RedemptionTrackerEventsHandler {
         }
 
         Marker marker = MarkerGenerator.generateMarker(redemptionTracker);
+        marker.add(Markers.append(REQUEST_ID,event.getRequestId()));
 
         if (availablePoints == 0) {
             redemptionTrackerRepository.delete(redemptionTracker);
@@ -76,6 +86,7 @@ public class RedemptionTrackerEventsHandler {
         }
 
         Marker marker = MarkerGenerator.generateMarker(redemptionTracker);
+        marker.add(Markers.append(REQUEST_ID,event.getRequestId()));
 
         if (availablePoints == 0) {
             redemptionTrackerRepository.delete(redemptionTracker);
@@ -86,4 +97,16 @@ public class RedemptionTrackerEventsHandler {
         }
     }
 
+    @EventHandler
+    public void on(LoyaltyBankDeletedEvent event) {
+        List<RedemptionTrackerEntity> redemptionTrackerEntities = redemptionTrackerRepository.findByLoyaltyBankId(event.getLoyaltyBankId());
+        redemptionTrackerRepository.deleteAll(redemptionTrackerEntities);
+
+        LOGGER.info(
+                MarkerGenerator.generateMarker(event),
+                "Deleted {} redemption trackers due to {}",
+                redemptionTrackerEntities.size(),
+                event.getClass().getSimpleName()
+        );
+    }
 }
