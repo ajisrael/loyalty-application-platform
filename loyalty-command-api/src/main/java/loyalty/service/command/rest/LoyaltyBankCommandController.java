@@ -51,4 +51,6 @@ public class LoyaltyBankCommandController {
 
         return LoyaltyBankCreatedResponseModel.builder().loyaltyBankId(loyaltyBankId).build();
     }
+
+    // TODO: add delete loyalty bank endpoint
 }
