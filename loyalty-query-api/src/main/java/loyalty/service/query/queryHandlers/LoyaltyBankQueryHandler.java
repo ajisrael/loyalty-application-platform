@@ -1,8 +1,10 @@
 package loyalty.service.query.queryHandlers;
 
 import lombok.AllArgsConstructor;
+import loyalty.service.core.data.entities.AccountEntity;
 import loyalty.service.core.data.entities.LoyaltyBankEntity;
 import loyalty.service.core.data.repositories.LoyaltyBankRepository;
+import loyalty.service.core.exceptions.AccountNotFoundException;
 import loyalty.service.core.exceptions.LoyaltyBankNotFoundException;
 import loyalty.service.core.exceptions.NoLoyaltyBanksForAccountFoundException;
 import loyalty.service.core.utils.MarkerGenerator;
@@ -21,8 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
-import static loyalty.service.core.constants.LogMessages.NO_LOYALTY_BANK_FOUND_FOR_ACCOUNT;
-import static loyalty.service.core.constants.LogMessages.PROCESSING_EVENT;
+import static loyalty.service.core.constants.LogMessages.*;
 
 @Component
 @AllArgsConstructor
@@ -61,10 +62,16 @@ public class LoyaltyBankQueryHandler {
     public LoyaltyBankQueryModel findLoyaltyBank(FindLoyaltyBankQuery query) {
         LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_EVENT, query.getClass().getSimpleName());
 
-        // TODO: add log for when loyalty bank is not found
-        LoyaltyBankEntity loyaltyBankEntity = loyaltyBankRepository.findById(query.getLoyaltyBankId()).orElseThrow(
-                () -> new LoyaltyBankNotFoundException(query.getLoyaltyBankId()));
-        return convertLoyaltyBankEntityToLoyaltyBankQueryModel(loyaltyBankEntity);
+        String loyaltyBankId = query.getLoyaltyBankId();
+
+        Optional<LoyaltyBankEntity> loyaltyBankEntityOptional = loyaltyBankRepository.findById(query.getLoyaltyBankId());
+
+        if (loyaltyBankEntityOptional.isEmpty()) {
+            LOGGER.info(Markers.append(REQUEST_ID, query.getRequestId()), LOYALTY_BANK_NOT_FOUND_IN_DB, loyaltyBankId);
+            throw new LoyaltyBankNotFoundException(loyaltyBankId);
+        }
+
+        return convertLoyaltyBankEntityToLoyaltyBankQueryModel(loyaltyBankEntityOptional.get());
     }
 
     private LoyaltyBankQueryModel convertLoyaltyBankEntityToLoyaltyBankQueryModel(LoyaltyBankEntity loyaltyBankEntity) {
