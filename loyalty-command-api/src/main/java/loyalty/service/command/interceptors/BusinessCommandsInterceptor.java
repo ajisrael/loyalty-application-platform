@@ -1,6 +1,7 @@
 package loyalty.service.command.interceptors;
 
 import lombok.RequiredArgsConstructor;
+import loyalty.service.command.commands.DeleteBusinessCommand;
 import loyalty.service.command.commands.UpdateBusinessCommand;
 import loyalty.service.command.data.entities.BusinessLookupEntity;
 import loyalty.service.command.data.repositories.BusinessLookupRepository;
@@ -22,9 +23,9 @@ import static loyalty.service.core.constants.LogMessages.*;
 
 @Component
 @RequiredArgsConstructor
-public class UpdateBusinessCommandInterceptor implements MessageDispatchInterceptor<CommandMessage<?>> {
+public class BusinessCommandsInterceptor implements MessageDispatchInterceptor<CommandMessage<?>> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateBusinessCommandInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BusinessCommandsInterceptor.class);
 
     private final BusinessLookupRepository businessLookupRepository;
 
@@ -40,20 +41,32 @@ public class UpdateBusinessCommandInterceptor implements MessageDispatchIntercep
                 String commandName = command.getClass().getSimpleName();
                 LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
 
-                String businessId = command.getBusinessId();
-                BusinessLookupEntity businessLookupEntity = businessLookupRepository.findByBusinessId(businessId);
+                throwExceptionIfBusinessDoesNotExist(command.getBusinessId(), command.getRequestId(), commandName);
+            }
 
-                if (businessLookupEntity == null) {
-                    LOGGER.info(
-                            Markers.append(REQUEST_ID, command.getRequestId()),
-                            BUSINESS_NOT_FOUND_CANCELLING_COMMAND, businessId, commandName
-                    );
+            if (DeleteBusinessCommand.class.equals(genericCommand.getPayloadType())) {
+                DeleteBusinessCommand command = (DeleteBusinessCommand) genericCommand.getPayload();
 
-                    throw new BusinessNotFoundException(businessId);
-                }
+                String commandName = command.getClass().getSimpleName();
+                LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
+
+                throwExceptionIfBusinessDoesNotExist(command.getBusinessId(), command.getRequestId(), commandName);
             }
 
             return genericCommand;
         };
+    }
+
+    private void throwExceptionIfBusinessDoesNotExist(String businessId, String requestId, String commandName) {
+        BusinessLookupEntity businessLookupEntity = businessLookupRepository.findByBusinessId(businessId);
+
+        if (businessLookupEntity == null) {
+            LOGGER.info(
+                    Markers.append(REQUEST_ID, requestId),
+                    BUSINESS_NOT_FOUND_CANCELLING_COMMAND, businessId, commandName
+            );
+
+            throw new BusinessNotFoundException(businessId);
+        }
     }
 }

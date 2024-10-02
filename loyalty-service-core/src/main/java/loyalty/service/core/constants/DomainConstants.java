@@ -15,6 +15,9 @@ public class DomainConstants {
     public static final String CAPTURED = "Captured";
 
     public static final String REQUEST_ID = "requestId";
+    public static final String REQUESTED_POINTS = "requestedPoints";
+    public static final String VOID = "void";
+    public static final String CAPTURE = "capture";
 
     public static final String DEFAULT_PAGE = "0";
     public static final String DEFAULT_PAGE_SIZE = "20";

@@ -17,6 +17,7 @@ public class LogMessages {
     public static final String BUSINESS_NOT_FOUND_CANCELLING_COMMAND = "Business {} does not exist, cancelling command {}";
     public static final String ACCOUNT_ALREADY_ENROLLED_IN_BUSINESS_CANCELLING_COMMAND = "Account {} already enrolled in business {}, cancelling command {}";
     public static final String VALIDATING_COMMAND = "Validating command {}";
+    public static final String EXCESSIVE_POINTS_REQUEST_CANCELLING_COMMAND = "Attempting to {} more points than authorized, cancelling command";
 
     public static final String ACCOUNT_SAVED_IN_LOOKUP_DB = "Account {} saved in lookup db";
     public static final String ACCOUNT_UPDATED_IN_LOOKUP_DB = "Account {} updated in lookup db";

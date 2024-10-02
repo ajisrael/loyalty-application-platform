@@ -24,28 +24,16 @@ public class LoyaltyCommandApiApplication {
 				context.getBean(ValidateCommandInterceptor.class)
 		);
 		commandBus.registerDispatchInterceptor(
-				context.getBean(CreateAccountCommandInterceptor.class)
+				context.getBean(AccountCommandsInterceptor.class)
 		);
 		commandBus.registerDispatchInterceptor(
-				context.getBean(UpdateAccountCommandInterceptor.class)
+				context.getBean(BusinessCommandsInterceptor.class)
 		);
 		commandBus.registerDispatchInterceptor(
-				context.getBean(DeleteAccountCommandInterceptor.class)
+				context.getBean(LoyaltyBankCommandsInterceptor.class)
 		);
 		commandBus.registerDispatchInterceptor(
-				context.getBean(CreateLoyaltyBankCommandInterceptor.class)
-		);
-		commandBus.registerDispatchInterceptor(
-				context.getBean(UpdateBusinessCommandInterceptor.class)
-		);
-		commandBus.registerDispatchInterceptor(
-				context.getBean(DeleteBusinessCommandInterceptor.class)
-		);
-		commandBus.registerDispatchInterceptor(
-				context.getBean(CreateVoidTransactionCommandInterceptor.class)
-		);
-		commandBus.registerDispatchInterceptor(
-				context.getBean(CreateCaptureTransactionCommandInterceptor.class)
+				context.getBean(TransactionCommandsInterceptor.class)
 		);
 	}
 
