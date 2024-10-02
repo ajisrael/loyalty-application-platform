@@ -1,4 +1,4 @@
-package loyalty.service.core.data.entities;
+package loyalty.service.query.data.entities;
 
 import lombok.Builder;
 import lombok.Data;

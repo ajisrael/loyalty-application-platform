@@ -1,7 +1,7 @@
 package loyalty.service.query.projections;
 
-import loyalty.service.core.data.entities.LoyaltyBankEntity;
-import loyalty.service.core.data.repositories.LoyaltyBankRepository;
+import loyalty.service.query.data.entities.LoyaltyBankEntity;
+import loyalty.service.query.data.repositories.LoyaltyBankRepository;
 import loyalty.service.core.events.AllPointsExpiredEvent;
 import loyalty.service.core.events.LoyaltyBankDeletedEvent;
 import loyalty.service.core.events.transactions.*;

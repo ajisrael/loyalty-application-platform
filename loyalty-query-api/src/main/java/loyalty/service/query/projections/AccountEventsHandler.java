@@ -1,7 +1,7 @@
 package loyalty.service.query.projections;
 
-import loyalty.service.core.data.entities.AccountEntity;
-import loyalty.service.core.data.repositories.AccountRepository;
+import loyalty.service.query.data.entities.AccountEntity;
+import loyalty.service.query.data.repositories.AccountRepository;
 import loyalty.service.core.events.AccountCreatedEvent;
 import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.AccountUpdatedEvent;

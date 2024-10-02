@@ -1,6 +1,6 @@
-package loyalty.service.core.data.repositories;
+package loyalty.service.query.data.repositories;
 
-import loyalty.service.core.data.entities.AccountEntity;
+import loyalty.service.query.data.entities.AccountEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;

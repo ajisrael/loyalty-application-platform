@@ -1,8 +1,8 @@
 package loyalty.service.query.queryHandlers;
 
 import lombok.AllArgsConstructor;
-import loyalty.service.core.data.entities.LoyaltyBankEntity;
-import loyalty.service.core.data.repositories.LoyaltyBankRepository;
+import loyalty.service.query.data.entities.LoyaltyBankEntity;
+import loyalty.service.query.data.repositories.LoyaltyBankRepository;
 import loyalty.service.core.exceptions.LoyaltyBankNotFoundException;
 import loyalty.service.core.exceptions.NoLoyaltyBanksForAccountFoundException;
 import loyalty.service.core.utils.MarkerGenerator;
