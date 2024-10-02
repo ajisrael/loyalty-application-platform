@@ -1,11 +1,11 @@
 package loyalty.service.query.queries;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@AllArgsConstructor
-public class FindLoyaltyBankQuery {
+@SuperBuilder
+public class FindLoyaltyBankQuery extends AbstractQuery {
 
     private String loyaltyBankId;
 }

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import loyalty.service.core.rest.PageResponseType;
 import loyalty.service.core.rest.PaginationResponse;
 import loyalty.service.core.utils.PaginationUtility;
+import loyalty.service.query.queries.FindAccountQuery;
 import loyalty.service.query.queries.FindAllLoyaltyBanksQuery;
 import loyalty.service.query.queries.FindLoyaltyBankQuery;
 import loyalty.service.query.queries.FindLoyaltyBanksWithAccountIdQuery;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static loyalty.service.core.constants.DomainConstants.DEFAULT_PAGE;
@@ -50,8 +52,12 @@ public class LoyaltyBankQueryController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get loyalty banks for account")
     public CompletableFuture<List<LoyaltyBankQueryModel>> getLoyaltyBanksForAccount(String accountId) {
-        return queryGateway.query(new FindLoyaltyBanksWithAccountIdQuery(accountId),
-                       ResponseTypes.multipleInstancesOf(LoyaltyBankQueryModel.class));
+        FindLoyaltyBanksWithAccountIdQuery query = FindLoyaltyBanksWithAccountIdQuery.builder()
+                .requestId(UUID.randomUUID().toString())
+                .accountId(accountId)
+                .build();
+
+        return queryGateway.query(query, ResponseTypes.multipleInstancesOf(LoyaltyBankQueryModel.class));
     }
 
     @GetMapping(params = "loyaltyBankId")
@@ -59,7 +65,11 @@ public class LoyaltyBankQueryController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get loyalty bank")
     public CompletableFuture<LoyaltyBankQueryModel> getLoyaltyBank(String loyaltyBankId) {
-        return queryGateway.query(new FindLoyaltyBankQuery(loyaltyBankId),
-                ResponseTypes.instanceOf(LoyaltyBankQueryModel.class));
+        FindLoyaltyBankQuery query = FindLoyaltyBankQuery.builder()
+                .requestId(UUID.randomUUID().toString())
+                .loyaltyBankId(loyaltyBankId)
+                .build();
+
+        return queryGateway.query(query, ResponseTypes.instanceOf(LoyaltyBankQueryModel.class));
     }
 }

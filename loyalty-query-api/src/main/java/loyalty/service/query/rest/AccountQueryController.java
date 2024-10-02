@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static loyalty.service.core.constants.DomainConstants.DEFAULT_PAGE;
@@ -47,7 +48,11 @@ public class AccountQueryController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get account by id")
     public CompletableFuture<AccountQueryModel> getAccount(String accountId) {
-        return queryGateway.query(new FindAccountQuery(accountId),
-                ResponseTypes.instanceOf(AccountQueryModel.class));
+        FindAccountQuery query = FindAccountQuery.builder()
+                .requestId(UUID.randomUUID().toString())
+                .accountId(accountId)
+                .build();
+
+        return queryGateway.query(query, ResponseTypes.instanceOf(AccountQueryModel.class));
     }
 }
