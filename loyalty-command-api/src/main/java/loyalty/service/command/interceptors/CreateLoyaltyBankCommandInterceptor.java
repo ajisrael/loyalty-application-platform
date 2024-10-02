@@ -56,20 +56,17 @@ public class CreateLoyaltyBankCommandInterceptor implements MessageDispatchInter
                     throw new AccountNotFoundException(accountId);
                 }
 
-                String businessName = command.getBusinessName();
-                List<LoyaltyBankLookupEntity> loyaltyBankLookupEntities = loyaltyBankLookupRepository.findByAccountId(accountId);
+                String businessId = command.getBusinessId();
+                List<LoyaltyBankLookupEntity> loyaltyBankLookupEntities = loyaltyBankLookupRepository.findByBusinessId(businessId);
 
-                boolean businessAlreadyAssignedToAccount = loyaltyBankLookupEntities.stream()
-                        .anyMatch(entity -> entity.getBusinessName().equals(businessName));
-
-                if (businessAlreadyAssignedToAccount) {
+                if (!loyaltyBankLookupEntities.isEmpty()) {
                     LOGGER.info(
                             Markers.append(REQUEST_ID, command.getRequestId()),
                             ACCOUNT_ALREADY_ENROLLED_IN_BUSINESS_CANCELLING_COMMAND,
-                            accountId, businessName, commandName
+                            accountId, businessId, commandName
                     );
 
-                    throw new AccountExistsWithLoyaltyBankException(accountId, businessName);
+                    throw new AccountExistsWithLoyaltyBankException(accountId, businessId);
                 }
             }
 

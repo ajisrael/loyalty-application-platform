@@ -9,7 +9,7 @@ public class LoyaltyBankCreatedEvent extends AbstractEvent {
 
     private String loyaltyBankId;
     private String accountId;
-    private String businessName;
+    private String businessId;
     private int pending;
     private int earned;
     private int authorized;

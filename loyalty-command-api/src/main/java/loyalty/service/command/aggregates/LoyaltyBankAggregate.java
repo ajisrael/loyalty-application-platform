@@ -32,8 +32,7 @@ public class LoyaltyBankAggregate {
     @AggregateIdentifier
     private String loyaltyBankId;
     private String accountId;
-    // TODO: change association to be based on business id
-    private String businessName;
+    private String businessId;
     private int pending;
     private int earned;
     private int authorized;
@@ -46,7 +45,7 @@ public class LoyaltyBankAggregate {
                 .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .accountId(command.getAccountId())
-                .businessName(command.getBusinessName())
+                .businessId(command.getBusinessId())
                 .pending(0)
                 .earned(0)
                 .authorized(0)
@@ -208,7 +207,7 @@ public class LoyaltyBankAggregate {
     public void on(LoyaltyBankCreatedEvent event) {
         this.loyaltyBankId = event.getLoyaltyBankId();
         this.accountId = event.getAccountId();
-        this.businessName = event.getBusinessName();
+        this.businessId = event.getBusinessId();
         this.pending = event.getPending();
         this.earned = event.getEarned();
         this.authorized = event.getAuthorized();

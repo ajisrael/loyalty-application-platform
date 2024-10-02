@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_ACCOUNT;
 import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_BUSINESS;
 
 @RestController
@@ -67,7 +66,7 @@ public class BusinessCommandController {
 
         LOGGER.info(
                 MarkerGenerator.generateMarker(command),
-                SENDING_COMMAND_FOR_ACCOUNT, command.getClass().getSimpleName(), command.getBusinessId()
+                SENDING_COMMAND_FOR_BUSINESS, command.getClass().getSimpleName(), command.getBusinessId()
         );
 
         commandGateway.sendAndWait(command);
@@ -85,7 +84,7 @@ public class BusinessCommandController {
 
         LOGGER.info(
                 MarkerGenerator.generateMarker(command),
-                SENDING_COMMAND_FOR_ACCOUNT, command.getClass().getSimpleName(), command.getBusinessId()
+                SENDING_COMMAND_FOR_BUSINESS, command.getClass().getSimpleName(), command.getBusinessId()
         );
 
         commandGateway.sendAndWait(command);

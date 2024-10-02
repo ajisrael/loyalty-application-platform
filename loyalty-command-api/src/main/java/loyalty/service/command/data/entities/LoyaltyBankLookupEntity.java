@@ -20,6 +20,6 @@ public class LoyaltyBankLookupEntity {
     private String loyaltyBankId;
     @Column(name = "account_id")
     private String accountId;
-    @Column(name = "business_name")
-    private String businessName;
+    @Column(name = "business_id")
+    private String businessId;
 }

@@ -9,4 +9,5 @@ public interface LoyaltyBankLookupRepository extends JpaRepository<LoyaltyBankLo
 
     LoyaltyBankLookupEntity findByLoyaltyBankId(String loyaltyBankId);
     List<LoyaltyBankLookupEntity> findByAccountId(String accountId);
+    List<LoyaltyBankLookupEntity> findByBusinessId(String businessId);
 }

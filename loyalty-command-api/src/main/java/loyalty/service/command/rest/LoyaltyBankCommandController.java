@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_ACCOUNT;
 import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_LOYALTY_BANK;
 
 @RestController
@@ -39,7 +38,7 @@ public class LoyaltyBankCommandController {
                 .requestId(UUID.randomUUID().toString())
                 .loyaltyBankId(UUID.randomUUID().toString())
                 .accountId(request.getAccountId())
-                .businessName(request.getBusinessName())
+                .businessId(request.getBusinessId())
                 .build();
 
         LOGGER.info(

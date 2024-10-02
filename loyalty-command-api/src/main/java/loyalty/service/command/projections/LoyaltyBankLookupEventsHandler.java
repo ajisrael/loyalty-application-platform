@@ -43,7 +43,7 @@ public class LoyaltyBankLookupEventsHandler {
                 new LoyaltyBankLookupEntity(
                         event.getLoyaltyBankId(),
                         event.getAccountId(),
-                        event.getBusinessName()
+                        event.getBusinessId()
                 )
         );
 

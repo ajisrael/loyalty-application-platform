@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateLoyaltyBankRequestModel {
 
-    @NotBlank(message = "businessName is a required field")
-    private String businessName;
+    @NotBlank(message = "businessId is a required field")
+    private String businessId;
     @NotBlank(message = "accountId is a required field")
     private String accountId;
 }

@@ -14,10 +14,6 @@ import org.springframework.context.ApplicationContext;
 @SpringBootApplication
 public class LoyaltyCommandApiApplication {
 
-	// TODO: update loyalty bank to have a name
-	// TODO: update loyalty bank and account relationship to have multiple banks for an account so long as the name is unique
-	// TODO: handle account deleted command for loyalty banks. Will probably have to create expiration transaction(s)
-
 	public static void main(String[] args) {
 		SpringApplication.run(LoyaltyCommandApiApplication.class, args);
 	}
@@ -38,6 +34,12 @@ public class LoyaltyCommandApiApplication {
 		);
 		commandBus.registerDispatchInterceptor(
 				context.getBean(CreateLoyaltyBankCommandInterceptor.class)
+		);
+		commandBus.registerDispatchInterceptor(
+				context.getBean(UpdateBusinessCommandInterceptor.class)
+		);
+		commandBus.registerDispatchInterceptor(
+				context.getBean(DeleteBusinessCommandInterceptor.class)
 		);
 		commandBus.registerDispatchInterceptor(
 				context.getBean(CreateVoidTransactionCommandInterceptor.class)
