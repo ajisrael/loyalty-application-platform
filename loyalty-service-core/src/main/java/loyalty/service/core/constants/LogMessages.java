@@ -32,4 +32,9 @@ public class LogMessages {
     public static final String ACCOUNT_UPDATED_IN_DB = "Account {} updated in db";
     public static final String ACCOUNT_DELETED_FROM_DB = "Account {} deleted from db";
     public static final String ACCOUNT_NOT_FOUND_IN_DB = "Account {} not found in db";
+
+    public static final String LOYALTY_BANK_SAVED_IN_DB = "Loyalty bank {} saved in db";
+    public static final String LOYALTY_BANK_DELETED_FROM_DB = "Loyalty bank {} deleted from db";
+    public static final String LOYALTY_BANK_NOT_FOUND_IN_DB = "Loyalty bank {} not found in db";
+    public static final String PROCESSED_EVENT_FOR_LOYALTY_BANK = "Processed {} event for loyaltyBank {}";
 }

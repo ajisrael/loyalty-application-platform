@@ -7,6 +7,8 @@ import loyalty.service.core.events.LoyaltyBankDeletedEvent;
 import loyalty.service.core.events.transactions.*;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
 import loyalty.service.core.exceptions.LoyaltyBankNotFoundException;
+import loyalty.service.core.utils.MarkerGenerator;
+import net.logstash.logback.marker.Markers;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.messaging.interceptors.ExceptionHandler;
@@ -16,6 +18,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+
+import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
+import static loyalty.service.core.constants.LogMessages.*;
 
 @Component
 @ProcessingGroup("loyalty-bank-group")
@@ -44,6 +49,8 @@ public class LoyaltyBankEventsHandler {
         LoyaltyBankEntity loyaltyBankEntity = new LoyaltyBankEntity();
         BeanUtils.copyProperties(event, loyaltyBankEntity);
         loyaltyBankRepository.save(loyaltyBankEntity);
+
+        LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), LOYALTY_BANK_SAVED_IN_DB, event.getLoyaltyBankId());
     }
 
     @EventHandler
@@ -52,8 +59,9 @@ public class LoyaltyBankEventsHandler {
 
         if (loyaltyBankEntityOptional.isPresent()) {
             loyaltyBankRepository.delete(loyaltyBankEntityOptional.get());
+            LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), LOYALTY_BANK_DELETED_FROM_DB, event.getLoyaltyBankId());
         } else {
-            throw new LoyaltyBankNotFoundException(event.getLoyaltyBankId());
+            logAndThrowLoyaltyBankNotFoundException(event.getRequestId(), event.getLoyaltyBankId());
         }
     }
 
@@ -65,8 +73,15 @@ public class LoyaltyBankEventsHandler {
             LoyaltyBankEntity loyaltyBankEntity = loyaltyBankEntityOptional.get();
             loyaltyBankEntity.setPending(loyaltyBankEntity.getPending() + event.getPoints());
             loyaltyBankRepository.save(loyaltyBankEntity);
+
+            LOGGER.info(
+                    MarkerGenerator.generateMarker(event),
+                    PROCESSED_EVENT_FOR_LOYALTY_BANK,
+                    event.getClass().getSimpleName(),
+                    event.getLoyaltyBankId()
+            );
         } else {
-            throw new LoyaltyBankNotFoundException(event.getLoyaltyBankId());
+            logAndThrowLoyaltyBankNotFoundException(event.getRequestId(), event.getLoyaltyBankId());
         }
     }
 
@@ -79,8 +94,15 @@ public class LoyaltyBankEventsHandler {
             loyaltyBankEntity.setPending(loyaltyBankEntity.getPending() - event.getPoints());
             loyaltyBankEntity.setEarned(loyaltyBankEntity.getEarned() + event.getPoints());
             loyaltyBankRepository.save(loyaltyBankEntity);
+
+            LOGGER.info(
+                    MarkerGenerator.generateMarker(event),
+                    PROCESSED_EVENT_FOR_LOYALTY_BANK,
+                    event.getClass().getSimpleName(),
+                    event.getLoyaltyBankId()
+            );
         } else {
-            throw new LoyaltyBankNotFoundException(event.getLoyaltyBankId());
+            logAndThrowLoyaltyBankNotFoundException(event.getRequestId(), event.getLoyaltyBankId());
         }
     }
 
@@ -92,8 +114,15 @@ public class LoyaltyBankEventsHandler {
             LoyaltyBankEntity loyaltyBankEntity = loyaltyBankEntityOptional.get();
             loyaltyBankEntity.setEarned(loyaltyBankEntity.getEarned() + event.getPoints());
             loyaltyBankRepository.save(loyaltyBankEntity);
+
+            LOGGER.info(
+                    MarkerGenerator.generateMarker(event),
+                    PROCESSED_EVENT_FOR_LOYALTY_BANK,
+                    event.getClass().getSimpleName(),
+                    event.getLoyaltyBankId()
+            );
         } else {
-            throw new LoyaltyBankNotFoundException(event.getLoyaltyBankId());
+            logAndThrowLoyaltyBankNotFoundException(event.getRequestId(), event.getLoyaltyBankId());
         }
     }
 
@@ -105,8 +134,15 @@ public class LoyaltyBankEventsHandler {
             LoyaltyBankEntity loyaltyBankEntity = loyaltyBankEntityOptional.get();
             loyaltyBankEntity.setAuthorized(loyaltyBankEntity.getAuthorized() + event.getPoints());
             loyaltyBankRepository.save(loyaltyBankEntity);
+
+            LOGGER.info(
+                    MarkerGenerator.generateMarker(event),
+                    PROCESSED_EVENT_FOR_LOYALTY_BANK,
+                    event.getClass().getSimpleName(),
+                    event.getLoyaltyBankId()
+            );
         } else {
-            throw new LoyaltyBankNotFoundException(event.getLoyaltyBankId());
+            logAndThrowLoyaltyBankNotFoundException(event.getRequestId(), event.getLoyaltyBankId());
         }
     }
 
@@ -118,8 +154,15 @@ public class LoyaltyBankEventsHandler {
             LoyaltyBankEntity loyaltyBankEntity = loyaltyBankEntityOptional.get();
             loyaltyBankEntity.setAuthorized(loyaltyBankEntity.getAuthorized() - event.getPoints());
             loyaltyBankRepository.save(loyaltyBankEntity);
+
+            LOGGER.info(
+                    MarkerGenerator.generateMarker(event),
+                    PROCESSED_EVENT_FOR_LOYALTY_BANK,
+                    event.getClass().getSimpleName(),
+                    event.getLoyaltyBankId()
+            );
         } else {
-            throw new LoyaltyBankNotFoundException(event.getLoyaltyBankId());
+            logAndThrowLoyaltyBankNotFoundException(event.getRequestId(), event.getLoyaltyBankId());
         }
     }
 
@@ -132,8 +175,15 @@ public class LoyaltyBankEventsHandler {
             loyaltyBankEntity.setAuthorized(loyaltyBankEntity.getAuthorized() - event.getPoints());
             loyaltyBankEntity.setCaptured(loyaltyBankEntity.getCaptured() + event.getPoints());
             loyaltyBankRepository.save(loyaltyBankEntity);
+
+            LOGGER.info(
+                    MarkerGenerator.generateMarker(event),
+                    PROCESSED_EVENT_FOR_LOYALTY_BANK,
+                    event.getClass().getSimpleName(),
+                    event.getLoyaltyBankId()
+            );
         } else {
-            throw new LoyaltyBankNotFoundException(event.getLoyaltyBankId());
+            logAndThrowLoyaltyBankNotFoundException(event.getRequestId(), event.getLoyaltyBankId());
         }
     }
 
@@ -147,8 +197,20 @@ public class LoyaltyBankEventsHandler {
             loyaltyBankEntity.setAuthorized(loyaltyBankEntity.getAuthorized() - event.getAuthorizedPointsVoided());
             loyaltyBankEntity.setCaptured(loyaltyBankEntity.getCaptured() + event.getAvailablePointsCaptured());
             loyaltyBankRepository.save(loyaltyBankEntity);
+
+            LOGGER.info(
+                    MarkerGenerator.generateMarker(event),
+                    PROCESSED_EVENT_FOR_LOYALTY_BANK,
+                    event.getClass().getSimpleName(),
+                    event.getLoyaltyBankId()
+            );
         } else {
-            throw new LoyaltyBankNotFoundException(event.getLoyaltyBankId());
+            logAndThrowLoyaltyBankNotFoundException(event.getRequestId(), event.getLoyaltyBankId());
         }
+    }
+
+    private void logAndThrowLoyaltyBankNotFoundException(String requestId, String loyaltyBankId) {
+        LOGGER.error(Markers.append(REQUEST_ID, requestId), LOYALTY_BANK_NOT_FOUND_IN_DB, loyaltyBankId);
+        throw new LoyaltyBankNotFoundException(loyaltyBankId);
     }
 }
