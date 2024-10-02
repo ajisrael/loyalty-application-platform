@@ -21,4 +21,7 @@ public class LogMessages {
     public static final String ACCOUNT_DELETED_FROM_LOOKUP_DB = "Account {} deleted from lookup db";
     public static final String LOYALTY_BANK_SAVED_IN_LOOKUP_DB = "Loyalty bank {} saved in lookup db";
     public static final String LOYALTY_BANK_DELETED_FROM_LOOKUP_DB = "Loyalty bank {} deleted from lookup db";
+    public static final String BUSINESS_SAVED_IN_LOOKUP_DB = "Business {} saved in lookup db";
+    public static final String BUSINESS_UPDATED_IN_LOOKUP_DB = "Business {} updated in lookup db";
+    public static final String BUSINESS_DELETED_FROM_LOOKUP_DB = "Business {} deleted from lookup db";
 }

@@ -52,6 +52,8 @@ public class LoyaltyCommandApiApplication {
 		// TODO: Save group strings to constants
 		configurer.registerListenerInvocationErrorHandler("account-lookup-group",
 				configuration -> new LoyaltyServiceEventsErrorHandler());
+		configurer.registerListenerInvocationErrorHandler("business-lookup-group",
+				configuration -> new LoyaltyServiceEventsErrorHandler());
 		configurer.registerListenerInvocationErrorHandler("loyalty-bank-lookup-group",
 				configuration -> new LoyaltyServiceEventsErrorHandler());
 		configurer.registerListenerInvocationErrorHandler("redemption-tracker-group",

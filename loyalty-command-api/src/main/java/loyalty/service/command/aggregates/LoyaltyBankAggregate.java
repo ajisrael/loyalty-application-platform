@@ -32,6 +32,7 @@ public class LoyaltyBankAggregate {
     @AggregateIdentifier
     private String loyaltyBankId;
     private String accountId;
+    // TODO: change association to be based on business id
     private String businessName;
     private int pending;
     private int earned;
