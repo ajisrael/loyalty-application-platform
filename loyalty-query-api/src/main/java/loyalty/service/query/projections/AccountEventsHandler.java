@@ -6,6 +6,7 @@ import loyalty.service.core.events.AccountCreatedEvent;
 import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.AccountUpdatedEvent;
 import loyalty.service.core.exceptions.AccountNotFoundException;
+import net.logstash.logback.marker.Markers;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.messaging.interceptors.ExceptionHandler;
@@ -15,6 +16,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+
+import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
+import static loyalty.service.core.constants.LogMessages.*;
 
 @Component
 @ProcessingGroup("account-group")
@@ -43,6 +47,8 @@ public class AccountEventsHandler {
         AccountEntity accountEntity = new AccountEntity();
         BeanUtils.copyProperties(event, accountEntity);
         accountRepository.save(accountEntity);
+
+        LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_SAVED_IN_DB, event.getAccountId());
     }
 
     @EventHandler
@@ -53,7 +59,10 @@ public class AccountEventsHandler {
             AccountEntity accountEntity = accountEntityOptional.get();
             BeanUtils.copyProperties(event, accountEntity);
             accountRepository.save(accountEntity);
+
+            LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_UPDATED_IN_DB, event.getAccountId());
         } else {
+            LOGGER.error(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_NOT_FOUND_IN_DB, event.getAccountId());
             throw new AccountNotFoundException(event.getAccountId());
         }
     }
@@ -64,7 +73,9 @@ public class AccountEventsHandler {
 
         if (accountEntityOptional.isPresent()) {
             accountRepository.delete(accountEntityOptional.get());
+            LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_DELETED_FROM_DB, event.getAccountId());
         } else {
+            LOGGER.error(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_NOT_FOUND_IN_DB, event.getAccountId());
             throw new AccountNotFoundException(event.getAccountId());
         }
     }
