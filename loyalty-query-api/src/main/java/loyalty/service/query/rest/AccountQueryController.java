@@ -8,7 +8,7 @@ import loyalty.service.core.utils.MarkerGenerator;
 import loyalty.service.core.utils.PaginationUtility;
 import loyalty.service.query.queries.FindAccountQuery;
 import loyalty.service.query.queries.FindAllAccountsQuery;
-import loyalty.service.query.querymodels.AccountQueryModel;
+import loyalty.service.query.queryModels.AccountQueryModel;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.slf4j.Logger;
@@ -22,7 +22,6 @@ import java.util.concurrent.CompletableFuture;
 
 import static loyalty.service.core.constants.DomainConstants.DEFAULT_PAGE;
 import static loyalty.service.core.constants.DomainConstants.DEFAULT_PAGE_SIZE;
-import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_ACCOUNT;
 import static loyalty.service.core.constants.LogMessages.SENDING_QUERY;
 
 @RestController

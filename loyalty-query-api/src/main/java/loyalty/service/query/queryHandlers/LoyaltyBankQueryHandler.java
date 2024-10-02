@@ -1,17 +1,15 @@
 package loyalty.service.query.queryHandlers;
 
 import lombok.AllArgsConstructor;
-import loyalty.service.core.data.entities.AccountEntity;
 import loyalty.service.core.data.entities.LoyaltyBankEntity;
 import loyalty.service.core.data.repositories.LoyaltyBankRepository;
-import loyalty.service.core.exceptions.AccountNotFoundException;
 import loyalty.service.core.exceptions.LoyaltyBankNotFoundException;
 import loyalty.service.core.exceptions.NoLoyaltyBanksForAccountFoundException;
 import loyalty.service.core.utils.MarkerGenerator;
 import loyalty.service.query.queries.FindAllLoyaltyBanksQuery;
 import loyalty.service.query.queries.FindLoyaltyBankQuery;
 import loyalty.service.query.queries.FindLoyaltyBanksWithAccountIdQuery;
-import loyalty.service.query.querymodels.LoyaltyBankQueryModel;
+import loyalty.service.query.queryModels.LoyaltyBankQueryModel;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.queryhandling.QueryHandler;
 import org.slf4j.Logger;

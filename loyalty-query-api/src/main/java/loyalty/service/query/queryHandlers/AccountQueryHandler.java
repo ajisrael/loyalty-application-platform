@@ -7,7 +7,7 @@ import loyalty.service.core.exceptions.AccountNotFoundException;
 import loyalty.service.core.utils.MarkerGenerator;
 import loyalty.service.query.queries.FindAccountQuery;
 import loyalty.service.query.queries.FindAllAccountsQuery;
-import loyalty.service.query.querymodels.AccountQueryModel;
+import loyalty.service.query.queryModels.AccountQueryModel;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.queryhandling.QueryHandler;
 import org.slf4j.Logger;
