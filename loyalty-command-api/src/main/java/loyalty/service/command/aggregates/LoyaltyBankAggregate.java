@@ -205,6 +205,20 @@ public class LoyaltyBankAggregate {
         AggregateLifecycle.apply(event);
     }
 
+    @CommandHandler
+    public void on(UnenrollLoyaltyBankCommand command) {
+        LoyaltyBankDeletedEvent event = LoyaltyBankDeletedEvent.builder()
+                .requestId(command.getRequestId())
+                .loyaltyBankId(command.getLoyaltyBankId())
+                .accountId(this.accountId)
+                .businessId(this.businessId)
+                .build();
+
+        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
+
+        AggregateLifecycle.apply(event);
+    }
+
     @EventSourcingHandler
     public void on(LoyaltyBankCreatedEvent event) {
         this.loyaltyBankId = event.getLoyaltyBankId();
@@ -286,7 +300,7 @@ public class LoyaltyBankAggregate {
     }
 
     private void throwExceptionIfLoyaltyBankStillHasAvailablePoints() {
-        if (this.pending != 0 && this.authorized != 0 && this.earned != this.captured) {
+        if (this.pending != 0 || this.authorized != 0 || this.earned != this.captured) {
             throw new FailedToExpireLoyaltyPointsException(this.loyaltyBankId);
         }
     }

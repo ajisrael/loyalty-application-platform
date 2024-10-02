@@ -4,7 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import loyalty.service.command.commands.CreateLoyaltyBankCommand;
+import loyalty.service.command.commands.DeleteLoyaltyBankCommand;
+import loyalty.service.command.commands.UnenrollLoyaltyBankCommand;
 import loyalty.service.command.rest.requests.CreateLoyaltyBankRequestModel;
+import loyalty.service.command.rest.requests.DeleteLoyaltyBankRequestModel;
 import loyalty.service.command.rest.responses.LoyaltyBankCreatedResponseModel;
 import loyalty.service.core.utils.MarkerGenerator;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -51,5 +54,22 @@ public class LoyaltyBankCommandController {
         return LoyaltyBankCreatedResponseModel.builder().loyaltyBankId(loyaltyBankId).build();
     }
 
-    // TODO: add delete loyalty bank endpoint
+    @DeleteMapping
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete loyalty bank")
+    public void deleteLoyaltyBank(@Valid @RequestBody DeleteLoyaltyBankRequestModel request) {
+
+        UnenrollLoyaltyBankCommand command = UnenrollLoyaltyBankCommand.builder()
+                .requestId(UUID.randomUUID().toString())
+                .loyaltyBankId(request.getLoyaltyBankId())
+                .build();
+
+        LOGGER.info(
+                MarkerGenerator.generateMarker(command),
+                SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId()
+        );
+
+        commandGateway.sendAndWait(command);
+    }
 }
