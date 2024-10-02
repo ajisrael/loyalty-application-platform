@@ -7,7 +7,7 @@ public class LogMessages {
     }
 
     public static final String INTERCEPTED_COMMAND = "Intercepted command: {}";
-    public static final String PROCESSING_EVENT = "Processing {}";
+    public static final String PROCESSING_QUERY = "Processing {}";
     public static final String SENDING_COMMAND_FOR_ENTITY = "Sending command %s for %s %s";
     public static final String SENDING_COMMAND_FOR_ACCOUNT = String.format(SENDING_COMMAND_FOR_ENTITY, "{}", "account", "{}");
     public static final String SENDING_COMMAND_FOR_LOYALTY_BANK = String.format(SENDING_COMMAND_FOR_ENTITY, "{}", "loyalty bank", "{}");
@@ -39,6 +39,11 @@ public class LogMessages {
     public static final String LOYALTY_BANK_NOT_FOUND_IN_DB = "Loyalty bank {} not found in db";
     public static final String PROCESSED_EVENT_FOR_LOYALTY_BANK = "Processed {} event for loyaltyBank {}";
     public static final String NO_LOYALTY_BANK_FOUND_FOR_ACCOUNT = "No loyalty bank found for account {}";
+
+    public static final String BUSINESS_SAVED_IN_DB = "Business {} saved in db";
+    public static final String BUSINESS_UPDATED_IN_DB = "Business {} updated in db";
+    public static final String BUSINESS_DELETED_FROM_DB = "Business {} deleted from db";
+    public static final String BUSINESS_NOT_FOUND_IN_DB = "Business {} not found in db";
 
     public static final String SENDING_QUERY = "Sending query {}";
 }

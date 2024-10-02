@@ -10,4 +10,5 @@ public interface LoyaltyBankRepository extends MongoRepository<LoyaltyBankEntity
 
     Optional<LoyaltyBankEntity> findByLoyaltyBankId(String loyaltyBankId);
     Optional<List<LoyaltyBankEntity>> findByAccountId(String accountId);
+    Optional<List<LoyaltyBankEntity>> findByBusinessId(String businessId);
 }

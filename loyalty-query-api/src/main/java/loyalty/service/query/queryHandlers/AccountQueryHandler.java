@@ -19,7 +19,7 @@ import java.util.Optional;
 
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.LogMessages.ACCOUNT_NOT_FOUND_IN_DB;
-import static loyalty.service.core.constants.LogMessages.PROCESSING_EVENT;
+import static loyalty.service.core.constants.LogMessages.PROCESSING_QUERY;
 
 @Component
 @AllArgsConstructor
@@ -30,7 +30,7 @@ public class AccountQueryHandler {
 
     @QueryHandler
     public Page<AccountQueryModel> findAllAccounts(FindAllAccountsQuery query) {
-        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_EVENT, query.getClass().getSimpleName());
+        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_QUERY, query.getClass().getSimpleName());
 
         return accountRepository.findAll(query.getPageable())
                 .map(this::convertAccountEntityToAccountQueryModel);
@@ -38,7 +38,7 @@ public class AccountQueryHandler {
 
     @QueryHandler
     public AccountQueryModel findAccount(FindAccountQuery query) {
-        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_EVENT, query.getClass().getSimpleName());
+        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_QUERY, query.getClass().getSimpleName());
 
         String accountId = query.getAccountId();
 

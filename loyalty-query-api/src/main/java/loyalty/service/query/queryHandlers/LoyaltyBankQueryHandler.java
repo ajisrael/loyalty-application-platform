@@ -32,7 +32,7 @@ public class LoyaltyBankQueryHandler {
 
     @QueryHandler
     public Page<LoyaltyBankQueryModel> findAllLoyaltyBanks(FindAllLoyaltyBanksQuery query) {
-        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_EVENT, query.getClass().getSimpleName());
+        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_QUERY, query.getClass().getSimpleName());
 
         return loyaltyBankRepository.findAll(query.getPageable())
                 .map(this::convertLoyaltyBankEntityToLoyaltyBankQueryModel);
@@ -40,7 +40,7 @@ public class LoyaltyBankQueryHandler {
 
     @QueryHandler
     public List<LoyaltyBankQueryModel> findLoyaltyBanksWithAccountId(FindLoyaltyBanksWithAccountIdQuery query) {
-        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_EVENT, query.getClass().getSimpleName());
+        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_QUERY, query.getClass().getSimpleName());
 
         String accountId = query.getAccountId();
 
@@ -58,7 +58,7 @@ public class LoyaltyBankQueryHandler {
 
     @QueryHandler
     public LoyaltyBankQueryModel findLoyaltyBank(FindLoyaltyBankQuery query) {
-        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_EVENT, query.getClass().getSimpleName());
+        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_QUERY, query.getClass().getSimpleName());
 
         String loyaltyBankId = query.getLoyaltyBankId();
 
@@ -78,7 +78,7 @@ public class LoyaltyBankQueryHandler {
         return new LoyaltyBankQueryModel(
                 loyaltyBankEntity.getLoyaltyBankId(),
                 loyaltyBankEntity.getAccountId(),
-                loyaltyBankEntity.getBusinessName(),
+                loyaltyBankEntity.getBusinessId(),
                 loyaltyBankEntity.getPending(),
                 loyaltyBankEntity.getEarned(),
                 loyaltyBankEntity.getAuthorized(),

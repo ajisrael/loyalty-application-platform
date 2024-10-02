@@ -7,15 +7,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @EqualsAndHashCode
-@Document(collection = "loyalty_banks")
-public class LoyaltyBankEntity {
+@Document(collection = "businesses")
+public class BusinessEntity {
 
     @Id
-    private String loyaltyBankId;
-    private String accountId;
     private String businessId;
-    private int pending;
-    private int earned;
-    private int authorized;
-    private int captured;
+    private String businessName;
 }
