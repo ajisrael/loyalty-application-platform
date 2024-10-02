@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import static loyalty.service.core.constants.LogMessages.PROCESSING_EVENT;
+
 @Component
 @AllArgsConstructor
 public class AccountQueryHandler {
@@ -23,7 +25,7 @@ public class AccountQueryHandler {
 
     @QueryHandler
     public Page<AccountQueryModel> findAllAccounts(FindAllAccountsQuery query) {
-        LOGGER.info(MarkerGenerator.generateMarker(query), "Processing {}", query.getClass().getSimpleName());
+        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_EVENT, query.getClass().getSimpleName());
 
         return accountRepository.findAll(query.getPageable())
                 .map(this::convertAccountEntityToAccountQueryModel);
@@ -31,8 +33,9 @@ public class AccountQueryHandler {
 
     @QueryHandler
     public AccountQueryModel findAccount(FindAccountQuery query) {
-        LOGGER.info(MarkerGenerator.generateMarker(query), "Processing {}", query.getClass().getSimpleName());
+        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_EVENT, query.getClass().getSimpleName());
 
+        // TODO: add log for when throwing exception
         AccountEntity accountEntity = accountRepository.findById(query.getAccountId()).orElseThrow(
                 () -> new AccountNotFoundException(query.getAccountId()));
         return convertAccountEntityToAccountQueryModel(accountEntity);
