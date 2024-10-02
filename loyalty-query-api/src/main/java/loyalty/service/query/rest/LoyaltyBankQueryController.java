@@ -43,6 +43,7 @@ public class LoyaltyBankQueryController {
             @RequestParam(defaultValue = DEFAULT_PAGE) int currentPage,
             @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
         FindAllLoyaltyBanksQuery query = FindAllLoyaltyBanksQuery.builder()
+                .requestId(UUID.randomUUID().toString())
                 .pageable(PaginationUtility.buildPageable(currentPage, pageSize))
                 .build();
 

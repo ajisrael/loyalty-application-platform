@@ -42,6 +42,7 @@ public class AccountQueryController {
             @RequestParam(defaultValue = DEFAULT_PAGE) int currentPage,
             @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
         FindAllAccountsQuery query = FindAllAccountsQuery.builder()
+                .requestId(UUID.randomUUID().toString())
                 .pageable(PaginationUtility.buildPageable(currentPage, pageSize))
                 .build();
 
