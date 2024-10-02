@@ -9,4 +9,5 @@ public class LoyaltyBankDeletedEvent extends AbstractEvent {
 
     private String loyaltyBankId;
     private String accountId;
+    private String businessId;
 }

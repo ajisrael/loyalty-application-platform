@@ -9,6 +9,7 @@ public class AllPointsExpiredEvent extends AbstractEvent {
 
     private String loyaltyBankId;
     private String accountId;
+    private String businessId;
     private int pendingPointsRemoved;
     private int authorizedPointsVoided;
     private int availablePointsCaptured;

@@ -178,6 +178,7 @@ public class LoyaltyBankAggregate {
                 .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .accountId(this.accountId)
+                .businessId(this.businessId)
                 .pendingPointsRemoved(this.pending)
                 .authorizedPointsVoided(this.authorized)
                 .availablePointsCaptured(this.getAvailablePoints())
@@ -196,6 +197,7 @@ public class LoyaltyBankAggregate {
                 .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
                 .accountId(this.accountId)
+                .businessId(this.businessId)
                 .build();
 
         LogHelper.logCommandIssuingEvent(LOGGER, command, event);
