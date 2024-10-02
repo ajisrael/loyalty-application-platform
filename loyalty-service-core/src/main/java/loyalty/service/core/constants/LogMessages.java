@@ -39,6 +39,7 @@ public class LogMessages {
     public static final String LOYALTY_BANK_NOT_FOUND_IN_DB = "Loyalty bank {} not found in db";
     public static final String PROCESSED_EVENT_FOR_LOYALTY_BANK = "Processed {} event for loyaltyBank {}";
     public static final String NO_LOYALTY_BANK_FOUND_FOR_ACCOUNT = "No loyalty bank found for account {}";
+    public static final String NO_LOYALTY_BANK_FOUND_FOR_BUSINESS = "No loyalty bank found for business {}";
 
     public static final String BUSINESS_SAVED_IN_DB = "Business {} saved in db";
     public static final String BUSINESS_UPDATED_IN_DB = "Business {} updated in db";

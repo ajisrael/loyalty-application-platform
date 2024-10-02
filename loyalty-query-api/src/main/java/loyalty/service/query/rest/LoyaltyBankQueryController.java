@@ -9,6 +9,7 @@ import loyalty.service.core.utils.PaginationUtility;
 import loyalty.service.query.queries.FindAllLoyaltyBanksQuery;
 import loyalty.service.query.queries.FindLoyaltyBankQuery;
 import loyalty.service.query.queries.FindLoyaltyBanksWithAccountIdQuery;
+import loyalty.service.query.queries.FindLoyaltyBanksWithBusinessIdQuery;
 import loyalty.service.query.queryModels.LoyaltyBankQueryModel;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -53,6 +54,7 @@ public class LoyaltyBankQueryController {
                 .thenApply(PaginationUtility::toPageResponse);
     }
 
+    // TODO: make this a paginated response
     @GetMapping(params = "accountId")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
@@ -61,6 +63,22 @@ public class LoyaltyBankQueryController {
         FindLoyaltyBanksWithAccountIdQuery query = FindLoyaltyBanksWithAccountIdQuery.builder()
                 .requestId(UUID.randomUUID().toString())
                 .accountId(accountId)
+                .build();
+
+        LOGGER.info(MarkerGenerator.generateMarker(query), SENDING_QUERY, query.getClass().getSimpleName());
+
+        return queryGateway.query(query, ResponseTypes.multipleInstancesOf(LoyaltyBankQueryModel.class));
+    }
+
+    // TODO: make this a paginated response
+    @GetMapping(params = "businessId")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get loyalty banks for business")
+    public CompletableFuture<List<LoyaltyBankQueryModel>> getLoyaltyBanksForBusiness(String businessId) {
+        FindLoyaltyBanksWithBusinessIdQuery query = FindLoyaltyBanksWithBusinessIdQuery.builder()
+                .requestId(UUID.randomUUID().toString())
+                .businessId(businessId)
                 .build();
 
         LOGGER.info(MarkerGenerator.generateMarker(query), SENDING_QUERY, query.getClass().getSimpleName());

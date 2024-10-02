@@ -1,6 +1,7 @@
 package loyalty.service.query.queryHandlers;
 
 import lombok.AllArgsConstructor;
+import loyalty.service.core.exceptions.NoLoyaltyBanksForBusinessFoundException;
 import loyalty.service.query.data.entities.LoyaltyBankEntity;
 import loyalty.service.query.data.repositories.LoyaltyBankRepository;
 import loyalty.service.core.exceptions.LoyaltyBankNotFoundException;
@@ -9,6 +10,7 @@ import loyalty.service.core.utils.MarkerGenerator;
 import loyalty.service.query.queries.FindAllLoyaltyBanksQuery;
 import loyalty.service.query.queries.FindLoyaltyBankQuery;
 import loyalty.service.query.queries.FindLoyaltyBanksWithAccountIdQuery;
+import loyalty.service.query.queries.FindLoyaltyBanksWithBusinessIdQuery;
 import loyalty.service.query.queryModels.LoyaltyBankQueryModel;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.queryhandling.QueryHandler;
@@ -49,6 +51,24 @@ public class LoyaltyBankQueryHandler {
         if (loyaltyBankEntitiesOptional.isEmpty() || loyaltyBankEntitiesOptional.get().isEmpty()) {
             LOGGER.info(Markers.append(REQUEST_ID, query.getRequestId()), NO_LOYALTY_BANK_FOUND_FOR_ACCOUNT, accountId);
             throw new NoLoyaltyBanksForAccountFoundException(accountId);
+        }
+
+        return loyaltyBankEntitiesOptional.get().stream()
+                .map(this::convertLoyaltyBankEntityToLoyaltyBankQueryModel)
+                .toList();
+    }
+
+    @QueryHandler
+    public List<LoyaltyBankQueryModel> findLoyaltyBanksWithBusinessId(FindLoyaltyBanksWithBusinessIdQuery query) {
+        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_QUERY, query.getClass().getSimpleName());
+
+        String accountId = query.getBusinessId();
+
+        Optional<List<LoyaltyBankEntity>> loyaltyBankEntitiesOptional = loyaltyBankRepository.findByBusinessId(accountId);
+
+        if (loyaltyBankEntitiesOptional.isEmpty() || loyaltyBankEntitiesOptional.get().isEmpty()) {
+            LOGGER.info(Markers.append(REQUEST_ID, query.getRequestId()), NO_LOYALTY_BANK_FOUND_FOR_BUSINESS, accountId);
+            throw new NoLoyaltyBanksForBusinessFoundException(accountId);
         }
 
         return loyaltyBankEntitiesOptional.get().stream()
