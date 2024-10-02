@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import loyalty.service.command.commands.CreateLoyaltyBankCommand;
-import loyalty.service.command.commands.DeleteLoyaltyBankCommand;
 import loyalty.service.command.commands.UnenrollLoyaltyBankCommand;
 import loyalty.service.command.rest.requests.CreateLoyaltyBankRequestModel;
 import loyalty.service.command.rest.requests.DeleteLoyaltyBankRequestModel;
