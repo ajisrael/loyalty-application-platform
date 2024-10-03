@@ -12,6 +12,7 @@ import loyalty.service.core.events.LoyaltyBankCreatedEvent;
 import loyalty.service.core.exceptions.FailedToExpireLoyaltyPointsException;
 import loyalty.service.core.exceptions.IllegalLoyaltyBankStateException;
 import loyalty.service.core.exceptions.InsufficientPointsException;
+import loyalty.service.core.utils.MarkerGenerator;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static loyalty.service.core.constants.DomainConstants.*;
+import static loyalty.service.core.constants.LogMessages.INSUFFICIENT_AVAILABLE_POINTS_FOR_AUTHORIZATION;
 
 @Aggregate
 @NoArgsConstructor
@@ -118,6 +120,7 @@ public class LoyaltyBankAggregate {
             throw new IllegalLoyaltyBankStateException(AUTHORIZED);
         }
         if (this.getAvailablePoints() < command.getPoints()) {
+            LOGGER.info(MarkerGenerator.generateMarker(this), INSUFFICIENT_AVAILABLE_POINTS_FOR_AUTHORIZATION, command.getPoints());
             throw new InsufficientPointsException();
         }
 
@@ -249,7 +252,7 @@ public class LoyaltyBankAggregate {
 
     @EventSourcingHandler
     public void on(AwardedTransactionCreatedEvent event) {
-        this.earned = event.getPoints();
+        this.earned += event.getPoints();
 
         LogHelper.logEventProcessed(LOGGER, event);
     }

@@ -20,6 +20,8 @@ public class LogMessages {
     public static final String VALIDATING_COMMAND = "Validating command {}";
     public static final String EXCESSIVE_POINTS_REQUEST_CANCELLING_COMMAND = "Attempting to {} more points than authorized, cancelling command";
 
+    public static final String INSUFFICIENT_AVAILABLE_POINTS_FOR_AUTHORIZATION = "Insufficient available points for authorization of {} points";
+
     public static final String ACCOUNT_SAVED_IN_LOOKUP_DB = "Account {} saved in lookup db";
     public static final String ACCOUNT_UPDATED_IN_LOOKUP_DB = "Account {} updated in lookup db";
     public static final String ACCOUNT_DELETED_FROM_LOOKUP_DB = "Account {} deleted from lookup db";
