@@ -46,5 +46,11 @@ public class LogMessages {
     public static final String BUSINESS_DELETED_FROM_DB = "Business {} deleted from db";
     public static final String BUSINESS_NOT_FOUND_IN_DB = "Business {} not found in db";
 
+    public static final String ACCOUNT_TO_LOYALTY_BANK_SAVED_IN_DB = "Account to loyalty bank relationship for accountId {} saved in db";
+    public static final String ACCOUNT_TO_LOYALTY_BANK_DELETED_FROM_DB = "Account to loyalty bank relationship for accountId {} deleted from db";
+    public static final String ACCOUNT_TO_LOYALTY_BANK_NOT_FOUND_IN_DB = "Account to loyalty bank relationship for accountId {} not found in db";
+    public static final String LOYALTY_BANK_ADDED_TO_ACCOUNT_TO_LOYALTY_BANK_IN_DB = "Loyalty bank {} added to account to loyalty bank relationship for accountId {} in db";
+    public static final String LOYALTY_BANK_REMOVED_FROM_ACCOUNT_TO_LOYALTY_BANK_IN_DB = "Loyalty bank {} removed from account to loyalty bank relationship for accountId {} in db";
+
     public static final String SENDING_QUERY = "Sending query {}";
 }

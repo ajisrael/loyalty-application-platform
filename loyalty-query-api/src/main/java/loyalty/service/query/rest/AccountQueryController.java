@@ -8,7 +8,9 @@ import loyalty.service.core.utils.MarkerGenerator;
 import loyalty.service.core.utils.PaginationUtility;
 import loyalty.service.query.queries.FindAccountQuery;
 import loyalty.service.query.queries.FindAllAccountsQuery;
+import loyalty.service.query.queries.FindEnrichedLoyaltyBanksForAccountQuery;
 import loyalty.service.query.queryModels.AccountQueryModel;
+import loyalty.service.query.queryModels.EnrichedLoyaltyBanksForAccountQueryModel;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.slf4j.Logger;
@@ -65,5 +67,20 @@ public class AccountQueryController {
         LOGGER.info(MarkerGenerator.generateMarker(query), SENDING_QUERY, query.getClass().getSimpleName());
 
         return queryGateway.query(query, ResponseTypes.instanceOf(AccountQueryModel.class));
+    }
+
+    @GetMapping(path = "/enrich", params = "accountId")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get account by id")
+    public CompletableFuture<EnrichedLoyaltyBanksForAccountQueryModel> getEnrichedAccount(String accountId) {
+        FindEnrichedLoyaltyBanksForAccountQuery query = FindEnrichedLoyaltyBanksForAccountQuery.builder()
+                .requestId(UUID.randomUUID().toString())
+                .accountId(accountId)
+                .build();
+
+        LOGGER.info(MarkerGenerator.generateMarker(query), SENDING_QUERY, query.getClass().getSimpleName());
+
+        return queryGateway.query(query, ResponseTypes.instanceOf(EnrichedLoyaltyBanksForAccountQueryModel.class));
     }
 }
