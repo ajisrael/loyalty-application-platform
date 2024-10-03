@@ -10,9 +10,7 @@ import loyalty.service.query.data.repositories.AccountRepository;
 import loyalty.service.query.data.repositories.BusinessRepository;
 import loyalty.service.query.data.repositories.LoyaltyBankRepository;
 import loyalty.service.query.queries.*;
-import loyalty.service.query.queryModels.BusinessQueryModel;
-import loyalty.service.query.queryModels.EnrichedLoyaltyBankForAccountQueryModel;
-import loyalty.service.query.queryModels.EnrichedLoyaltyBanksForAccountQueryModel;
+import loyalty.service.query.queryModels.*;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.queryhandling.QueryHandler;
 import org.slf4j.Logger;
@@ -34,7 +32,6 @@ public class EnrichedLoyaltyBankQueryHandler {
     private final AccountRepository accountRepository;
     private final LoyaltyBankRepository loyaltyBankRepository;
     private final BusinessRepository businessRepository;
-
 
     @QueryHandler
     public EnrichedLoyaltyBanksForAccountQueryModel findAndEnrichLoyaltyBanksForAccount(FindEnrichedLoyaltyBanksForAccountQuery query) {
@@ -91,6 +88,67 @@ public class EnrichedLoyaltyBankQueryHandler {
         );
 
         return enrichedLoyaltyBanksForAccountQueryModel;
+    }
+
+    @QueryHandler
+    public EnrichedLoyaltyBanksForBusinessQueryModel findAndEnrichLoyaltyBanksForBusiness(FindEnrichedLoyaltyBanksForBusinessQuery query) {
+        LOGGER.info(MarkerGenerator.generateMarker(query), PROCESSING_QUERY, query.getClass().getSimpleName());
+
+        String businessId = query.getBusinessId();
+
+        Optional<BusinessEntity> businessEntityOptional = businessRepository.findByBusinessId(businessId);
+
+        if (businessEntityOptional.isEmpty()) {
+            LOGGER.info(Markers.append(REQUEST_ID, query.getRequestId()), ACCOUNT_NOT_FOUND_IN_DB, businessId);
+            throw new AccountNotFoundException(businessId);
+        }
+
+        BusinessEntity businessEntity = businessEntityOptional.get();
+
+        EnrichedLoyaltyBanksForBusinessQueryModel enrichedLoyaltyBanksForBusinessQueryModel =
+                new EnrichedLoyaltyBanksForBusinessQueryModel(
+                        businessEntity.getBusinessId(),
+                        businessEntity.getBusinessId(),
+                        new ArrayList<>()
+                );
+
+        Optional<List<LoyaltyBankEntity>> loyaltyBankEntitiesOptional = loyaltyBankRepository.findByBusinessId(businessId);
+
+        if (loyaltyBankEntitiesOptional.isEmpty() || loyaltyBankEntitiesOptional.get().isEmpty()) {
+            LOGGER.info(Markers.append(REQUEST_ID, query.getRequestId()), NO_LOYALTY_BANK_FOUND_FOR_BUSINESS, businessId);
+        }
+
+        loyaltyBankEntitiesOptional.get().forEach(
+                loyaltyBankEntity -> {
+                    String accountId = loyaltyBankEntity.getAccountId();
+                    Optional<AccountEntity> accountEntityOptional = accountRepository.findByAccountId(accountId);
+
+                    if (accountEntityOptional.isEmpty()) {
+                        LOGGER.info(Markers.append(REQUEST_ID, query.getRequestId()), BUSINESS_NOT_FOUND_IN_DB, accountId);
+                        throw new AccountNotFoundException(accountId);
+                    }
+
+                    AccountEntity accountEntity = accountEntityOptional.get();
+                    AccountQueryModel accountQueryModel = new AccountQueryModel(
+                            accountEntity.getAccountId(),
+                            accountEntity.getFirstName(),
+                            accountEntity.getLastName(),
+                            accountEntity.getEmail()
+                    );
+
+                    enrichedLoyaltyBanksForBusinessQueryModel.addLoyaltyBank(new EnrichedLoyaltyBankForBusinessQueryModel(
+                            loyaltyBankEntity.getLoyaltyBankId(),
+                            accountQueryModel,
+                            loyaltyBankEntity.getPending(),
+                            loyaltyBankEntity.getEarned(),
+                            loyaltyBankEntity.getAuthorized(),
+                            loyaltyBankEntity.getCaptured(),
+                            loyaltyBankEntity.getEarned() - loyaltyBankEntity.getAuthorized() - loyaltyBankEntity.getCaptured()
+                    ));
+                }
+        );
+
+        return enrichedLoyaltyBanksForBusinessQueryModel;
     }
 
 }

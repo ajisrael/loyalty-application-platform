@@ -8,7 +8,9 @@ import loyalty.service.core.utils.MarkerGenerator;
 import loyalty.service.core.utils.PaginationUtility;
 import loyalty.service.query.queries.FindAllBusinessesQuery;
 import loyalty.service.query.queries.FindBusinessQuery;
+import loyalty.service.query.queries.FindEnrichedLoyaltyBanksForBusinessQuery;
 import loyalty.service.query.queryModels.BusinessQueryModel;
+import loyalty.service.query.queryModels.EnrichedLoyaltyBanksForBusinessQueryModel;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.slf4j.Logger;
@@ -65,5 +67,20 @@ public class BusinessQueryController {
         LOGGER.info(MarkerGenerator.generateMarker(query), SENDING_QUERY, query.getClass().getSimpleName());
 
         return queryGateway.query(query, ResponseTypes.instanceOf(BusinessQueryModel.class));
+    }
+
+    @GetMapping(path = "/enrich", params = "businessId")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get business by id")
+    public CompletableFuture<EnrichedLoyaltyBanksForBusinessQueryModel> getEnrichedBusiness(String businessId) {
+        FindEnrichedLoyaltyBanksForBusinessQuery query = FindEnrichedLoyaltyBanksForBusinessQuery.builder()
+                .requestId(UUID.randomUUID().toString())
+                .businessId(businessId)
+                .build();
+
+        LOGGER.info(MarkerGenerator.generateMarker(query), SENDING_QUERY, query.getClass().getSimpleName());
+
+        return queryGateway.query(query, ResponseTypes.instanceOf(EnrichedLoyaltyBanksForBusinessQueryModel.class));
     }
 }
