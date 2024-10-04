@@ -9,8 +9,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableDiscoveryClient
+@EnableScheduling
 @SpringBootApplication
 public class LoyaltyCommandApiApplication {
 
@@ -48,5 +50,8 @@ public class LoyaltyCommandApiApplication {
 				configuration -> new LoyaltyServiceEventsErrorHandler());
 		configurer.registerListenerInvocationErrorHandler("redemption-tracker-group",
 				configuration -> new LoyaltyServiceEventsErrorHandler());
+		configurer.registerListenerInvocationErrorHandler("expiration-tracker-group",
+				configuration -> new LoyaltyServiceEventsErrorHandler());
+
 	}
 }

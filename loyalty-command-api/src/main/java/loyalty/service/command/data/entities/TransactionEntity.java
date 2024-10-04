@@ -1,12 +1,7 @@
 package loyalty.service.command.data.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.Instant;
 
@@ -25,4 +20,7 @@ public class TransactionEntity {
 
     @Column(name = "timestamp")
     private Instant timestamp;
+
+    @Column(name = "expiration_tracker_id")
+    private String loyaltyBankId;
 }

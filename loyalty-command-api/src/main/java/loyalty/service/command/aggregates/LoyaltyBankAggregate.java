@@ -176,6 +176,24 @@ public class LoyaltyBankAggregate {
     }
 
     @CommandHandler
+    public void on(CreateExpirePointsTransactionCommand command) {
+        if (this.captured + command.getPoints() < 0) {
+            throw new IllegalLoyaltyBankStateException(CAPTURED);
+        }
+
+        ExpiredTransactionCreatedEvent event = ExpiredTransactionCreatedEvent.builder()
+                .requestId(command.getRequestId())
+                .loyaltyBankId(command.getLoyaltyBankId())
+                .transactionId(command.getTransactionId())
+                .points(command.getPoints())
+                .build();
+
+        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
+
+        AggregateLifecycle.apply(event);
+    }
+
+    @CommandHandler
     public void on(ExpireAllPointsCommand command) {
         AllPointsExpiredEvent event = AllPointsExpiredEvent.builder()
                 .requestId(command.getRequestId())
@@ -274,6 +292,13 @@ public class LoyaltyBankAggregate {
     @EventSourcingHandler
     public void on(CapturedTransactionCreatedEvent event) {
         this.authorized -= event.getPoints();
+        this.captured += event.getPoints();
+
+        LogHelper.logEventProcessed(LOGGER, event);
+    }
+
+    @EventSourcingHandler
+    public void on(ExpiredTransactionCreatedEvent event) {
         this.captured += event.getPoints();
 
         LogHelper.logEventProcessed(LOGGER, event);

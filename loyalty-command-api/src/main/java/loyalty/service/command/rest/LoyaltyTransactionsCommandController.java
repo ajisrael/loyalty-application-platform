@@ -22,7 +22,7 @@ import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_LOY
 
 @RestController
 @RequestMapping("/transaction")
-@Tag(name = "Loyalty Transactions Command API")
+@Tag(name = "Loyalty Service Command API")
 public class LoyaltyTransactionsCommandController {
 
     @Autowired

@@ -16,8 +16,9 @@ public class ExpirationTrackerEntity {
     @Id
     @Column(name = "loyalty_bank_id", unique = true)
     private String loyaltyBankId;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "loyalty_bank_id")
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name="loyalty_bank_id")
     private List<TransactionEntity> transactionList = new ArrayList<>();
 
     public ExpirationTrackerEntity(String loyaltyBankId) {
