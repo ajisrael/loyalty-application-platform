@@ -188,6 +188,26 @@ public class LoyaltyBankEventsHandler {
     }
 
     @EventHandler
+    public void on(ExpiredTransactionCreatedEvent event) {
+        Optional<LoyaltyBankEntity> loyaltyBankEntityOptional = loyaltyBankRepository.findByLoyaltyBankId(event.getLoyaltyBankId());
+
+        if (loyaltyBankEntityOptional.isPresent()) {
+            LoyaltyBankEntity loyaltyBankEntity = loyaltyBankEntityOptional.get();
+            loyaltyBankEntity.setCaptured(loyaltyBankEntity.getCaptured() + event.getPoints());
+            loyaltyBankRepository.save(loyaltyBankEntity);
+
+            LOGGER.info(
+                    MarkerGenerator.generateMarker(event),
+                    PROCESSED_EVENT_FOR_LOYALTY_BANK,
+                    event.getClass().getSimpleName(),
+                    event.getLoyaltyBankId()
+            );
+        } else {
+            logAndThrowLoyaltyBankNotFoundException(event.getRequestId(), event.getLoyaltyBankId());
+        }
+    }
+
+    @EventHandler
     public void on(AllPointsExpiredEvent event) {
         Optional<LoyaltyBankEntity> loyaltyBankEntityOptional = loyaltyBankRepository.findByLoyaltyBankId(event.getLoyaltyBankId());
 
