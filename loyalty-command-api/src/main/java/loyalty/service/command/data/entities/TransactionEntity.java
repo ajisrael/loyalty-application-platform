@@ -23,4 +23,8 @@ public class TransactionEntity {
 
     @Column(name = "expiration_tracker_id")
     private String loyaltyBankId;
+
+    public void addPoints(int points) {
+        this.points += points;
+    }
 }

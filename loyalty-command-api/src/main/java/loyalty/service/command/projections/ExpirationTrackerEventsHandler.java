@@ -5,6 +5,7 @@ import loyalty.service.command.data.entities.ExpirationTrackerEntity;
 import loyalty.service.command.data.entities.TransactionEntity;
 import loyalty.service.command.data.repositories.ExpirationTrackerRepository;
 import loyalty.service.command.data.repositories.TransactionRepository;
+import loyalty.service.core.events.AllPointsExpiredEvent;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
 import loyalty.service.core.events.LoyaltyBankDeletedEvent;
 import loyalty.service.core.events.transactions.*;
@@ -68,16 +69,37 @@ public class ExpirationTrackerEventsHandler {
     }
 
     @EventHandler
-    public void on(CapturedTransactionCreatedEvent event, @Timestamp java.time.Instant eventTimestamp) {
+    public void on(AuthorizedTransactionCreatedEvent event) {
         String loyaltyBankId = event.getLoyaltyBankId();
         ExpirationTrackerEntity expirationTrackerEntity = expirationTrackerRepository.findByLoyaltyBankId(loyaltyBankId);
-        applyCapturedPointsToTransactions(event.getPoints(), expirationTrackerEntity);
+        applyPointsToTransactions(event.getPoints(), expirationTrackerEntity);
         expirationTrackerRepository.save(expirationTrackerEntity);
 
         Marker marker = MarkerGenerator.generateMarker(expirationTrackerEntity);
         marker.add(Markers.append(REQUEST_ID,event.getRequestId()));
 
-        LOGGER.info(marker, "Captured points applied to transactions for loyalty bank {}", loyaltyBankId);
+        LOGGER.info(marker, "Authorized points applied to transactions for loyalty bank {}", loyaltyBankId);
+    }
+
+    @EventHandler
+    public void on(VoidTransactionCreatedEvent event, @Timestamp Instant eventTimeStamp) {
+        String loyaltyBankId = event.getLoyaltyBankId();
+        ExpirationTrackerEntity expirationTrackerEntity = expirationTrackerRepository.findByLoyaltyBankId(loyaltyBankId);
+
+        if (expirationTrackerEntity.getTransactionList().isEmpty()) {
+            expirationTrackerEntity.getTransactionList().add(
+                    new TransactionEntity(event.getRequestId(), event.getPoints(), eventTimeStamp, loyaltyBankId)
+            );
+        } else {
+            expirationTrackerEntity.getTransactionList().get(0).addPoints(event.getPoints());
+        }
+
+        expirationTrackerRepository.save(expirationTrackerEntity);
+
+        Marker marker = MarkerGenerator.generateMarker(expirationTrackerEntity);
+        marker.add(Markers.append(REQUEST_ID,event.getRequestId()));
+
+        LOGGER.info(marker, "Voided points applied to transactions for loyalty bank {}", loyaltyBankId);
     }
 
     @EventHandler
@@ -97,6 +119,19 @@ public class ExpirationTrackerEventsHandler {
         marker.add(Markers.append(REQUEST_ID,event.getRequestId()));
 
         LOGGER.info(marker, "Removed transaction for loyalty bank {} due to expiration", loyaltyBankId);
+    }
+
+    @EventHandler
+    public void on(AllPointsExpiredEvent event) {
+        String loyaltyBankId = event.getLoyaltyBankId();
+        ExpirationTrackerEntity expirationTrackerEntity = expirationTrackerRepository.findByLoyaltyBankId(loyaltyBankId);
+        expirationTrackerEntity.getTransactionList().clear();
+        expirationTrackerRepository.save(expirationTrackerEntity);
+
+        Marker marker = MarkerGenerator.generateMarker(expirationTrackerEntity);
+        marker.add(Markers.append(REQUEST_ID,event.getRequestId()));
+
+        LOGGER.info(marker, "Transactions cleared for loyalty bank {}", loyaltyBankId);
     }
 
     @EventHandler
@@ -123,7 +158,7 @@ public class ExpirationTrackerEventsHandler {
         LOGGER.info(marker, "TransactionEntity created for loyalty bank {}", loyaltyBankId);
     }
 
-    private void applyCapturedPointsToTransactions(int points, ExpirationTrackerEntity expirationTrackerEntity) {
+    private void applyPointsToTransactions(int points, ExpirationTrackerEntity expirationTrackerEntity) {
         while (points > 0) {
             TransactionEntity oldestTransaction = expirationTrackerEntity.getTransactionList().get(0);
             oldestTransaction.setPoints(oldestTransaction.getPoints() - points);
