@@ -105,7 +105,7 @@ public class ExpirationTrackerEventsHandler {
     @EventHandler
     public void on(ExpiredTransactionCreatedEvent event) {
         String loyaltyBankId = event.getLoyaltyBankId();
-        TransactionEntity transactionEntity = transactionRepository.findByTransactionId(event.getTransactionId());
+        TransactionEntity transactionEntity = transactionRepository.findByTransactionId(event.getTargetTransactionId());
 
         if (transactionEntity.getPoints() != event.getPoints()) {
             Marker marker = MarkerGenerator.generateMarker(transactionEntity);
@@ -113,7 +113,7 @@ public class ExpirationTrackerEventsHandler {
             LOGGER.error(marker, "Points expired do not match transaction");
         }
 
-        transactionRepository.deleteById(event.getTransactionId());
+        transactionRepository.deleteById(event.getTargetTransactionId());
 
         Marker marker = MarkerGenerator.generateMarker(transactionEntity);
         marker.add(Markers.append(REQUEST_ID,event.getRequestId()));

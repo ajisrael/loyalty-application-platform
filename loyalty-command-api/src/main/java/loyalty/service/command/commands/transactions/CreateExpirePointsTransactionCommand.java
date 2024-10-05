@@ -6,5 +6,5 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 public class CreateExpirePointsTransactionCommand extends AbstractTransactionCommand  {
-    private String transactionId;
+    private String targetTransactionId;
 }

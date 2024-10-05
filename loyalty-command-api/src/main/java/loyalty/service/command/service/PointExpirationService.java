@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_LOYALTY_BANK;
@@ -45,7 +44,7 @@ public class PointExpirationService {
             CreateExpirePointsTransactionCommand command = CreateExpirePointsTransactionCommand.builder()
                     .requestId(requestId)
                     .loyaltyBankId(transaction.getLoyaltyBankId())
-                    .transactionId(transaction.getTransactionId())
+                    .targetTransactionId(transaction.getTransactionId())
                     .points(transaction.getPoints())
                     .build();
 

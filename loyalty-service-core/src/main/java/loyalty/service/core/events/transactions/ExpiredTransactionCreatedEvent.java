@@ -6,5 +6,5 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 public class ExpiredTransactionCreatedEvent extends AbstractTransactionEvent {
-    private String transactionId;
+    private String targetTransactionId;
 }

@@ -184,7 +184,7 @@ public class LoyaltyBankAggregate {
         ExpiredTransactionCreatedEvent event = ExpiredTransactionCreatedEvent.builder()
                 .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
-                .transactionId(command.getTransactionId())
+                .targetTransactionId(command.getTargetTransactionId())
                 .points(command.getPoints())
                 .build();
 
