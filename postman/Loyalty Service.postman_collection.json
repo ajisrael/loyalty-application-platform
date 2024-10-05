@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1a764ba9-e657-4183-bbdb-e7cc8a082773",
+		"_postman_id": "4096ee84-68f3-4531-ac68-fee34c612634",
 		"name": "Loyalty Service",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "8822572"
@@ -2197,14 +2197,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8082/loyalty-service/account",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/{{commandApi}}/account",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8082",
 					"path": [
-						"loyalty-service",
+						"{{commandApi}}",
 						"account"
 					]
 				}
@@ -2226,14 +2224,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8082/loyalty-service/account",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/{{commandApi}}/account",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8082",
 					"path": [
-						"loyalty-service",
+						"{{commandApi}}",
 						"account"
 					]
 				}
@@ -2255,14 +2251,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8082/loyalty-service/account",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/{{commandApi}}/account",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8082",
 					"path": [
-						"loyalty-service",
+						"{{commandApi}}",
 						"account"
 					]
 				}
@@ -2275,14 +2269,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8082/loyalty-service/account?accountId={{accountId}}",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/{{queryApi}}/account?accountId={{accountId}}",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8082",
 					"path": [
-						"loyalty-service",
+						"{{queryApi}}",
 						"account"
 					],
 					"query": [
@@ -2301,15 +2293,296 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8082/loyalty-service/account",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/{{queryApi}}/account",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8082",
 					"path": [
-						"loyalty-service",
+						"{{queryApi}}",
 						"account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Enriched Account",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{queryApi}}/account/enrich?accountId={{accountId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{queryApi}}",
+						"account",
+						"enrich"
+					],
+					"query": [
+						{
+							"key": "accountId",
+							"value": "{{accountId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Business",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Check if the response contains the 'businessId' property",
+							"if (jsonData.businessId) {",
+							"    // Set the 'businessId' in the Postman environment",
+							"    pm.environment.set(\"businessId\", jsonData.businessId);",
+							"    console.log(\"businessId saved to environment: \" + jsonData.businessId);",
+							"} else {",
+							"    console.error(\"businessId not found in the response body.\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"businessName\": \"Business1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{commandApi}}/business",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{commandApi}}",
+						"business"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Business",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"businessId\": \"{{businessId}}\",\n    \"businessName\": \"NewBusinessName\"\n} ",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{commandApi}}/business",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{commandApi}}",
+						"business"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Business",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"businessId\": \"{{businessId}}\"\n} ",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{commandApi}}/business",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{commandApi}}",
+						"business"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Business",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{queryApi}}/business?businessId={{businessId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{queryApi}}",
+						"business"
+					],
+					"query": [
+						{
+							"key": "businessId",
+							"value": "{{businessId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Businesses",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{queryApi}}/business",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{queryApi}}",
+						"business"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Enriched Business",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{queryApi}}/business/enrich?businessId={{businessId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{queryApi}}",
+						"business",
+						"enrich"
+					],
+					"query": [
+						{
+							"key": "businessId",
+							"value": "{{businessId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Loyalty Bank",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Check if the response contains the 'loyaltyBankId' property",
+							"if (jsonData.loyaltyBankId) {",
+							"    // Set the 'loyaltyBankId' in the Postman environment",
+							"    pm.environment.set(\"loyaltyBankId\", jsonData.loyaltyBankId);",
+							"    console.log(\"loyaltyBankId saved to environment: \" + jsonData.loyaltyBankId);",
+							"} else {",
+							"    console.error(\"loyaltyBankId not found in the response body.\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"businessId\": \"{{businessId}}\",\n    \"accountId\": \"{{accountId}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{commandApi}}/bank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{commandApi}}",
+						"bank"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Loyalty Bank",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"loyaltyBankId\": \"{{loyaltyBankId}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{commandApi}}/bank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{commandApi}}",
+						"bank"
 					]
 				}
 			},
@@ -2343,14 +2616,58 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8082/loyalty-service/bank?accountId={{accountId}}",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/{{queryApi}}/bank?loyaltyBankId={{loyaltyBankId}}",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8082",
 					"path": [
-						"loyalty-service",
+						"{{queryApi}}",
+						"bank"
+					],
+					"query": [
+						{
+							"key": "loyaltyBankId",
+							"value": "{{loyaltyBankId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Loyalty Banks for Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Check if the response contains the 'accountId' property",
+							"if (jsonData.loyaltyBankId) {",
+							"    // Set the 'accountId' in the Postman environment",
+							"    pm.environment.set(\"loyaltyBankId\", jsonData.loyaltyBankId);",
+							"    console.log(\"loyaltyBankId saved to environment: \" + jsonData.loyaltyBankId);",
+							"} else {",
+							"    console.error(\"loyaltyBankId not found in the response body.\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{queryApi}}/bank?accountId={{accountId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{queryApi}}",
 						"bank"
 					],
 					"query": [
@@ -2364,19 +2681,63 @@
 			"response": []
 		},
 		{
-			"name": "Get Loyalty Banks",
+			"name": "Get Loyalty Banks for Business",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Check if the response contains the 'accountId' property",
+							"if (jsonData.loyaltyBankId) {",
+							"    // Set the 'accountId' in the Postman environment",
+							"    pm.environment.set(\"loyaltyBankId\", jsonData.loyaltyBankId);",
+							"    console.log(\"loyaltyBankId saved to environment: \" + jsonData.loyaltyBankId);",
+							"} else {",
+							"    console.error(\"loyaltyBankId not found in the response body.\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8082/loyalty-service/bank",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/{{queryApi}}/bank?businessId={{businessId}}",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8082",
 					"path": [
-						"loyalty-service",
+						"{{queryApi}}",
+						"bank"
+					],
+					"query": [
+						{
+							"key": "businessId",
+							"value": "{{businessId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Loyalty Banks",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{queryApi}}/bank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{queryApi}}",
 						"bank"
 					]
 				}
@@ -2398,14 +2759,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8082/loyalty-service/transaction/pending",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/{{commandApi}}/transaction/pending",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8082",
 					"path": [
-						"loyalty-service",
+						"{{commandApi}}",
 						"transaction",
 						"pending"
 					]
@@ -2428,14 +2787,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8082/loyalty-service/transaction/earn",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/{{commandApi}}/transaction/earn",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8082",
 					"path": [
-						"loyalty-service",
+						"{{commandApi}}",
 						"transaction",
 						"earn"
 					]
@@ -2444,7 +2801,57 @@
 			"response": []
 		},
 		{
+			"name": "Award Transaction",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"loyaltyBankId\": \"{{loyaltyBankId}}\",\n    \"points\": 1000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{commandApi}}/transaction/award",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{commandApi}}",
+						"transaction",
+						"award"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Authorize Transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Check if the response contains the 'paymentId' property",
+							"if (jsonData.paymentId) {",
+							"    // Set the 'paymentId' in the Postman environment",
+							"    pm.environment.set(\"paymentId\", jsonData.paymentId);",
+							"    console.log(\"paymentId saved to environment: \" + jsonData.paymentId);",
+							"} else {",
+							"    console.error(\"paymentId not found in the response body.\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -2458,16 +2865,42 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8082/loyalty-service/transaction/authorize",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/{{commandApi}}/transaction/authorize",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8082",
 					"path": [
-						"loyalty-service",
+						"{{commandApi}}",
 						"transaction",
 						"authorize"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Void Transaction",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"loyaltyBankId\": \"{{loyaltyBankId}}\",\n    \"paymentId\": \"{{paymentId}}\",\n    \"points\": 80\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{commandApi}}/transaction/void",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{commandApi}}",
+						"transaction",
+						"void"
 					]
 				}
 			},
@@ -2480,7 +2913,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"loyaltyBankId\": \"{{loyaltyBankId}}\",\n    \"points\": 100\n}",
+					"raw": "{\n    \"loyaltyBankId\": \"{{loyaltyBankId}}\",\n    \"paymentId\": \"{{paymentId}}\",\n    \"points\": 10\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2488,16 +2921,50 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8082/loyalty-service/transaction/capture",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/{{commandApi}}/transaction/capture",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8082",
 					"path": [
-						"loyalty-service",
+						"{{commandApi}}",
 						"transaction",
 						"capture"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Expire Points Before Date",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{commandApi}}/expire?date=2024-10-04",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{commandApi}}",
+						"expire"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "2024-10-04"
+						}
 					]
 				}
 			},
