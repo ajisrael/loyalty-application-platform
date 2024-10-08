@@ -2,3 +2,4 @@
 .DS_Store
 *.key
 run_postman_test.sh
+*.iml
