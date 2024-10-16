@@ -4,6 +4,7 @@ import loyalty.service.command.commands.CreateAccountCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.core.events.AccountCreatedEvent;
 import loyalty.service.core.events.AccountUpdatedEvent;
+import org.axonframework.eventsourcing.eventstore.EventStoreException;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,8 +56,11 @@ class AccountAggregateTest {
     }
 
     @Test
+    @DisplayName("CreateAccountCommand doesn't process on an existing AccountAggregate")
     void testAccountAggregate_whenCreateAccountCommandHandledWithPriorActivity_ShouldThrowException() {
-        fail("Not implemented");
+        fixture.given(accountCreatedEvent)
+                .when(createAccountCommand)
+                .expectException(EventStoreException.class);
     }
 
     @Test
