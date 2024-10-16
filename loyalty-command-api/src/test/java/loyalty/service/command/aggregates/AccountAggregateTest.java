@@ -1,7 +1,9 @@
 package loyalty.service.command.aggregates;
 
 import loyalty.service.command.commands.CreateAccountCommand;
+import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.core.events.AccountCreatedEvent;
+import loyalty.service.core.events.AccountUpdatedEvent;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,8 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -19,11 +19,26 @@ class AccountAggregateTest {
 
     private FixtureConfiguration<AccountAggregate> fixture;
 
-    public static final String TEST_REQUEST_ID = "test-request-id";
-    public static final String TEST_ACCOUNT_ID = "test-account-id";
-    public static final String TEST_FIRST_NAME = "John";
-    public static final String TEST_LAST_NAME = "Doe";
-    public static final String TEST_EMAIL = "john.doe@test.com";
+    private static final String TEST_REQUEST_ID = "test-request-id";
+    private static final String TEST_ACCOUNT_ID = "test-account-id";
+    private static final String TEST_FIRST_NAME = "John";
+    private static final String TEST_LAST_NAME = "Doe";
+    private static final String TEST_EMAIL = "john.doe@test.com";
+    private static final CreateAccountCommand createAccountCommand = CreateAccountCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .accountId(TEST_ACCOUNT_ID)
+            .firstName(TEST_FIRST_NAME)
+            .lastName(TEST_LAST_NAME)
+            .email(TEST_EMAIL)
+            .build();
+
+    private static final AccountCreatedEvent accountCreatedEvent  = AccountCreatedEvent.builder()
+            .requestId(createAccountCommand.getRequestId())
+            .accountId(createAccountCommand.getAccountId())
+            .firstName(createAccountCommand.getFirstName())
+            .lastName(createAccountCommand.getLastName())
+            .email(createAccountCommand.getEmail())
+            .build();
 
     @BeforeEach
     void setup() {
@@ -33,28 +48,40 @@ class AccountAggregateTest {
     @Test
     @DisplayName("CreateAccountCommand results in AccountCreatedEvent")
     void testAccountAggregate_whenCreateAccountCommandHandledWithNoPriorActivity_ShouldIssueAccountCreatedEvent() {
+        // Act & Assert
+        fixture.givenNoPriorActivity()
+                .when(createAccountCommand)
+                .expectEvents(accountCreatedEvent);
+    }
+
+    @Test
+    void testAccountAggregate_whenCreateAccountCommandHandledWithPriorActivity_ShouldThrowException() {
+        fail("Not implemented");
+    }
+
+    @Test
+    @DisplayName("UpdateAccountCommand results in AccountUpdatedEvent")
+    void testUpdateAccount_whenUpdateAccountCommandHandled_ShouldIssueAccountUpdatedEvent() {
         // Arrange
-        CreateAccountCommand command = CreateAccountCommand.builder()
+        UpdateAccountCommand updateAccountCommand = UpdateAccountCommand.builder()
                 .requestId(TEST_REQUEST_ID)
                 .accountId(TEST_ACCOUNT_ID)
-                .firstName(TEST_FIRST_NAME)
+                .firstName("Johnathan")
                 .lastName(TEST_LAST_NAME)
                 .email(TEST_EMAIL)
                 .build();
 
-        AccountCreatedEvent event  = AccountCreatedEvent.builder()
-                .requestId(command.getRequestId())
-                .accountId(command.getAccountId())
-                .firstName(command.getFirstName())
-                .lastName(command.getLastName())
-                .email(command.getEmail())
+        AccountUpdatedEvent accountUpdatedEvent = AccountUpdatedEvent.builder()
+                .requestId(updateAccountCommand.getRequestId())
+                .accountId(updateAccountCommand.getAccountId())
+                .firstName(updateAccountCommand.getFirstName())
+                .lastName(updateAccountCommand.getLastName())
+                .email(updateAccountCommand.getEmail())
                 .build();
 
         // Act & Assert
-        fixture.givenNoPriorActivity()
-                .when(command)
-                .expectEvents(event);
+        fixture.given(accountCreatedEvent)
+                .when(updateAccountCommand)
+                .expectEvents(accountUpdatedEvent);
     }
-
-
 }
