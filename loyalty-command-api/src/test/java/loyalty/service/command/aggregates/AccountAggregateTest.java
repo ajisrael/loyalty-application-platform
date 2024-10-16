@@ -71,6 +71,7 @@ class AccountAggregateTest {
             .requestId(deleteAccountCommand.getRequestId())
             .accountId(deleteAccountCommand.getAccountId())
             .build();
+
     @BeforeEach
     void setup() {
         fixture = new AggregateTestFixture<>(AccountAggregate.class);
@@ -82,7 +83,13 @@ class AccountAggregateTest {
         // Act & Assert
         fixture.givenNoPriorActivity()
                 .when(createAccountCommand)
-                .expectEvents(accountCreatedEvent);
+                .expectEvents(accountCreatedEvent)
+                .expectState(state -> {
+                    assertEquals(accountCreatedEvent.getAccountId(), state.getAccountId(), "AccountIds should match");
+                    assertEquals(accountCreatedEvent.getFirstName(), state.getFirstName(), "FirstNames should match");
+                    assertEquals(accountCreatedEvent.getLastName(), state.getLastName(), "LastNames should match");
+                    assertEquals(accountCreatedEvent.getEmail(), state.getEmail(), "Emails should match");
+                });
     }
 
     @Test
@@ -99,7 +106,13 @@ class AccountAggregateTest {
         // Arrange & Act & Assert
         fixture.given(accountCreatedEvent)
                 .when(updateAccountCommand)
-                .expectEvents(accountUpdatedEvent);
+                .expectEvents(accountUpdatedEvent)
+                .expectState(state -> {
+                    assertEquals(accountUpdatedEvent.getAccountId(), state.getAccountId(), "AccountIds should match");
+                    assertEquals(accountUpdatedEvent.getFirstName(), state.getFirstName(), "FirstNames should match");
+                    assertEquals(accountUpdatedEvent.getLastName(), state.getLastName(), "LastNames should match");
+                    assertEquals(accountUpdatedEvent.getEmail(), state.getEmail(), "Emails should match");
+                });
     }
 
     @Test
@@ -116,7 +129,8 @@ class AccountAggregateTest {
         // Arrange & Act & Assert
         fixture.given(accountCreatedEvent)
                 .when(deleteAccountCommand)
-                .expectEvents(accountDeletedEvent);
+                .expectEvents(accountDeletedEvent)
+                .expectMarkedDeleted();
     }
 
     @Test
