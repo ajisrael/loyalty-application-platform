@@ -1,8 +1,10 @@
 package loyalty.service.command.aggregates;
 
 import loyalty.service.command.commands.CreateAccountCommand;
+import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.core.events.AccountCreatedEvent;
+import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.AccountUpdatedEvent;
 import org.axonframework.eventsourcing.eventstore.EventStoreException;
 import org.axonframework.modelling.command.AggregateNotFoundException;
@@ -60,6 +62,15 @@ class AccountAggregateTest {
             .email(updateAccountCommand.getEmail())
             .build();
 
+    private static final DeleteAccountCommand deleteAccountCommand = DeleteAccountCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .accountId(TEST_ACCOUNT_ID)
+            .build();
+
+    private static final AccountDeletedEvent accountDeletedEvent = AccountDeletedEvent.builder()
+            .requestId(deleteAccountCommand.getRequestId())
+            .accountId(deleteAccountCommand.getAccountId())
+            .build();
     @BeforeEach
     void setup() {
         fixture = new AggregateTestFixture<>(AccountAggregate.class);
@@ -85,17 +96,34 @@ class AccountAggregateTest {
     @Test
     @DisplayName("UpdateAccountCommand results in AccountUpdatedEvent")
     void testUpdateAccount_whenUpdateAccountCommandHandled_ShouldIssueAccountUpdatedEvent() {
-        // Act & Assert
+        // Arrange & Act & Assert
         fixture.given(accountCreatedEvent)
                 .when(updateAccountCommand)
                 .expectEvents(accountUpdatedEvent);
     }
 
     @Test
-    @DisplayName("Cannot update an acount that hasn't been created")
+    @DisplayName("Cannot update an account that hasn't been created")
     void testUpdateAccount_whenUpdateAccountCommandHandledWithNoPriorActivity_shouldThrowException() {
         fixture.givenNoPriorActivity()
                 .when(updateAccountCommand)
+                .expectException(AggregateNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("DeleteAccountCommand results in AccountDeletedEvent")
+    void testDeleteAccount_whenDeleteAccountCommandHandled_ShouldIssueAccountDeletedEvent() {
+        // Arrange & Act & Assert
+        fixture.given(accountCreatedEvent)
+                .when(deleteAccountCommand)
+                .expectEvents(accountDeletedEvent);
+    }
+
+    @Test
+    @DisplayName("Cannot delete an account that hasn't been created")
+    void testDeleteAccount_whenDeleteAccountCommandHandledWithNoPriorActivity_shouldThrowException() {
+        fixture.givenNoPriorActivity()
+                .when(deleteAccountCommand)
                 .expectException(AggregateNotFoundException.class);
     }
 }
