@@ -93,7 +93,7 @@ class AccountAggregateTest {
     }
 
     @Test
-    @DisplayName("CreateAccountCommand doesn't process on an existing AccountAggregate")
+    @DisplayName("Cannot create account that has already been created")
     void testAccountAggregate_whenCreateAccountCommandHandledWithPriorActivity_ShouldThrowException() {
         fixture.given(accountCreatedEvent)
                 .when(createAccountCommand)
