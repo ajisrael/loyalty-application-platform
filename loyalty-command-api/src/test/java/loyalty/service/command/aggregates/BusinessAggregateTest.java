@@ -6,6 +6,8 @@ import loyalty.service.command.commands.UpdateBusinessCommand;
 import loyalty.service.core.events.BusinessDeletedEvent;
 import loyalty.service.core.events.BusinessEnrolledEvent;
 import loyalty.service.core.events.BusinessUpdatedEvent;
+import org.axonframework.eventsourcing.eventstore.EventStoreException;
+import org.axonframework.modelling.command.AggregateNotFoundException;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.junit.jupiter.api.BeforeEach;
@@ -79,6 +81,14 @@ class BusinessAggregateTest {
     }
 
     @Test
+    @DisplayName("Cannot enroll an existing business")
+    void testBusinessAggregate_whenCreateBusinessCommandHandledWithPriorActivity_ShouldThrowException() {
+        fixture.given(businessEnrolledEvent)
+                .when(enrollBusinessCommand)
+                .expectException(EventStoreException.class);
+    }
+
+    @Test
     @DisplayName("UpdateBusinessCommand results in BusinessUpdatedEvent")
     void testUpdateBusiness_whenUpdateBusinessCommandHandled_ShouldIssueBusinessUpdatedEvent() {
         // Arrange & Act & Assert
@@ -92,6 +102,14 @@ class BusinessAggregateTest {
     }
 
     @Test
+    @DisplayName("Cannot update a business that hasn't been enrolled")
+    void testUpdateBusiness_whenUpdateBusinessCommandHandledWithNoPriorActivity_shouldThrowException() {
+        fixture.givenNoPriorActivity()
+                .when(updateBusinessCommand)
+                .expectException(AggregateNotFoundException.class);
+    }
+
+    @Test
     @DisplayName("DeleteBusinessCommand results in BusinessDeletedEvent")
     void testDeleteBusiness_whenDeleteBusinessCommandHandled_ShouldIssueBusinessDeletedEvent() {
         // Arrange & Act & Assert
@@ -99,5 +117,13 @@ class BusinessAggregateTest {
                 .when(deleteBusinessCommand)
                 .expectEvents(businessDeletedEvent)
                 .expectMarkedDeleted();
+    }
+
+    @Test
+    @DisplayName("Cannot delete an business that hasn't been created")
+    void testDeleteBusiness_whenDeleteBusinessCommandHandledWithNoPriorActivity_shouldThrowException() {
+        fixture.givenNoPriorActivity()
+                .when(deleteBusinessCommand)
+                .expectException(AggregateNotFoundException.class);
     }
 }
