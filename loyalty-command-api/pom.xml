@@ -28,6 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<axon.version>4.10.1</axon.version>
 		<spring-cloud.version>2023.0.3</spring-cloud.version>
 	</properties>
 	<dependencies>
@@ -35,13 +36,13 @@
 		<dependency>
 		    <groupId>org.axonframework</groupId>
 		    <artifactId>axon-spring-boot-starter</artifactId>
-		    <version>4.10.0</version>
+		    <version>${axon.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.axonframework/axon-eventsourcing -->
 		<dependency>
 			<groupId>org.axonframework</groupId>
 			<artifactId>axon-eventsourcing</artifactId>
-			<version>4.10.0</version>
+			<version>${axon.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-netflix-eureka-client -->
 		<dependency>
