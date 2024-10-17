@@ -12,5 +12,5 @@ public class AllPointsExpiredEvent extends AbstractEvent {
     private String businessId;
     private int pendingPointsRemoved;
     private int authorizedPointsVoided;
-    private int availablePointsCaptured;
+    private int pointsExpired;
 }

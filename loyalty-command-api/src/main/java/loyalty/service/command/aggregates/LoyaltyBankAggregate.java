@@ -202,7 +202,7 @@ public class LoyaltyBankAggregate {
                 .businessId(this.businessId)
                 .pendingPointsRemoved(this.pending)
                 .authorizedPointsVoided(this.authorized)
-                .availablePointsCaptured(this.getAvailablePoints())
+                .pointsExpired(this.earned - this.captured)
                 .build();
 
         LogHelper.logCommandIssuingEvent(LOGGER, command, event);
@@ -308,7 +308,7 @@ public class LoyaltyBankAggregate {
     public void on(AllPointsExpiredEvent event) {
         this.pending -= event.getPendingPointsRemoved();
         this.authorized -= event.getAuthorizedPointsVoided();
-        this.captured += event.getAvailablePointsCaptured();
+        this.captured += event.getPointsExpired();
 
         // Should never throw
         throwExceptionIfLoyaltyBankStillHasAvailablePoints();

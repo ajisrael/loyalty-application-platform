@@ -215,7 +215,7 @@ public class LoyaltyBankEventsHandler {
             LoyaltyBankEntity loyaltyBankEntity = loyaltyBankEntityOptional.get();
             loyaltyBankEntity.setPending(loyaltyBankEntity.getPending() - event.getPendingPointsRemoved());
             loyaltyBankEntity.setAuthorized(loyaltyBankEntity.getAuthorized() - event.getAuthorizedPointsVoided());
-            loyaltyBankEntity.setCaptured(loyaltyBankEntity.getCaptured() + event.getAvailablePointsCaptured());
+            loyaltyBankEntity.setCaptured(loyaltyBankEntity.getCaptured() + event.getPointsExpired());
             loyaltyBankRepository.save(loyaltyBankEntity);
 
             LOGGER.info(
