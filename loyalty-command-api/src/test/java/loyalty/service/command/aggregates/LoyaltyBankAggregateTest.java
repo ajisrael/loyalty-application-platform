@@ -217,6 +217,7 @@ class LoyaltyBankAggregateTest {
                     assertEquals(0, state.getEarned(), "Earned should be 0");
                     assertEquals(0, state.getAuthorized(), "Authorized should be 0");
                     assertEquals(0, state.getCaptured(), "Captured should be 0");
+                    assertEquals(0, state.getAvailablePoints(), "Available points should be 0");
                 });
     }
 
@@ -238,10 +239,11 @@ class LoyaltyBankAggregateTest {
                     assertEquals(loyaltyBankCreatedEvent.getLoyaltyBankId(), state.getLoyaltyBankId(), "LoyaltyBankIds should match");
                     assertEquals(loyaltyBankCreatedEvent.getAccountId(), state.getAccountId(), "AccountIds should match");
                     assertEquals(loyaltyBankCreatedEvent.getBusinessId(), state.getBusinessId(), "BusinessIds should match");
-                    assertEquals(pendingTransactionCreatedEvent.getPoints(), state.getPending(), "Pending should be 0");
+                    assertEquals(pendingTransactionCreatedEvent.getPoints(), state.getPending(), "Pending points were not what was expected");
                     assertEquals(0, state.getEarned(), "Earned should be 0");
                     assertEquals(0, state.getAuthorized(), "Authorized should be 0");
                     assertEquals(0, state.getCaptured(), "Captured should be 0");
+                    assertEquals(0, state.getAvailablePoints(), "Available points should be 0");
                 });
     }
 
@@ -266,6 +268,7 @@ class LoyaltyBankAggregateTest {
     @DisplayName("CreateEarnedTransactionCommand results in EarnedTransactionCreatedEvent")
     void testCreateEarnedTransaction_whenCreateEarnedTransactionCommandHandled_shouldIssueEarnedTransactionCreatedEvent() {
         int expectedPendingPoints = pendingTransactionCreatedEvent.getPoints() - earnedTransactionCreatedEvent.getPoints();
+        int expectedAvailablePoints = earnedTransactionCreatedEvent.getPoints();
 
         fixture.given(loyaltyBankCreatedEvent, pendingTransactionCreatedEvent)
                 .when(createEarnedTransactionCommand)
@@ -278,6 +281,7 @@ class LoyaltyBankAggregateTest {
                     assertEquals(earnedTransactionCreatedEvent.getPoints(), state.getEarned(), "Earned points were not what was expected");
                     assertEquals(0, state.getAuthorized(), "Authorized should be 0");
                     assertEquals(0, state.getCaptured(), "Captured should be 0");
+                    assertEquals(expectedAvailablePoints, state.getAvailablePoints(), "Available points were not what was expected");
                 });
     }
 
@@ -312,6 +316,8 @@ class LoyaltyBankAggregateTest {
     @Test
     @DisplayName("CreateAwardedTransactionCommand results in AwardedTransactionCreatedEvent")
     void testCreateAwardedTransaction_whenCreateAwardedTransactionCommandHandled_shouldIssueAwardedTransactionCreatedEvent() {
+        int expectedAvailablePoints = awardedTransactionCreatedEvent.getPoints();
+
         fixture.given(loyaltyBankCreatedEvent)
                 .when(createAwardedTransactionCommand)
                 .expectEvents(awardedTransactionCreatedEvent)
@@ -323,6 +329,7 @@ class LoyaltyBankAggregateTest {
                     assertEquals(awardedTransactionCreatedEvent.getPoints(), state.getEarned(), "Earned points were not what was expected");
                     assertEquals(0, state.getAuthorized(), "Authorized should be 0");
                     assertEquals(0, state.getCaptured(), "Captured should be 0");
+                    assertEquals(expectedAvailablePoints, state.getAvailablePoints(), "Available points were not what was expected");
                 });
     }
 
@@ -347,6 +354,8 @@ class LoyaltyBankAggregateTest {
     @Test
     @DisplayName("CreateAuthorizedTransactionCommand results in AuthorizedTransactionCreatedEvent")
     void testCreateAuthorizedTransaction_whenCreateAuthorizedTransactionCommandHandled_shouldIssueAuthorizedTransactionCreatedEvent() {
+        int expectedAvailablePoints = awardedTransactionCreatedEvent.getPoints() - authorizedTransactionCreatedEvent.getPoints();
+
         fixture.given(loyaltyBankCreatedEvent, awardedTransactionCreatedEvent)
                 .when(createAuthorizedTransactionCommand)
                 .expectEvents(authorizedTransactionCreatedEvent)
@@ -358,6 +367,7 @@ class LoyaltyBankAggregateTest {
                     assertEquals(awardedTransactionCreatedEvent.getPoints(), state.getEarned(), "Earned points were not what was expected");
                     assertEquals(authorizedTransactionCreatedEvent.getPoints(), state.getAuthorized(), "Authorized points were not what was expected");
                     assertEquals(0, state.getCaptured(), "Captured should be 0");
+                    assertEquals(expectedAvailablePoints, state.getAvailablePoints(), "Available points were not what was expected");
                 });
     }
 
@@ -392,6 +402,7 @@ class LoyaltyBankAggregateTest {
     @DisplayName("CreateVoidTransactionCommand results in VoidTransactionCreatedEvent")
     void testCreateVoidTransaction_whenCreateVoidTransactionCommandHandled_shouldIssueVoidTransactionCreatedEvent() {
         int expectedAuthorizedPoints = authorizedTransactionCreatedEvent.getPoints() - voidTransactionCreatedEvent.getPoints();
+        int expectedAvailablePoints = awardedTransactionCreatedEvent.getPoints() - expectedAuthorizedPoints;
 
         fixture.given(loyaltyBankCreatedEvent, awardedTransactionCreatedEvent, authorizedTransactionCreatedEvent)
                 .when(createVoidTransactionCommand)
@@ -404,6 +415,7 @@ class LoyaltyBankAggregateTest {
                     assertEquals(awardedTransactionCreatedEvent.getPoints(), state.getEarned(), "Earned points were not what was expected");
                     assertEquals(expectedAuthorizedPoints, state.getAuthorized(), "Authorized points were not what was expected");
                     assertEquals(0, state.getCaptured(), "Captured should be 0");
+                    assertEquals(expectedAvailablePoints, state.getAvailablePoints(), "Available points were not what was expected");
                 });
     }
 
@@ -429,6 +441,7 @@ class LoyaltyBankAggregateTest {
     @DisplayName("CreateCapturedTransactionCommand results in CapturedTransactionCreatedEvent")
     void testCreateCapturedTransaction_whenCreateCapturedTransactionCommandHandled_shouldIssueCapturedTransactionCreatedEvent() {
         int expectedAuthorizedPoints = authorizedTransactionCreatedEvent.getPoints() - capturedTransactionCreatedEvent.getPoints();
+        int expectedAvailablePoints = awardedTransactionCreatedEvent.getPoints() - expectedAuthorizedPoints - capturedTransactionCreatedEvent.getPoints();
 
         fixture.given(loyaltyBankCreatedEvent, awardedTransactionCreatedEvent, authorizedTransactionCreatedEvent)
                 .when(createCapturedTransactionCommand)
@@ -441,6 +454,7 @@ class LoyaltyBankAggregateTest {
                     assertEquals(awardedTransactionCreatedEvent.getPoints(), state.getEarned(), "Earned points were not what was expected");
                     assertEquals(expectedAuthorizedPoints, state.getAuthorized(), "Authorized points were not what was expected");
                     assertEquals(capturedTransactionCreatedEvent.getPoints(), state.getCaptured(), "Captured points were not what was expected");
+                    assertEquals(expectedAvailablePoints, state.getAvailablePoints(), "Available points were not what was expected");
                 });
     }
 
@@ -497,7 +511,7 @@ class LoyaltyBankAggregateTest {
                     assertEquals(expectedEarnedPoints, state.getEarned(), "Earned points were not what was expected");
                     assertEquals(expectedAuthorizedPoints, state.getAuthorized(), "Authorized points were not what was expected");
                     assertEquals(expectedCapturedPoints, state.getCaptured(), "Captured points were not what was expected");
-                    assertEquals(expectedAvailablePoints, state.getAvailablePoints(), "Should not have available points after expiration");
+                    assertEquals(expectedAvailablePoints, state.getAvailablePoints(), "Available points were not what was expected");
                 });
     }
 
