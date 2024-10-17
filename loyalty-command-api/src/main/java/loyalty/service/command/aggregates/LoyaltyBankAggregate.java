@@ -323,7 +323,7 @@ public class LoyaltyBankAggregate {
         LogHelper.logEventProcessed(LOGGER, event);
     }
 
-    private int getAvailablePoints() {
+    protected int getAvailablePoints() {
         return this.earned - this.authorized - this.captured;
     }
 

@@ -38,6 +38,7 @@ class LoyaltyBankAggregateTest {
     private static final int TEST_AUTHORIZED_POINTS = 100;
     private static final int TEST_VOID_POINTS = 100;
     private static final int TEST_CAPTURED_POINTS = 100;
+    private static final int TEST_EXPIRE_POINTS = 50;
 
     private static final CreateLoyaltyBankCommand createLoyaltyBankCommand = CreateLoyaltyBankCommand.builder()
             .requestId(TEST_REQUEST_ID)
@@ -161,6 +162,27 @@ class LoyaltyBankAggregateTest {
             .loyaltyBankId(createCapturedTransactionCommand.getLoyaltyBankId())
             .paymentId(createCapturedTransactionCommand.getPaymentId())
             .points(createCapturedTransactionCommand.getPoints())
+            .build();
+
+    private static final CreateExpirePointsTransactionCommand createExpirePointsTransactionCommand = CreateExpirePointsTransactionCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .loyaltyBankId(TEST_LOYALTY_BANK_ID)
+            .targetTransactionId(TEST_REQUEST_ID)
+            .points(TEST_EXPIRE_POINTS)
+            .build();
+
+    private static final CreateExpirePointsTransactionCommand createNegativeExpirePointsTransactionCommand = CreateExpirePointsTransactionCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .loyaltyBankId(TEST_LOYALTY_BANK_ID)
+            .targetTransactionId(TEST_REQUEST_ID)
+            .points(TEST_EXPIRE_POINTS * -1)
+            .build();
+
+    private static final ExpiredTransactionCreatedEvent expiredTransactionCreatedEvent = ExpiredTransactionCreatedEvent.builder()
+            .requestId(createExpirePointsTransactionCommand.getRequestId())
+            .loyaltyBankId(createExpirePointsTransactionCommand.getLoyaltyBankId())
+            .targetTransactionId(createExpirePointsTransactionCommand.getTargetTransactionId())
+            .points(createExpirePointsTransactionCommand.getPoints())
             .build();
 
     private static final DeleteLoyaltyBankCommand deleteLoyaltyBankCommand = DeleteLoyaltyBankCommand.builder()
@@ -447,6 +469,53 @@ class LoyaltyBankAggregateTest {
     void testCreateCapturedTransaction_whenCreateCapturedTransactionCommandHandledWithNoPriorActivity_shouldThrowException() {
         fixture.givenNoPriorActivity()
                 .when(createCapturedTransactionCommand)
+                .expectException(AggregateNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("CreateExpirePointsTransactionCommand results in ExpiredTransactionCreatedEvent")
+    void testCreateExpirePointsTransaction_whenCreateExpirePointsTransactionCommandHandled_shouldIssueExpiredTransactionCreatedEvent() {
+        int expectedEarnedPoints = awardedTransactionCreatedEvent.getPoints() * 2; // two award events given
+        int expectedAuthorizedPoints = authorizedTransactionCreatedEvent.getPoints() - capturedTransactionCreatedEvent.getPoints();
+        int expectedCapturedPoints = capturedTransactionCreatedEvent.getPoints() + expiredTransactionCreatedEvent.getPoints();
+        int expectedAvailablePoints = expectedEarnedPoints - expectedAuthorizedPoints - expectedCapturedPoints;
+
+        fixture.given(
+                loyaltyBankCreatedEvent,
+                awardedTransactionCreatedEvent,
+                authorizedTransactionCreatedEvent,
+                capturedTransactionCreatedEvent,
+                awardedTransactionCreatedEvent // second award transaction makes sure there is points available to expire
+                )
+                .when(createExpirePointsTransactionCommand)
+                .expectEvents(expiredTransactionCreatedEvent)
+                .expectState(state -> {
+                    assertEquals(loyaltyBankCreatedEvent.getLoyaltyBankId(), state.getLoyaltyBankId(), "LoyaltyBankIds should match");
+                    assertEquals(loyaltyBankCreatedEvent.getAccountId(), state.getAccountId(), "AccountIds should match");
+                    assertEquals(loyaltyBankCreatedEvent.getBusinessId(), state.getBusinessId(), "BusinessIds should match");
+                    assertEquals(0, state.getPending(), "Pending should be 0");
+                    assertEquals(expectedEarnedPoints, state.getEarned(), "Earned points were not what was expected");
+                    assertEquals(expectedAuthorizedPoints, state.getAuthorized(), "Authorized points were not what was expected");
+                    assertEquals(expectedCapturedPoints, state.getCaptured(), "Captured points were not what was expected");
+                    assertEquals(expectedAvailablePoints, state.getAvailablePoints(), "Should not have available points after expiration");
+                });
+    }
+
+    @Test
+    @DisplayName("Cannot create expire transaction that would make captured balance negative")
+    void testCreateExpirePointsTransaction_whenCreateExpirePointsTransactionCommandHandledWouldMakeCapturedPointsBalanceNegative_shouldThrowException() {
+        fixture.given(loyaltyBankCreatedEvent)
+                .when(createNegativeExpirePointsTransactionCommand)
+                .expectException(IllegalLoyaltyBankStateException.class)
+                .expectExceptionMessage(String.format(LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE, CAPTURED))
+                .expectNoEvents();
+    }
+
+    @Test
+    @DisplayName("Cannot create capture transaction for a loyaltyBank that hasn't been created")
+    void testCreateExpirePointsTransaction_whenCreateExpirePointsTransactionCommandHandledWithNoPriorActivity_shouldThrowException() {
+        fixture.givenNoPriorActivity()
+                .when(createExpirePointsTransactionCommand)
                 .expectException(AggregateNotFoundException.class);
     }
 
