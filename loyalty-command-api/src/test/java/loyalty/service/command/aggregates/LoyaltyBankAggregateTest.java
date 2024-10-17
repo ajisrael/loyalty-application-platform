@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static loyalty.service.core.constants.DomainConstants.*;
+import static loyalty.service.core.constants.ExceptionMessages.LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,6 +37,7 @@ class LoyaltyBankAggregateTest {
     private static final int TEST_AWARD_POINTS = 100;
     private static final int TEST_AUTHORIZED_POINTS = 100;
     private static final int TEST_VOID_POINTS = 100;
+    private static final int TEST_CAPTURED_POINTS = 100;
 
     private static final CreateLoyaltyBankCommand createLoyaltyBankCommand = CreateLoyaltyBankCommand.builder()
             .requestId(TEST_REQUEST_ID)
@@ -139,6 +142,27 @@ class LoyaltyBankAggregateTest {
             .points(createVoidTransactionCommand.getPoints())
             .build();
 
+    private static final CreateCapturedTransactionCommand createCapturedTransactionCommand = CreateCapturedTransactionCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .loyaltyBankId(TEST_LOYALTY_BANK_ID)
+            .paymentId(TEST_PAYMENT_ID)
+            .points(TEST_CAPTURED_POINTS)
+            .build();
+
+    private static final CreateCapturedTransactionCommand createNegativeCapturedTransactionCommand = CreateCapturedTransactionCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .loyaltyBankId(TEST_LOYALTY_BANK_ID)
+            .paymentId(TEST_PAYMENT_ID)
+            .points(TEST_CAPTURED_POINTS * -1)
+            .build();
+
+    private static final CapturedTransactionCreatedEvent capturedTransactionCreatedEvent = CapturedTransactionCreatedEvent.builder()
+            .requestId(createCapturedTransactionCommand.getRequestId())
+            .loyaltyBankId(createCapturedTransactionCommand.getLoyaltyBankId())
+            .paymentId(createCapturedTransactionCommand.getPaymentId())
+            .points(createCapturedTransactionCommand.getPoints())
+            .build();
+
     private static final DeleteLoyaltyBankCommand deleteLoyaltyBankCommand = DeleteLoyaltyBankCommand.builder()
             .requestId(TEST_REQUEST_ID)
             .loyaltyBankId(TEST_LOYALTY_BANK_ID)
@@ -241,6 +265,7 @@ class LoyaltyBankAggregateTest {
         fixture.given(loyaltyBankCreatedEvent)
                 .when(createEarnedTransactionCommand)
                 .expectException(IllegalLoyaltyBankStateException.class)
+                .expectExceptionMessage(String.format(LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE, PENDING))
                 .expectNoEvents();
     }
 
@@ -250,6 +275,7 @@ class LoyaltyBankAggregateTest {
         fixture.given(loyaltyBankCreatedEvent, createPendingTransactionCommand)
                 .when(createNegativeEarnedTransactionCommand)
                 .expectException(IllegalLoyaltyBankStateException.class)
+                .expectExceptionMessage(String.format(LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE, EARNED))
                 .expectNoEvents();
     }
 
@@ -284,6 +310,7 @@ class LoyaltyBankAggregateTest {
         fixture.given(loyaltyBankCreatedEvent)
                 .when(createNegativeAwardedTransactionCommand)
                 .expectException(IllegalLoyaltyBankStateException.class)
+                .expectExceptionMessage(String.format(LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE, EARNED))
                 .expectNoEvents();
     }
 
@@ -318,6 +345,7 @@ class LoyaltyBankAggregateTest {
         fixture.given(loyaltyBankCreatedEvent)
                 .when(createNegativeAuthorizedTransactionCommand)
                 .expectException(IllegalLoyaltyBankStateException.class)
+                .expectExceptionMessage(String.format(LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE, AUTHORIZED))
                 .expectNoEvents();
     }
 
@@ -363,6 +391,7 @@ class LoyaltyBankAggregateTest {
         fixture.given(loyaltyBankCreatedEvent)
                 .when(createVoidTransactionCommand)
                 .expectException(IllegalLoyaltyBankStateException.class)
+                .expectExceptionMessage(String.format(LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE, AUTHORIZED))
                 .expectNoEvents();
     }
 
@@ -371,6 +400,53 @@ class LoyaltyBankAggregateTest {
     void testCreateVoidTransaction_whenCreateVoidTransactionCommandHandledWithNoPriorActivity_shouldThrowException() {
         fixture.givenNoPriorActivity()
                 .when(createVoidTransactionCommand)
+                .expectException(AggregateNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("CreateCapturedTransactionCommand results in CapturedTransactionCreatedEvent")
+    void testCreateCapturedTransaction_whenCreateCapturedTransactionCommandHandled_shouldIssueCapturedTransactionCreatedEvent() {
+        int expectedAuthorizedPoints = authorizedTransactionCreatedEvent.getPoints() - capturedTransactionCreatedEvent.getPoints();
+
+        fixture.given(loyaltyBankCreatedEvent, awardedTransactionCreatedEvent, authorizedTransactionCreatedEvent)
+                .when(createCapturedTransactionCommand)
+                .expectEvents(capturedTransactionCreatedEvent)
+                .expectState(state -> {
+                    assertEquals(loyaltyBankCreatedEvent.getLoyaltyBankId(), state.getLoyaltyBankId(), "LoyaltyBankIds should match");
+                    assertEquals(loyaltyBankCreatedEvent.getAccountId(), state.getAccountId(), "AccountIds should match");
+                    assertEquals(loyaltyBankCreatedEvent.getBusinessId(), state.getBusinessId(), "BusinessIds should match");
+                    assertEquals(0, state.getPending(), "Pending should be 0");
+                    assertEquals(awardedTransactionCreatedEvent.getPoints(), state.getEarned(), "Earned points were not what was expected");
+                    assertEquals(expectedAuthorizedPoints, state.getAuthorized(), "Authorized points were not what was expected");
+                    assertEquals(capturedTransactionCreatedEvent.getPoints(), state.getCaptured(), "Captured points were not what was expected");
+                });
+    }
+
+    @Test
+    @DisplayName("Cannot create capture transaction that would make authorized balance negative")
+    void testCreateCapturedTransaction_whenCreateCapturedTransactionCommandHandledWouldMakeAuthorizedBalanceNegative_shouldThrowException() {
+        fixture.given(loyaltyBankCreatedEvent)
+                .when(createCapturedTransactionCommand)
+                .expectException(IllegalLoyaltyBankStateException.class)
+                .expectExceptionMessage(String.format(LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE, AUTHORIZED))
+                .expectNoEvents();
+    }
+
+    @Test
+    @DisplayName("Cannot create capture transaction that would make captured balance negative")
+    void testCreateCapturedTransaction_whenCreateCapturedTransactionCommandHandledWouldMakeCapturedBalanceNegative_shouldThrowException() {
+        fixture.given(loyaltyBankCreatedEvent,awardedTransactionCreatedEvent,authorizedTransactionCreatedEvent)
+                .when(createNegativeCapturedTransactionCommand)
+                .expectException(IllegalLoyaltyBankStateException.class)
+                .expectExceptionMessage(String.format(LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE, CAPTURED))
+                .expectNoEvents();
+    }
+
+    @Test
+    @DisplayName("Cannot create capture transaction for a loyaltyBank that hasn't been created")
+    void testCreateCapturedTransaction_whenCreateCapturedTransactionCommandHandledWithNoPriorActivity_shouldThrowException() {
+        fixture.givenNoPriorActivity()
+                .when(createCapturedTransactionCommand)
                 .expectException(AggregateNotFoundException.class);
     }
 
