@@ -2,15 +2,18 @@ package loyalty.service.command.aggregates;
 
 import loyalty.service.command.commands.CreateLoyaltyBankCommand;
 import loyalty.service.command.commands.DeleteLoyaltyBankCommand;
+import loyalty.service.command.commands.transactions.CreateAuthorizedTransactionCommand;
 import loyalty.service.command.commands.transactions.CreateAwardedTransactionCommand;
 import loyalty.service.command.commands.transactions.CreateEarnedTransactionCommand;
 import loyalty.service.command.commands.transactions.CreatePendingTransactionCommand;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
 import loyalty.service.core.events.LoyaltyBankDeletedEvent;
+import loyalty.service.core.events.transactions.AuthorizedTransactionCreatedEvent;
 import loyalty.service.core.events.transactions.AwardedTransactionCreatedEvent;
 import loyalty.service.core.events.transactions.EarnedTransactionCreatedEvent;
 import loyalty.service.core.events.transactions.PendingTransactionCreatedEvent;
 import loyalty.service.core.exceptions.IllegalLoyaltyBankStateException;
+import loyalty.service.core.exceptions.InsufficientPointsException;
 import org.axonframework.eventsourcing.eventstore.EventStoreException;
 import org.axonframework.modelling.command.AggregateNotFoundException;
 import org.axonframework.test.aggregate.AggregateTestFixture;
@@ -32,9 +35,11 @@ class LoyaltyBankAggregateTest {
     private static final String TEST_LOYALTY_BANK_ID = "test-loyalty-bank-id";
     private static final String TEST_ACCOUNT_ID = "test-account-id";
     private static final String TEST_BUSINESS_ID = "test-business-id";
+    private static final String TEST_PAYMENT_ID = "test-business-id";
     private static final int TEST_PENDING_POINTS = 100;
     private static final int TEST_EARNED_POINTS = 100;
     private static final int TEST_AWARD_POINTS = 100;
+    private static final int TEST_AUTHORIZED_POINTS = 100;
 
     private static final CreateLoyaltyBankCommand createLoyaltyBankCommand = CreateLoyaltyBankCommand.builder()
             .requestId(TEST_REQUEST_ID)
@@ -102,6 +107,27 @@ class LoyaltyBankAggregateTest {
             .requestId(createAwardedTransactionCommand.getRequestId())
             .loyaltyBankId(createAwardedTransactionCommand.getLoyaltyBankId())
             .points(createAwardedTransactionCommand.getPoints())
+            .build();
+
+    private static final CreateAuthorizedTransactionCommand createAuthorizedTransactionCommand = CreateAuthorizedTransactionCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .loyaltyBankId(TEST_LOYALTY_BANK_ID)
+            .paymentId(TEST_PAYMENT_ID)
+            .points(TEST_AUTHORIZED_POINTS)
+            .build();
+
+    private static final CreateAuthorizedTransactionCommand createNegativeAuthorizedTransactionCommand = CreateAuthorizedTransactionCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .loyaltyBankId(TEST_LOYALTY_BANK_ID)
+            .paymentId(TEST_PAYMENT_ID)
+            .points(TEST_AUTHORIZED_POINTS * -1)
+            .build();
+
+    private static final AuthorizedTransactionCreatedEvent authorizedTransactionCreatedEvent = AuthorizedTransactionCreatedEvent.builder()
+            .requestId(createAuthorizedTransactionCommand.getRequestId())
+            .loyaltyBankId(createAuthorizedTransactionCommand.getLoyaltyBankId())
+            .paymentId(createAuthorizedTransactionCommand.getPaymentId())
+            .points(createAuthorizedTransactionCommand.getPoints())
             .build();
 
     private static final DeleteLoyaltyBankCommand deleteLoyaltyBankCommand = DeleteLoyaltyBankCommand.builder()
@@ -260,6 +286,48 @@ class LoyaltyBankAggregateTest {
                 .expectException(AggregateNotFoundException.class);
     }
 
+    @Test
+    @DisplayName("CreateAuthorizedTransactionCommand results in AuthorizedTransactionCreatedEvent")
+    void testCreateAuthorizedTransaction_whenCreateAuthorizedTransactionCommandHandled_shouldIssueAuthorizedTransactionCreatedEvent() {
+        fixture.given(loyaltyBankCreatedEvent, awardedTransactionCreatedEvent)
+                .when(createAuthorizedTransactionCommand)
+                .expectEvents(authorizedTransactionCreatedEvent)
+                .expectState(state -> {
+                    assertEquals(loyaltyBankCreatedEvent.getLoyaltyBankId(), state.getLoyaltyBankId(), "LoyaltyBankIds should match");
+                    assertEquals(loyaltyBankCreatedEvent.getAccountId(), state.getAccountId(), "AccountIds should match");
+                    assertEquals(loyaltyBankCreatedEvent.getBusinessId(), state.getBusinessId(), "BusinessIds should match");
+                    assertEquals(0, state.getPending(), "Pending should be 0");
+                    assertEquals(awardedTransactionCreatedEvent.getPoints(), state.getEarned(), "Earned points were not what was expected");
+                    assertEquals(authorizedTransactionCreatedEvent.getPoints(), state.getAuthorized(), "Authorized points were not what was expected");
+                    assertEquals(0, state.getCaptured(), "Captured should be 0");
+                });
+    }
+
+    @Test
+    @DisplayName("Cannot create authorize transaction that would make authorized balance negative")
+    void testCreateAuthorizedTransaction_whenCreateAuthorizedTransactionCommandHandledWouldMakeAuthorizedBalanceNegative_shouldThrowException() {
+        fixture.given(loyaltyBankCreatedEvent)
+                .when(createNegativeAuthorizedTransactionCommand)
+                .expectException(IllegalLoyaltyBankStateException.class)
+                .expectNoEvents();
+    }
+
+    @Test
+    @DisplayName("Cannot create authorize transaction for more points than available")
+    void testCreateAuthorizedTransaction_whenCreateAuthorizedTransactionCommandHandledForMorePointsThanAvailable_shouldThrowException() {
+        fixture.given(loyaltyBankCreatedEvent)
+                .when(createAuthorizedTransactionCommand)
+                .expectException(InsufficientPointsException.class)
+                .expectNoEvents();
+    }
+
+    @Test
+    @DisplayName("Cannot create award transaction for a loyaltyBank that hasn't been created")
+    void testCreateAuthorizedTransaction_whenCreateAuthorizedTransactionCommandHandledWithNoPriorActivity_shouldThrowException() {
+        fixture.givenNoPriorActivity()
+                .when(createAuthorizedTransactionCommand)
+                .expectException(AggregateNotFoundException.class);
+    }
 
     @Test
     @DisplayName("DeleteLoyaltyBankCommand results in LoyaltyBankDeletedEvent")
