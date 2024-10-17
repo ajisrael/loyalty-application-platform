@@ -154,7 +154,7 @@ class LoyaltyBankAggregateTest {
 
     @Test
     @DisplayName("Cannot create a pending transaction for a loyaltyBank that hasn't been created")
-    void testUpdateLoyaltyBank_whenCreatePendingTransactionCommandHandledWithNoPriorActivity_shouldThrowException() {
+    void testCreatePendingTransaction_whenCreatePendingTransactionCommandHandledWithNoPriorActivity_shouldThrowException() {
         fixture.givenNoPriorActivity()
                 .when(createPendingTransactionCommand)
                 .expectException(AggregateNotFoundException.class);
@@ -179,7 +179,6 @@ class LoyaltyBankAggregateTest {
                 });
     }
 
-
     @Test
     @DisplayName("Cannot create earned transaction with insufficient pending points")
     void testCreateEarnedTransaction_whenCreateEarnedTransactionCommandWouldPutPendingBalanceNegative_shouldThrowException() {
@@ -200,7 +199,7 @@ class LoyaltyBankAggregateTest {
 
     @Test
     @DisplayName("Cannot create a earned transaction for a loyaltyBank that hasn't been created")
-    void testUpdateLoyaltyBank_whenCreateEarnedTransactionCommandHandledWithNoPriorActivity_shouldThrowException() {
+    void testCreateEarnedTransaction_whenCreateEarnedTransactionCommandHandledWithNoPriorActivity_shouldThrowException() {
         fixture.givenNoPriorActivity()
                 .when(createEarnedTransactionCommand)
                 .expectException(AggregateNotFoundException.class);
