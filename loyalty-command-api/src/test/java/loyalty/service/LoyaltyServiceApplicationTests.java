@@ -7,9 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class LoyaltyServiceApplicationTests {
 
-	@Test
-	@Disabled // TODO: identify why context doesn't load for test
-	void contextLoads() {
-	}
+//	@Test
+//	@Disabled // TODO: identify why context doesn't load for test
+//	void contextLoads() {
+//	}
 
 }
