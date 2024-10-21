@@ -17,6 +17,7 @@ public abstract class AbstractTransactionCommand extends AbstractCommand {
     private String loyaltyBankId;
     private int points;
 
+    @Override
     public void validate() {
         super.validate();
         throwExceptionIfParameterIsNullOrBlank(this.getLoyaltyBankId(), LOYALTY_BANK_ID_CANNOT_BE_EMPTY);
