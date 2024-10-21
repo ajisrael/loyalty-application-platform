@@ -51,7 +51,7 @@ class DeleteAccountCommandTest {
 
     @ParameterizedTest
     @MethodSource(value = "invalidStringParams")
-    @DisplayName("Cannot create account with invalid accountId")
+    @DisplayName("Cannot delete account with invalid accountId")
     void testDeleteAccountCommand_whenAccountIdIsInvalid_shouldThrowException(String accountId) {
         // Arrange
         DeleteAccountCommand createLoyaltyBankCommand = deleteAccountCommandBuilder
