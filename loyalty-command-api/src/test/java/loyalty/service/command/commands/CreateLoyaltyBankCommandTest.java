@@ -39,7 +39,7 @@ class CreateLoyaltyBankCommandTest {
     @ParameterizedTest
     @MethodSource(value = "invalidStringParams")
     @DisplayName("Cannot create loyalty bank with invalid requestId")
-    void testCreateLoyaltyBankCommand_whenRequestIdIsWhitespace_shouldThrowException(String requestId) {
+    void testCreateLoyaltyBankCommand_whenRequestIdIsInvalid_shouldThrowException(String requestId) {
         // Arrange
         CreateLoyaltyBankCommand createLoyaltyBankCommand = (CreateLoyaltyBankCommand) createLoyaltyBankCommandBuilder
                 .requestId(requestId)
