@@ -89,7 +89,7 @@ class CreateAuthorizedTransactionCommandTest {
     @DisplayName("Cannot create authorize transaction with invalid paymentId")
     void testCreateAuthorizedTransactionCommand_whenPaymentIdIsInvalid_shouldThrowException(String paymentId) {
         // Arrange
-        CreateAuthorizedTransactionCommand createAuthorizedTransactionCommand = createAuthorizedTransactionCommandBuilder
+        CreateAuthorizedTransactionCommand createAuthorizedTransactionCommand = (CreateAuthorizedTransactionCommand) createAuthorizedTransactionCommandBuilder
                 .paymentId(paymentId)
                 .build();
 
