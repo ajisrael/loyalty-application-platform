@@ -1,8 +1,16 @@
 package loyalty.service.core.utils;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static loyalty.service.core.constants.ExceptionMessages.EMAIL_CANNOT_BE_EMPTY;
+import static loyalty.service.core.constants.ExceptionMessages.INVALID_EMAIL_FORMAT;
 
 public class Helper {
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+    );
 
     private Helper() {
         throw new IllegalStateException("utility class");
@@ -58,6 +66,14 @@ public class Helper {
     public static void throwExceptionIfEntityDoesExist(Object entity, String message) {
         if (entity != null) {
             throw new IllegalArgumentException(message);
+        }
+    }
+
+    public static void throwExceptionIfEmailIsInvalid(String email) {
+        throwExceptionIfParameterIsNullOrBlank(email, EMAIL_CANNOT_BE_EMPTY);
+        Matcher matcher = EMAIL_PATTERN.matcher(email);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException(String.format(INVALID_EMAIL_FORMAT, email));
         }
     }
 }

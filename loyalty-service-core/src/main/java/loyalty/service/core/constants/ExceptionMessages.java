@@ -23,6 +23,7 @@ public class ExceptionMessages {
     public static final String REQUEST_ID_CANNOT_BE_EMPTY = String.format(PARAMETER_CANNOT_BE_EMPTY, "requestId");
     public static final String POINTS_CANNOT_BE_LTE_ZERO = "points cannot be less than or equal to zero";
 
+    public static final String INVALID_EMAIL_FORMAT = "%s is not a valid email";
 
     public static final String ACCOUNT_WITH_ID_ALREADY_EXISTS = String.format(ENTITY_WITH_ID_ALREADY_EXISTS, ACCOUNT, "%s");
     public static final String ACCOUNT_WITH_ID_OR_EMAIL_ALREADY_EXISTS = String.format(ENTITY_WITH_ID_ALREADY_EXISTS, ACCOUNT, "%s");
