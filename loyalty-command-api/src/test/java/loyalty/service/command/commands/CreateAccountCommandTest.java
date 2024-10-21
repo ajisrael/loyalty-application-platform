@@ -3,6 +3,11 @@ package loyalty.service.command.commands;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static loyalty.service.core.constants.ExceptionMessages.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,12 +36,13 @@ class CreateAccountCommandTest {
         assertDoesNotThrow(createAccountCommand::validate);
     }
 
-    @Test
-    @DisplayName("Cannot create account with null requestId")
-    void testCreateAccountCommand_whenRequestIdIsNull_shouldThrowException() {
+    @ParameterizedTest
+    @MethodSource(value = "invalidStringParams")
+    @DisplayName("Cannot create account with invalid requestId")
+    void testCreateAccountCommand_whenRequestIdIsInvalid_shouldThrowException(String requestId) {
         // Arrange
         CreateAccountCommand createAccountCommand = (CreateAccountCommand) createAccountCommandBuilder
-                .requestId(null)
+                .requestId(requestId)
                 .build();
 
         // Act & Assert
@@ -46,42 +52,13 @@ class CreateAccountCommandTest {
         assertEquals(REQUEST_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
     }
 
-    @Test
-    @DisplayName("Cannot create account with empty requestId")
-    void testCreateAccountCommand_whenRequestIdIsEmpty_shouldThrowException() {
-        // Arrange
-        CreateAccountCommand createAccountCommand = (CreateAccountCommand) createAccountCommandBuilder
-                .requestId("")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createAccountCommand::validate);
-
-        // Assert
-        assertEquals(REQUEST_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with whitespace requestId")
-    void testCreateAccountCommand_whenRequestIdIsWhitespace_shouldThrowException() {
-        // Arrange
-        CreateAccountCommand createAccountCommand = (CreateAccountCommand) createAccountCommandBuilder
-                .requestId(" ")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createAccountCommand::validate);
-
-        // Assert
-        assertEquals(REQUEST_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with null accountId")
-    void testCreateAccountCommand_whenAccountIdIsNull_shouldThrowException() {
+    @ParameterizedTest
+    @MethodSource(value = "invalidStringParams")
+    @DisplayName("Cannot create account with invalid accountId")
+    void testCreateAccountCommand_whenAccountIdIsInvalid_shouldThrowException(String accountId) {
         // Arrange
         CreateAccountCommand createAccountCommand = createAccountCommandBuilder
-                .accountId(null)
+                .accountId(accountId)
                 .build();
 
         // Act & Assert
@@ -91,42 +68,13 @@ class CreateAccountCommandTest {
         assertEquals(ACCOUNT_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
     }
 
-    @Test
-    @DisplayName("Cannot create account with empty accountId")
-    void testCreateAccountCommand_whenAccountIdIsEmpty_shouldThrowException() {
+    @ParameterizedTest
+    @MethodSource(value = "invalidStringParams")
+    @DisplayName("Cannot create account with invalid firstName")
+    void testCreateAccountCommand_whenFirstNameIsInvalid_shouldThrowException(String firstName) {
         // Arrange
         CreateAccountCommand createAccountCommand = createAccountCommandBuilder
-                .accountId("")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createAccountCommand::validate);
-
-        // Assert
-        assertEquals(ACCOUNT_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with whitespace accountId")
-    void testCreateAccountCommand_whenAccountIdIsWhitespace_shouldThrowException() {
-        // Arrange
-        CreateAccountCommand createAccountCommand = createAccountCommandBuilder
-                .accountId(" ")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createAccountCommand::validate);
-
-        // Assert
-        assertEquals(ACCOUNT_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with null firstName")
-    void testCreateAccountCommand_whenFirstNameIsNull_shouldThrowException() {
-        // Arrange
-        CreateAccountCommand createAccountCommand = createAccountCommandBuilder
-                .firstName(null)
+                .firstName(firstName)
                 .build();
 
         // Act & Assert
@@ -136,42 +84,13 @@ class CreateAccountCommandTest {
         assertEquals(FIRST_NAME_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
     }
 
-    @Test
-    @DisplayName("Cannot create account with empty firstName")
-    void testCreateAccountCommand_whenFirstNameIsEmpty_shouldThrowException() {
+    @ParameterizedTest
+    @MethodSource(value = "invalidStringParams")
+    @DisplayName("Cannot create account with invalid lastName")
+    void testCreateAccountCommand_whenLastNameIsInvalid_shouldThrowException(String lastName) {
         // Arrange
         CreateAccountCommand createAccountCommand = createAccountCommandBuilder
-                .firstName("")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createAccountCommand::validate);
-
-        // Assert
-        assertEquals(FIRST_NAME_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with whitespace firstName")
-    void testCreateAccountCommand_whenFirstNameIsWhitespace_shouldThrowException() {
-        // Arrange
-        CreateAccountCommand createAccountCommand = createAccountCommandBuilder
-                .firstName(" ")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createAccountCommand::validate);
-
-        // Assert
-        assertEquals(FIRST_NAME_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with null lastName")
-    void testCreateAccountCommand_whenLastNameIsNull_shouldThrowException() {
-        // Arrange
-        CreateAccountCommand createAccountCommand = createAccountCommandBuilder
-                .lastName(null)
+                .lastName(lastName)
                 .build();
 
         // Act & Assert
@@ -181,83 +100,24 @@ class CreateAccountCommandTest {
         assertEquals(LAST_NAME_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
     }
 
-    @Test
-    @DisplayName("Cannot create account with empty lastName")
-    void testCreateAccountCommand_whenLastNameIsEmpty_shouldThrowException() {
-        // Arrange
-        CreateAccountCommand createAccountCommand = createAccountCommandBuilder
-                .lastName("")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createAccountCommand::validate);
-
-        // Assert
-        assertEquals(LAST_NAME_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with whitespace lastName")
-    void testCreateAccountCommand_whenLastNameIsWhitespace_shouldThrowException() {
-        // Arrange
-        CreateAccountCommand createAccountCommand = createAccountCommandBuilder
-                .lastName(" ")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createAccountCommand::validate);
-
-        // Assert
-        assertEquals(LAST_NAME_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with null email")
-    void testCreateAccountCommand_whenEmailIsNull_shouldThrowException() {
-        // Arrange
-        CreateAccountCommand createAccountCommand = createAccountCommandBuilder
-                .email(null)
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createAccountCommand::validate);
-
-        // Assert
-        assertEquals(EMAIL_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with empty email")
-    void testCreateAccountCommand_whenEmailIsEmpty_shouldThrowException() {
-        // Arrange
-        CreateAccountCommand createAccountCommand = createAccountCommandBuilder
-                .email("")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createAccountCommand::validate);
-
-        // Assert
-        assertEquals(EMAIL_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with whitespace email")
-    void testCreateAccountCommand_whenEmailIsWhitespace_shouldThrowException() {
-        // Arrange
-        CreateAccountCommand createAccountCommand = createAccountCommandBuilder
-                .email(" ")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createAccountCommand::validate);
-
-        // Assert
-        assertEquals(EMAIL_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
+    @ParameterizedTest
+    @MethodSource(value = "invalidStringParams")
     @DisplayName("Cannot create account with invalid email")
+    void testCreateAccountCommand_whenEmailIsInvalid_shouldThrowException(String email) {
+        // Arrange
+        CreateAccountCommand createAccountCommand = createAccountCommandBuilder
+                .email(email)
+                .build();
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createAccountCommand::validate);
+
+        // Assert
+        assertEquals(EMAIL_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
+    }
+
+    @Test
+    @DisplayName("Cannot create account with improperly formatted email")
     void testCreateAccountCommand_whenEmailFormatIsInvalid_shouldThrowException() {
         // Arrange
         String invalidEmailFormat = "not-a-valid-email-format";
@@ -270,5 +130,12 @@ class CreateAccountCommandTest {
 
         // Assert
         assertEquals(String.format(INVALID_EMAIL_FORMAT, invalidEmailFormat), exception.getLocalizedMessage());
+    }
+    private static Stream<Arguments> invalidStringParams() {
+        return Stream.of(
+                Arguments.arguments((String) null),
+                Arguments.arguments(""),
+                Arguments.arguments(" ")
+        );
     }
 }
