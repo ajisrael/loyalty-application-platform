@@ -3,6 +3,11 @@ package loyalty.service.command.commands;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static loyalty.service.core.constants.ExceptionMessages.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,12 +35,13 @@ class CreateLoyaltyBankCommandTest {
         assertDoesNotThrow(createLoyaltyBankCommand::validate);
     }
 
-    @Test
-    @DisplayName("Cannot create account with null requestId")
-    void testCreateLoyaltyBankCommand_whenRequestIdIsNull_shouldThrowException() {
+    @ParameterizedTest
+    @MethodSource(value = "invalidStringParams")
+    @DisplayName("Cannot create loyalty bank with invalid requestId")
+    void testCreateLoyaltyBankCommand_whenRequestIdIsWhitespace_shouldThrowException(String requestId) {
         // Arrange
         CreateLoyaltyBankCommand createLoyaltyBankCommand = (CreateLoyaltyBankCommand) createLoyaltyBankCommandBuilder
-                .requestId(null)
+                .requestId(requestId)
                 .build();
 
         // Act & Assert
@@ -45,42 +51,13 @@ class CreateLoyaltyBankCommandTest {
         assertEquals(REQUEST_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
     }
 
-    @Test
-    @DisplayName("Cannot create account with empty requestId")
-    void testCreateLoyaltyBankCommand_whenRequestIdIsEmpty_shouldThrowException() {
-        // Arrange
-        CreateLoyaltyBankCommand createLoyaltyBankCommand = (CreateLoyaltyBankCommand) createLoyaltyBankCommandBuilder
-                .requestId("")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createLoyaltyBankCommand::validate);
-
-        // Assert
-        assertEquals(REQUEST_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with whitespace requestId")
-    void testCreateLoyaltyBankCommand_whenRequestIdIsWhitespace_shouldThrowException() {
-        // Arrange
-        CreateLoyaltyBankCommand createLoyaltyBankCommand = (CreateLoyaltyBankCommand) createLoyaltyBankCommandBuilder
-                .requestId(" ")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createLoyaltyBankCommand::validate);
-
-        // Assert
-        assertEquals(REQUEST_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with null loyaltyBankId")
-    void testCreateLoyaltyBankCommand_whenLoyaltyBankIdIsNull_shouldThrowException() {
+    @ParameterizedTest
+    @MethodSource(value = "invalidStringParams")
+    @DisplayName("Cannot create loyalty bank with invalid loyaltyBankId")
+    void testCreateLoyaltyBankCommand_whenLoyaltyBankIdIsInvalid_shouldThrowException(String loyaltyBankId) {
         // Arrange
         CreateLoyaltyBankCommand createLoyaltyBankCommand = createLoyaltyBankCommandBuilder
-                .loyaltyBankId(null)
+                .loyaltyBankId(loyaltyBankId)
                 .build();
 
         // Act & Assert
@@ -90,42 +67,13 @@ class CreateLoyaltyBankCommandTest {
         assertEquals(LOYALTY_BANK_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
     }
 
-    @Test
-    @DisplayName("Cannot create account with empty loyaltyBankId")
-    void testCreateLoyaltyBankCommand_whenLoyaltyBankIdIsEmpty_shouldThrowException() {
+    @ParameterizedTest
+    @MethodSource(value = "invalidStringParams")
+    @DisplayName("Cannot create loyalty bank with invalid accountId")
+    void testCreateLoyaltyBankCommand_whenAccountIdIsInvalid_shouldThrowException(String accountId) {
         // Arrange
         CreateLoyaltyBankCommand createLoyaltyBankCommand = createLoyaltyBankCommandBuilder
-                .loyaltyBankId("")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createLoyaltyBankCommand::validate);
-
-        // Assert
-        assertEquals(LOYALTY_BANK_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with whitespace loyaltyBankId")
-    void testCreateLoyaltyBankCommand_whenLoyaltyBankIdIsWhitespace_shouldThrowException() {
-        // Arrange
-        CreateLoyaltyBankCommand createLoyaltyBankCommand = createLoyaltyBankCommandBuilder
-                .loyaltyBankId(" ")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createLoyaltyBankCommand::validate);
-
-        // Assert
-        assertEquals(LOYALTY_BANK_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with null accountId")
-    void testCreateLoyaltyBankCommand_whenAccountIdIsNull_shouldThrowException() {
-        // Arrange
-        CreateLoyaltyBankCommand createLoyaltyBankCommand = createLoyaltyBankCommandBuilder
-                .accountId(null)
+                .accountId(accountId)
                 .build();
 
         // Act & Assert
@@ -135,42 +83,13 @@ class CreateLoyaltyBankCommandTest {
         assertEquals(ACCOUNT_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
     }
 
-    @Test
-    @DisplayName("Cannot create account with empty accountId")
-    void testCreateLoyaltyBankCommand_whenAccountIdIsEmpty_shouldThrowException() {
+    @ParameterizedTest
+    @MethodSource(value = "invalidStringParams")
+    @DisplayName("Cannot create loyalty bank with invalid businessId")
+    void testCreateLoyaltyBankCommand_whenBusinessIdIsInvalid_shouldThrowException(String businessId) {
         // Arrange
         CreateLoyaltyBankCommand createLoyaltyBankCommand = createLoyaltyBankCommandBuilder
-                .accountId("")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createLoyaltyBankCommand::validate);
-
-        // Assert
-        assertEquals(ACCOUNT_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with whitespace accountId")
-    void testCreateLoyaltyBankCommand_whenAccountIdIsWhitespace_shouldThrowException() {
-        // Arrange
-        CreateLoyaltyBankCommand createLoyaltyBankCommand = createLoyaltyBankCommandBuilder
-                .accountId(" ")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createLoyaltyBankCommand::validate);
-
-        // Assert
-        assertEquals(ACCOUNT_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with null businessId")
-    void testCreateLoyaltyBankCommand_whenBusinessIdIsNull_shouldThrowException() {
-        // Arrange
-        CreateLoyaltyBankCommand createLoyaltyBankCommand = createLoyaltyBankCommandBuilder
-                .businessId(null)
+                .businessId(businessId)
                 .build();
 
         // Act & Assert
@@ -180,33 +99,11 @@ class CreateLoyaltyBankCommandTest {
         assertEquals(BUSINESS_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
     }
 
-    @Test
-    @DisplayName("Cannot create account with empty businessId")
-    void testCreateLoyaltyBankCommand_whenBusinessIdIsEmpty_shouldThrowException() {
-        // Arrange
-        CreateLoyaltyBankCommand createLoyaltyBankCommand = createLoyaltyBankCommandBuilder
-                .businessId("")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createLoyaltyBankCommand::validate);
-
-        // Assert
-        assertEquals(BUSINESS_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
-    }
-
-    @Test
-    @DisplayName("Cannot create account with whitespace businessId")
-    void testCreateLoyaltyBankCommand_whenBusinessIdIsWhitespace_shouldThrowException() {
-        // Arrange
-        CreateLoyaltyBankCommand createLoyaltyBankCommand = createLoyaltyBankCommandBuilder
-                .businessId(" ")
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, createLoyaltyBankCommand::validate);
-
-        // Assert
-        assertEquals(BUSINESS_ID_CANNOT_BE_EMPTY, exception.getLocalizedMessage());
+    private static Stream<Arguments> invalidStringParams() {
+        return Stream.of(
+                Arguments.arguments((String) null),
+                Arguments.arguments(""),
+                Arguments.arguments(" ")
+        );
     }
 }
