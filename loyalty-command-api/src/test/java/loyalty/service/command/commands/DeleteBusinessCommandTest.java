@@ -1,5 +1,6 @@
 package loyalty.service.command.commands;
 
+import loyalty.service.command.test.utils.TestParameters;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,10 +68,6 @@ class DeleteBusinessCommandTest {
     }
 
     private static Stream<Arguments> invalidStringParams() {
-        return Stream.of(
-                Arguments.arguments((String) null),
-                Arguments.arguments(""),
-                Arguments.arguments(" ")
-        );
+        return TestParameters.invalidStringParams();
     }
 }
