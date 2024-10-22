@@ -5,6 +5,5 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class CreateVoidTransactionCommand extends AbstractTransactionCommand {
-    private String paymentId;
+public class CreateVoidTransactionCommand extends AbstractPaymentTransactionCommand {
 }
