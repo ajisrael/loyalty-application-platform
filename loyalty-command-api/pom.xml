@@ -107,6 +107,11 @@
 			<artifactId>loyalty-service-core</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>io.axoniq.console</groupId>
+			<artifactId>console-framework-client-spring-boot-starter</artifactId>
+			<version>1.8.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

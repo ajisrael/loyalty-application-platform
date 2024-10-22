@@ -18,6 +18,12 @@ axon:
     repository:
       type: jpa
 
+axoniq:
+  console:
+    application-name: LoyaltyApplicationPlatform
+    credentials: 61ff4ce7-0:e307d85667eb49dc9b2b0f2c4d60dc05
+    dlq-mode: FULL
+
 eureka:
   client:
     service-url:
