@@ -1,8 +1,8 @@
 package loyalty.service.command.projections;
 
-import lombok.AllArgsConstructor;
 import loyalty.service.command.data.entities.AccountLookupEntity;
 import loyalty.service.command.data.repositories.AccountLookupRepository;
+import loyalty.service.core.exceptions.IllegalProjectionStateException;
 import loyalty.service.core.events.AccountCreatedEvent;
 import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.AccountUpdatedEvent;
@@ -13,6 +13,7 @@ import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.messaging.interceptors.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -26,55 +27,75 @@ import static loyalty.service.core.constants.LogMessages.*;
 import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExist;
 
 @Component
-@AllArgsConstructor
 @Validated
 @ProcessingGroup("account-lookup-group")
 public class AccountLookupEventsHandler {
 
-    private AccountLookupRepository accountLookupRepository;
+    private final AccountLookupRepository accountLookupRepository;
     private final SmartValidator validator;
+    private Marker marker = null;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountLookupEventsHandler.class);
 
-    @ExceptionHandler(resultType = Exception.class)
-    public void handle(Exception exception) throws Exception {
-        throw exception;
+    public AccountLookupEventsHandler(AccountLookupRepository accountLookupRepository, SmartValidator validator) {
+        this.accountLookupRepository = accountLookupRepository;
+        this.validator = validator;
     }
 
     @ExceptionHandler(resultType = IllegalArgumentException.class)
     public void handle(IllegalArgumentException exception) {
-        LOGGER.error(exception.getLocalizedMessage());
+        LOGGER.error(marker, exception.getLocalizedMessage());
+    }
+
+    @ExceptionHandler(resultType = IllegalProjectionStateException.class)
+    public void handle(IllegalProjectionStateException exception) {
+        LOGGER.error(marker, exception.getLocalizedMessage());
     }
 
     @EventHandler
     public void on(AccountCreatedEvent event) {
+        marker = Markers.append(REQUEST_ID, event.getRequestId());
+
         AccountLookupEntity accountLookupEntity = new AccountLookupEntity(event.getAccountId(), event.getEmail());
+        accountLookupEntity.setEmail(null);
+
+        marker.add(MarkerGenerator.generateMarker(accountLookupEntity));
 
         validateEntity(accountLookupEntity);
         accountLookupRepository.save(accountLookupEntity);
 
-        LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_SAVED_IN_LOOKUP_DB, event.getAccountId());
+        LOGGER.info(marker, ACCOUNT_SAVED_IN_LOOKUP_DB, event.getAccountId());
     }
 
     @EventHandler
     public void on(AccountUpdatedEvent event) {
+        marker = Markers.append(REQUEST_ID, event.getRequestId());
+
         AccountLookupEntity accountLookupEntity = accountLookupRepository.findByAccountId(event.getAccountId());
         throwExceptionIfEntityDoesNotExist(accountLookupEntity, String.format(ACCOUNT_WITH_ID_DOES_NOT_EXIST, event.getAccountId()));
 
         BeanUtils.copyProperties(event, accountLookupEntity);
+
+        marker.add(MarkerGenerator.generateMarker(accountLookupEntity));
+
         validateEntity(accountLookupEntity);
         accountLookupRepository.save(accountLookupEntity);
 
-        LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_UPDATED_IN_LOOKUP_DB, event.getAccountId());
+        LOGGER.info(marker, ACCOUNT_UPDATED_IN_LOOKUP_DB, event.getAccountId());
     }
 
     @EventHandler
     public void on(AccountDeletedEvent event) {
+        marker = Markers.append(REQUEST_ID, event.getRequestId());
+
         AccountLookupEntity accountLookupEntity = accountLookupRepository.findByAccountId(event.getAccountId());
         throwExceptionIfEntityDoesNotExist(accountLookupEntity, String.format(ACCOUNT_WITH_ID_DOES_NOT_EXIST, event.getAccountId()));
+
+        marker.add(MarkerGenerator.generateMarker(accountLookupEntity));
+
         accountLookupRepository.delete(accountLookupEntity);
 
-        LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_DELETED_FROM_LOOKUP_DB, event.getAccountId());
+        LOGGER.info(marker, ACCOUNT_DELETED_FROM_LOOKUP_DB, event.getAccountId());
     }
 
     private void validateEntity(AccountLookupEntity entity) {
@@ -82,7 +103,7 @@ public class AccountLookupEventsHandler {
         validator.validate(entity, bindingResult);
 
         if (bindingResult.hasErrors()) {
-            throw new IllegalArgumentException(bindingResult.getFieldError().getDefaultMessage());
+            throw new IllegalProjectionStateException(bindingResult.getFieldError().getDefaultMessage());
         }
     }
 }
