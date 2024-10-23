@@ -19,13 +19,13 @@ import loyalty.service.core.validation.ProjectionId;
 public class AccountLookupEntity {
 
     @Id
-    @Column(name = "account_id", unique = true)
+    @ProjectionId(message = "AccountId should be valid")
     @NotNull(message = "AccountId cannot be null")
-    @ProjectionId
+    @Column(name = "account_id", unique = true)
     private String accountId;
 
-    @Column(name = "email", unique = true)
-    @NotNull(message = "Email cannot be null")
     @Email(message = "Email should be valid")
+    @NotNull(message = "Email cannot be null")
+    @Column(name = "email", unique = true)
     private String email;
 }

@@ -18,8 +18,8 @@ import loyalty.service.core.validation.ProjectionId;
 public class BusinessLookupEntity {
 
     @Id
-    @Column(name = "business_id", unique = true)
+    @ProjectionId(message = "BusinessId should be valid")
     @NotNull(message = "BusinessId cannot be null")
-    @ProjectionId
+    @Column(name = "business_id", unique = true)
     private String businessId;
 }
