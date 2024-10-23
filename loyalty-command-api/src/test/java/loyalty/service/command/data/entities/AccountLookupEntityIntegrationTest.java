@@ -86,7 +86,7 @@ class AccountLookupEntityIntegrationTest {
     @DisplayName("Cannot store AccountLookupEntity with invalid accountId format")
     void testAccountLookupEntity_whenInvalidAccountIdProvided_shouldThrowException() {
         // Arrange
-        accountLookupEntity.setAccountId("invalid-uuid");
+        accountLookupEntity.setAccountId("invalid-id");
 
         // Act & Assert
         assertThrows(ConstraintViolationException.class, () -> {

@@ -65,7 +65,7 @@ class BusinessLookupEntityIntegrationTest {
     @DisplayName("Cannot store BusinessLookupEntity with invalid businessId format")
     void testBusinessLookupEntity_whenInvalidBusinessIdProvided_shouldThrowException() {
         // Arrange
-        businessLookupEntity.setBusinessId("invalid-uuid");
+        businessLookupEntity.setBusinessId("invalid-id");
 
         // Act & Assert
         assertThrows(ConstraintViolationException.class, () -> {
