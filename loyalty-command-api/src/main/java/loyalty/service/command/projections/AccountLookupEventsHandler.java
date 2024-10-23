@@ -57,7 +57,6 @@ public class AccountLookupEventsHandler {
         marker = Markers.append(REQUEST_ID, event.getRequestId());
 
         AccountLookupEntity accountLookupEntity = new AccountLookupEntity(event.getAccountId(), event.getEmail());
-        accountLookupEntity.setEmail(null);
 
         marker.add(MarkerGenerator.generateMarker(accountLookupEntity));
 
