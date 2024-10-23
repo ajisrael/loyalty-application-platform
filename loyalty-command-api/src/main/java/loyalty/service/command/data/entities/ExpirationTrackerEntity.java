@@ -23,13 +23,15 @@ public class ExpirationTrackerEntity {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name="loyalty_bank_id")
-    private List<TransactionEntity> transactionList = new ArrayList<>();
+    private List<TransactionEntity> transactionList = new ArrayList<>(); // TODO: maybe convert this to an ordered hash map to simplify addTransaction() method
 
     public ExpirationTrackerEntity(String loyaltyBankId) {
         this.loyaltyBankId = loyaltyBankId;
     }
 
     public void addTransaction(TransactionEntity transactionEntity) {
+        // TODO: check that the loyalty bankId on the transaction entity matches the expiration tracker entity
+        // TODO: check that transaction doesn't already exist in list
         transactionList.add(transactionEntity);
     }
 

@@ -17,7 +17,7 @@ public class TransactionEntity {
     @Id
     @ProjectionId(message = "TransactionId should be Valid")
     @NotNull(message = "TransactionId cannot be null")
-    @Column(name = "transaction_id")
+    @Column(name = "transaction_id", unique = true)
     private String transactionId;
 
     @Column(name = "points")
