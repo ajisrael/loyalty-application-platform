@@ -91,7 +91,7 @@ class AccountLookupEntityIntegrationTest {
         // Act & Assert
         assertThrows(ConstraintViolationException.class, () -> {
             testEntityManager.persistAndFlush(accountLookupEntity);
-        }, "Should throw ConstraintViolationException due to invalid UUID format");
+        }, "Should throw ConstraintViolationException due to invalid format");
     }
 
     @Test
