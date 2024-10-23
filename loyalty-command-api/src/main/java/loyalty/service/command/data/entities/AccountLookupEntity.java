@@ -23,7 +23,7 @@ public class AccountLookupEntity {
     @NotNull(message = "AccountId cannot be null")
     @Pattern(
             regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-            message = "Account ID must be a valid UUID"
+            message = "AccountId must be a valid UUID"
     )
     private String accountId;
 
