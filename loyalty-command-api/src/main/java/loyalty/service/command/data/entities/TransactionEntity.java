@@ -20,6 +20,7 @@ public class TransactionEntity {
     @Column(name = "transaction_id", unique = true)
     private String transactionId;
 
+    // TODO: make sure points aren't negative
     @Column(name = "points")
     private int points;
 
