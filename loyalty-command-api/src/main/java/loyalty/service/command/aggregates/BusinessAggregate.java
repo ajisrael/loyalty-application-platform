@@ -21,9 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Getter
 public class BusinessAggregate {
 
-    @Autowired
-    private CommandGateway commandGateway;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(BusinessAggregate.class);
 
     @AggregateIdentifier
