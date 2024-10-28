@@ -49,7 +49,7 @@ public class ExpirationTrackerEventsHandler {
 
     @ExceptionHandler(resultType = IllegalArgumentException.class)
     public void handle(IllegalArgumentException exception) {
-        LOGGER.error(exception.getLocalizedMessage());
+        LOGGER.error(marker, exception.getLocalizedMessage());
     }
 
     @ExceptionHandler(resultType = IllegalProjectionStateException.class)
