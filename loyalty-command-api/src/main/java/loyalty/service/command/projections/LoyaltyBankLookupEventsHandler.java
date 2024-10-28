@@ -2,16 +2,22 @@ package loyalty.service.command.projections;
 
 import lombok.AllArgsConstructor;
 import loyalty.service.command.data.entities.LoyaltyBankLookupEntity;
+import loyalty.service.command.data.entities.TransactionEntity;
 import loyalty.service.command.data.repositories.LoyaltyBankLookupRepository;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
 import loyalty.service.core.events.LoyaltyBankDeletedEvent;
+import loyalty.service.core.exceptions.IllegalProjectionStateException;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.messaging.interceptors.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.SmartValidator;
 
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.ExceptionMessages.LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST;
@@ -19,43 +25,63 @@ import static loyalty.service.core.constants.LogMessages.*;
 import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExist;
 
 @Component
-@AllArgsConstructor
 @ProcessingGroup("loyalty-bank-lookup-group")
 public class LoyaltyBankLookupEventsHandler {
 
-    private LoyaltyBankLookupRepository loyaltyBankLookupRepository;
+    private final LoyaltyBankLookupRepository loyaltyBankLookupRepository;
+    private final SmartValidator validator;
+    private Marker marker = null;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoyaltyBankLookupEventsHandler.class);
 
-    @ExceptionHandler(resultType = Exception.class)
-    public void handle(Exception exception) throws Exception {
-        throw exception;
+    public LoyaltyBankLookupEventsHandler(LoyaltyBankLookupRepository loyaltyBankLookupRepository, SmartValidator validator) {
+        this.loyaltyBankLookupRepository = loyaltyBankLookupRepository;
+        this.validator = validator;
     }
 
     @ExceptionHandler(resultType = IllegalArgumentException.class)
     public void handle(IllegalArgumentException exception) {
-        LOGGER.error(exception.getLocalizedMessage());
+        LOGGER.error(marker, exception.getLocalizedMessage());
+    }
+
+    @ExceptionHandler(resultType = IllegalProjectionStateException.class)
+    public void handle(IllegalProjectionStateException exception) {
+        LOGGER.error(marker, exception.getLocalizedMessage());
     }
 
     @EventHandler
     public void on(LoyaltyBankCreatedEvent event) {
-        loyaltyBankLookupRepository.save(
-                new LoyaltyBankLookupEntity(
+        marker = Markers.append(REQUEST_ID, event.getRequestId());
+
+        LoyaltyBankLookupEntity loyaltyBankLookupEntity = new LoyaltyBankLookupEntity(
                         event.getLoyaltyBankId(),
                         event.getAccountId(),
                         event.getBusinessId()
-                )
-        );
+                );
 
-        LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), LOYALTY_BANK_SAVED_IN_LOOKUP_DB, event.getLoyaltyBankId());
+        validateEntity(loyaltyBankLookupEntity);
+        loyaltyBankLookupRepository.save(loyaltyBankLookupEntity);
+
+        LOGGER.info(marker, LOYALTY_BANK_SAVED_IN_LOOKUP_DB, event.getLoyaltyBankId());
     }
 
     @EventHandler
     public void on(LoyaltyBankDeletedEvent event) {
+        marker = Markers.append(REQUEST_ID, event.getRequestId());
+
         LoyaltyBankLookupEntity loyaltyBankLookupEntity = loyaltyBankLookupRepository.findByLoyaltyBankId(event.getLoyaltyBankId());
         throwExceptionIfEntityDoesNotExist(loyaltyBankLookupEntity, String.format(LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST, event.getLoyaltyBankId()));
         loyaltyBankLookupRepository.delete(loyaltyBankLookupEntity);
 
-        LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), LOYALTY_BANK_DELETED_FROM_LOOKUP_DB, event.getLoyaltyBankId());
+        LOGGER.info(marker, LOYALTY_BANK_DELETED_FROM_LOOKUP_DB, event.getLoyaltyBankId());
+    }
+
+    private void validateEntity(LoyaltyBankLookupEntity entity) {
+        BindingResult bindingResult = new BeanPropertyBindingResult(entity, "loyaltyBankLookupEntity");
+        validator.validate(entity, bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            throw new IllegalProjectionStateException(bindingResult.getFieldError().getDefaultMessage());
+        }
     }
 }
