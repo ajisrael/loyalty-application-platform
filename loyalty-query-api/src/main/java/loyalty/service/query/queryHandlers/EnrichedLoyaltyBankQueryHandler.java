@@ -108,7 +108,7 @@ public class EnrichedLoyaltyBankQueryHandler {
         EnrichedLoyaltyBanksForBusinessQueryModel enrichedLoyaltyBanksForBusinessQueryModel =
                 new EnrichedLoyaltyBanksForBusinessQueryModel(
                         businessEntity.getBusinessId(),
-                        businessEntity.getBusinessId(),
+                        businessEntity.getBusinessName(),
                         new ArrayList<>()
                 );
 
