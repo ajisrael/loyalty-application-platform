@@ -67,7 +67,7 @@ public class RedemptionTrackerEventsHandler {
 
         // should never throw
         if (availablePoints < 0) {
-            throw new IllegalStateException("Captured points cannot exceed max points");
+            throw new IllegalStateException("Voided points cannot exceed available points");
         }
 
         Marker marker = MarkerGenerator.generateMarker(redemptionTracker);

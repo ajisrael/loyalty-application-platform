@@ -41,4 +41,7 @@ public class ExceptionMessages {
     public static final String ACCOUNT_ID_ALREADY_HAS_LOYALTY_BANK = "AccountId %s already has a loyalty bank with %s";
     public static final String LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE = "%s balance cannot be negative";
     public static final String FAILED_TO_EXPIRE_LOYALTY_POINTS = "Failed to expire points in loyalty bank %s";
+
+    public static final String CANNOT_VOID_MORE_POINTS_THAN_AVAILABLE = "Cannot void more points than available";
+    public static final String CANNOT_CAPTURE_MORE_POINTS_THAN_AVAILABLE = "Cannot capture more points than available";
 }
