@@ -104,7 +104,7 @@ if [ "$BUILD_ALL" = true ]; then
     cd ..
 
 else
-    echo "Skipping build as --build flag was not provided."
+    echo "Skipping build as --build-all flag was not provided."
 fi
 
 echo "Bringing up containers..."
