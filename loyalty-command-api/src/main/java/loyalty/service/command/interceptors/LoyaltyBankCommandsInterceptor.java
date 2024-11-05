@@ -41,51 +41,76 @@ public class LoyaltyBankCommandsInterceptor implements MessageDispatchIntercepto
     public BiFunction<Integer, CommandMessage<?>, CommandMessage<?>> handle(
             @Nonnull List<? extends CommandMessage<?>> messages) {
         return (index, genericCommand) -> {
+            String commandName = genericCommand.getPayloadType().getSimpleName();
+            LOGGER.debug(MarkerGenerator.generateMarker(genericCommand.getPayload()), INTERCEPTED_COMMAND, commandName);
 
             if (CreateLoyaltyBankCommand.class.equals(genericCommand.getPayloadType())) {
-                CreateLoyaltyBankCommand command = (CreateLoyaltyBankCommand) genericCommand.getPayload();
-
-                String commandName = command.getClass().getSimpleName();
-                LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
-
-                String accountId = command.getAccountId();
-                AccountLookupEntity accountLookupEntity = accountLookupRepository.findByAccountId(accountId);
-
-                if (accountLookupEntity == null) {
-                    LOGGER.info(
-                            Markers.append(REQUEST_ID, command.getRequestId()),
-                            ACCOUNT_NOT_FOUND_CANCELLING_COMMAND, accountId, commandName
-                    );
-
-                    throw new AccountNotFoundException(accountId);
-                }
-
-                String businessId = command.getBusinessId();
-                BusinessLookupEntity businessLookupEntity = businessLookupRepository.findByBusinessId(businessId);
-
-                if (businessLookupEntity == null) {
-                    LOGGER.info(
-                            Markers.append(REQUEST_ID, command.getRequestId()),
-                            BUSINESS_NOT_FOUND_CANCELLING_COMMAND, businessId, commandName
-                    );
-
-                    throw new BusinessNotFoundException(businessId);
-                }
-
-                LoyaltyBankLookupEntity loyaltyBankLookupEntity = loyaltyBankLookupRepository.findByBusinessIdAndAccountId(businessId, accountId);
-
-                if (loyaltyBankLookupEntity != null) {
-                    LOGGER.info(
-                            Markers.append(REQUEST_ID, command.getRequestId()),
-                            ACCOUNT_ALREADY_ENROLLED_IN_BUSINESS_CANCELLING_COMMAND,
-                            accountId, businessId, commandName
-                    );
-
-                    throw new AccountExistsWithLoyaltyBankException(accountId, businessId);
-                }
+                handleCreateLoyaltyBankCommand((CreateLoyaltyBankCommand) genericCommand.getPayload(), commandName);
             }
 
             return genericCommand;
         };
+    }
+
+    private void handleCreateLoyaltyBankCommand(CreateLoyaltyBankCommand command, String commandName) {
+        String accountId = command.getAccountId();
+        throwExceptionIfAccountDoesNotExist(accountId, command.getRequestId(), commandName);
+
+        String businessId = command.getBusinessId();
+        throwExceptionIfBusinessDoesNotExist(businessId, command.getRequestId(), commandName);
+
+        throwExceptionIfAccountAlreadyEnrolledInBusiness(accountId, businessId, command.getRequestId(), commandName);
+    }
+
+    private void throwExceptionIfAccountDoesNotExist(String accountId, String requestId, String commandName) {
+        AccountLookupEntity accountLookupEntity = accountLookupRepository.findByAccountId(accountId);
+
+        if (accountLookupEntity == null) {
+            logAndThrowAccountNotFoundException(accountId, requestId, commandName);
+        }
+    }
+
+    private void throwExceptionIfBusinessDoesNotExist(String businessId, String requestId, String commandName) {
+        BusinessLookupEntity businessLookupEntity = businessLookupRepository.findByBusinessId(businessId);
+
+        if (businessLookupEntity == null) {
+            logAndThrowBusinessNotFoundException(businessId, requestId, commandName);
+        }
+    }
+
+    private void throwExceptionIfAccountAlreadyEnrolledInBusiness(String accountId, String businessId, String requestId, String commandName) {
+        LoyaltyBankLookupEntity loyaltyBankLookupEntity = loyaltyBankLookupRepository.findByBusinessIdAndAccountId(businessId, accountId);
+
+        if (loyaltyBankLookupEntity != null) {
+            logAndThrowAccountExistsWithLoyaltyBankException(accountId, businessId, requestId, commandName);
+        }
+    }
+
+    private void logAndThrowAccountNotFoundException(String accountId, String requestId, String commandName) {
+        LOGGER.info(
+                Markers.append(REQUEST_ID, requestId),
+                ACCOUNT_NOT_FOUND_CANCELLING_COMMAND, accountId, commandName
+        );
+
+        throw new AccountNotFoundException(accountId);
+    }
+
+    private void logAndThrowBusinessNotFoundException(String businessId, String requestId, String commandName) {
+        LOGGER.info(
+                Markers.append(REQUEST_ID, requestId),
+                BUSINESS_NOT_FOUND_CANCELLING_COMMAND, businessId, commandName
+        );
+
+        throw new BusinessNotFoundException(businessId);
+    }
+
+    private void logAndThrowAccountExistsWithLoyaltyBankException(String accountId, String businessId, String requestId, String commandName) {
+        LOGGER.info(
+                Markers.append(REQUEST_ID, requestId),
+                ACCOUNT_ALREADY_ENROLLED_IN_BUSINESS_CANCELLING_COMMAND,
+                accountId, businessId, commandName
+        );
+
+        throw new AccountExistsWithLoyaltyBankException(accountId, businessId);
     }
 }

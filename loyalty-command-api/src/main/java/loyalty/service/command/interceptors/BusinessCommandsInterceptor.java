@@ -34,39 +34,41 @@ public class BusinessCommandsInterceptor implements MessageDispatchInterceptor<C
     public BiFunction<Integer, CommandMessage<?>, CommandMessage<?>> handle(
             @Nonnull List<? extends CommandMessage<?>> messages) {
         return (index, genericCommand) -> {
+            String commandName = genericCommand.getPayloadType().getSimpleName();
+            LOGGER.debug(MarkerGenerator.generateMarker(genericCommand.getPayload()), INTERCEPTED_COMMAND, commandName);
 
             if (UpdateBusinessCommand.class.equals(genericCommand.getPayloadType())) {
-                UpdateBusinessCommand command = (UpdateBusinessCommand) genericCommand.getPayload();
-
-                String commandName = command.getClass().getSimpleName();
-                LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
-
-                throwExceptionIfBusinessDoesNotExist(command.getBusinessId(), command.getRequestId(), commandName);
-            }
-
-            if (DeleteBusinessCommand.class.equals(genericCommand.getPayloadType())) {
-                DeleteBusinessCommand command = (DeleteBusinessCommand) genericCommand.getPayload();
-
-                String commandName = command.getClass().getSimpleName();
-                LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
-
-                throwExceptionIfBusinessDoesNotExist(command.getBusinessId(), command.getRequestId(), commandName);
+                handleUpdateBusinessCommand((UpdateBusinessCommand) genericCommand.getPayload(), commandName);
+            } else if (DeleteBusinessCommand.class.equals(genericCommand.getPayloadType())) {
+                handleDeleteBusinessCommand((DeleteBusinessCommand) genericCommand.getPayload(), commandName);
             }
 
             return genericCommand;
         };
     }
 
+    private void handleUpdateBusinessCommand(UpdateBusinessCommand command, String commandName) {
+        throwExceptionIfBusinessDoesNotExist(command.getBusinessId(), command.getRequestId(), commandName);
+    }
+
+    private void handleDeleteBusinessCommand(DeleteBusinessCommand command, String commandName) {
+        throwExceptionIfBusinessDoesNotExist(command.getBusinessId(), command.getRequestId(), commandName);
+    }
+
     private void throwExceptionIfBusinessDoesNotExist(String businessId, String requestId, String commandName) {
         BusinessLookupEntity businessLookupEntity = businessLookupRepository.findByBusinessId(businessId);
 
         if (businessLookupEntity == null) {
-            LOGGER.info(
-                    Markers.append(REQUEST_ID, requestId),
-                    BUSINESS_NOT_FOUND_CANCELLING_COMMAND, businessId, commandName
-            );
-
-            throw new BusinessNotFoundException(businessId);
+            logAndThrowBusinessNotFoundException(businessId, requestId, commandName);
         }
+    }
+
+    private void logAndThrowBusinessNotFoundException(String businessId, String requestId, String commandName) {
+        LOGGER.info(
+                Markers.append(REQUEST_ID, requestId),
+                BUSINESS_NOT_FOUND_CANCELLING_COMMAND, businessId, commandName
+        );
+
+        throw new BusinessNotFoundException(businessId);
     }
 }
