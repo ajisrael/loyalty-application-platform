@@ -3,7 +3,6 @@ package loyalty.service.command.interceptors;
 import loyalty.service.command.commands.*;
 import loyalty.service.command.data.entities.BusinessLookupEntity;
 import loyalty.service.command.data.repositories.BusinessLookupRepository;
-import loyalty.service.core.exceptions.AccountNotFoundException;
 import loyalty.service.core.exceptions.BusinessNotFoundException;
 import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.commandhandling.GenericCommandMessage;

@@ -1,8 +1,5 @@
 package loyalty.service.command.interceptors;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import loyalty.service.command.commands.CreateAccountCommand;
 import loyalty.service.command.commands.CreateLoyaltyBankCommand;
 import loyalty.service.command.data.entities.AccountLookupEntity;
 import loyalty.service.command.data.entities.BusinessLookupEntity;
@@ -13,8 +10,6 @@ import loyalty.service.command.data.repositories.LoyaltyBankLookupRepository;
 import loyalty.service.core.exceptions.AccountExistsWithLoyaltyBankException;
 import loyalty.service.core.exceptions.AccountNotFoundException;
 import loyalty.service.core.exceptions.BusinessNotFoundException;
-import loyalty.service.core.exceptions.EmailExistsForAccountException;
-import net.logstash.logback.marker.Markers;
 import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.commandhandling.GenericCommandMessage;
 import org.junit.jupiter.api.DisplayName;
@@ -23,15 +18,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.helpers.MessageFormatter;
 
 import java.util.List;
 import java.util.UUID;
 
-import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
-import static loyalty.service.core.constants.LogMessages.EMAIL_FOUND_ON_ANOTHER_ACCOUNT_CANCELLING_COMMAND;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
