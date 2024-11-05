@@ -80,7 +80,7 @@ public class TransactionCommandsInterceptor implements MessageDispatchIntercepto
     }
 
     private void throwExceptionIfAttemptingToVoidMorePointsThanAvailable(RedemptionTrackerEntity redemptionTrackerEntity, int points, String requestId, String commandName) {
-        if (redemptionTrackerEntity.getAuthorizedPoints() < points) {
+        if (redemptionTrackerEntity.getPointsAvailableForRedemption() < points) {
             Marker marker = MarkerGenerator.generateMarker(redemptionTrackerEntity);
             marker.add(Markers.append(REQUEST_ID, requestId));
             marker.add(Markers.append(REQUESTED_POINTS, points));
@@ -91,7 +91,7 @@ public class TransactionCommandsInterceptor implements MessageDispatchIntercepto
     }
 
     private void throwExceptionIfAttemptingToCaptureMorePointsThanAvailable(RedemptionTrackerEntity redemptionTrackerEntity, int points, String requestId, String commandName) {
-        if (redemptionTrackerEntity.getAuthorizedPoints() < points) {
+        if (redemptionTrackerEntity.getPointsAvailableForRedemption() < points) {
             Marker marker = MarkerGenerator.generateMarker(redemptionTrackerEntity);
             marker.add(Markers.append(REQUEST_ID, requestId));
             marker.add(Markers.append(REQUESTED_POINTS, points));
