@@ -66,7 +66,12 @@ public class LoyaltyBankCommandsInterceptor implements MessageDispatchIntercepto
         AccountLookupEntity accountLookupEntity = accountLookupRepository.findByAccountId(accountId);
 
         if (accountLookupEntity == null) {
-            logAndThrowAccountNotFoundException(accountId, requestId, commandName);
+            LOGGER.info(
+                    Markers.append(REQUEST_ID, requestId),
+                    ACCOUNT_NOT_FOUND_CANCELLING_COMMAND, accountId, commandName
+            );
+
+            throw new AccountNotFoundException(accountId);
         }
     }
 
@@ -74,7 +79,12 @@ public class LoyaltyBankCommandsInterceptor implements MessageDispatchIntercepto
         BusinessLookupEntity businessLookupEntity = businessLookupRepository.findByBusinessId(businessId);
 
         if (businessLookupEntity == null) {
-            logAndThrowBusinessNotFoundException(businessId, requestId, commandName);
+            LOGGER.info(
+                    Markers.append(REQUEST_ID, requestId),
+                    BUSINESS_NOT_FOUND_CANCELLING_COMMAND, businessId, commandName
+            );
+
+            throw new BusinessNotFoundException(businessId);
         }
     }
 
@@ -82,35 +92,13 @@ public class LoyaltyBankCommandsInterceptor implements MessageDispatchIntercepto
         LoyaltyBankLookupEntity loyaltyBankLookupEntity = loyaltyBankLookupRepository.findByBusinessIdAndAccountId(businessId, accountId);
 
         if (loyaltyBankLookupEntity != null) {
-            logAndThrowAccountExistsWithLoyaltyBankException(accountId, businessId, requestId, commandName);
+            LOGGER.info(
+                    Markers.append(REQUEST_ID, requestId),
+                    ACCOUNT_ALREADY_ENROLLED_IN_BUSINESS_CANCELLING_COMMAND,
+                    accountId, businessId, commandName
+            );
+
+            throw new AccountExistsWithLoyaltyBankException(accountId, businessId);
         }
-    }
-
-    private void logAndThrowAccountNotFoundException(String accountId, String requestId, String commandName) {
-        LOGGER.info(
-                Markers.append(REQUEST_ID, requestId),
-                ACCOUNT_NOT_FOUND_CANCELLING_COMMAND, accountId, commandName
-        );
-
-        throw new AccountNotFoundException(accountId);
-    }
-
-    private void logAndThrowBusinessNotFoundException(String businessId, String requestId, String commandName) {
-        LOGGER.info(
-                Markers.append(REQUEST_ID, requestId),
-                BUSINESS_NOT_FOUND_CANCELLING_COMMAND, businessId, commandName
-        );
-
-        throw new BusinessNotFoundException(businessId);
-    }
-
-    private void logAndThrowAccountExistsWithLoyaltyBankException(String accountId, String businessId, String requestId, String commandName) {
-        LOGGER.info(
-                Markers.append(REQUEST_ID, requestId),
-                ACCOUNT_ALREADY_ENROLLED_IN_BUSINESS_CANCELLING_COMMAND,
-                accountId, businessId, commandName
-        );
-
-        throw new AccountExistsWithLoyaltyBankException(accountId, businessId);
     }
 }
