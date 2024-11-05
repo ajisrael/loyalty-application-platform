@@ -38,7 +38,7 @@ public class AccountCommandsInterceptor implements MessageDispatchInterceptor<Co
             @Nonnull List<? extends CommandMessage<?>> messages) {
         return (index, genericCommand) -> {
             String commandName = genericCommand.getPayloadType().getSimpleName();
-            LOGGER.info(MarkerGenerator.generateMarker(genericCommand.getPayload()), INTERCEPTED_COMMAND, commandName);
+            LOGGER.debug(MarkerGenerator.generateMarker(genericCommand.getPayload()), INTERCEPTED_COMMAND, commandName);
 
             if (CreateAccountCommand.class.equals(genericCommand.getPayloadType())) {
                 handleCreateAccountCommand((CreateAccountCommand) genericCommand.getPayload(), commandName);

@@ -91,14 +91,7 @@ class AccountCommandsInterceptorTest {
         verify(accountLookupRepository, times(1)).findByEmail(TEST_EMAIL);
 
         List<ILoggingEvent> loggedEvents = listAppender.list;
-        assertEquals(1, loggedEvents.size());
-        verifyInterceptedMessage(loggedEvents, CreateAccountCommand.class.getSimpleName());
-
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("firstName", command.getFirstName())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("lastName", command.getLastName())));
+        assertEquals(0, loggedEvents.size());
     }
 
     @Test
@@ -129,17 +122,10 @@ class AccountCommandsInterceptorTest {
         verify(accountLookupRepository, times(1)).findByEmail(TEST_EMAIL);
 
         List<ILoggingEvent> loggedEvents = listAppender.list;
-        assertEquals(2, loggedEvents.size());
+        assertEquals(1, loggedEvents.size());
         String commandName = CreateAccountCommand.class.getSimpleName();
-        verifyInterceptedMessage(loggedEvents, commandName);
 
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("firstName", command.getFirstName())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("lastName", command.getLastName())));
-
-        loggingEvent = loggedEvents.get(1);
+        loggingEvent = loggedEvents.get(0);
         assertEquals(Level.INFO, loggingEvent.getLevel());
 
         String expectedLogMessage = MessageFormatter.format(EMAIL_FOUND_ON_ANOTHER_ACCOUNT_CANCELLING_COMMAND, existingAccountId, commandName).getMessage();
@@ -178,14 +164,7 @@ class AccountCommandsInterceptorTest {
         verify(accountLookupRepository, times(1)).findByEmail(TEST_EMAIL);
 
         List<ILoggingEvent> loggedEvents = listAppender.list;
-        assertEquals(1, loggedEvents.size());
-        verifyInterceptedMessage(loggedEvents, UpdateAccountCommand.class.getSimpleName());
-
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("firstName", command.getFirstName())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("lastName", command.getLastName())));
+        assertEquals(0, loggedEvents.size());
     }
 
     @Test
@@ -213,17 +192,10 @@ class AccountCommandsInterceptorTest {
         verify(accountLookupRepository, times(1)).findByAccountId(TEST_ACCOUNT_ID);
 
         List<ILoggingEvent> loggedEvents = listAppender.list;
-        assertEquals(2, loggedEvents.size());
+        assertEquals(1, loggedEvents.size());
         String commandName = UpdateAccountCommand.class.getSimpleName();
-        verifyInterceptedMessage(loggedEvents, commandName);
 
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("firstName", command.getFirstName())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("lastName", command.getLastName())));
-
-        loggingEvent = loggedEvents.get(1);
+        loggingEvent = loggedEvents.get(0);
         assertEquals(Level.INFO, loggingEvent.getLevel());
 
         String expectedLogMessage = MessageFormatter.format(ACCOUNT_NOT_FOUND_CANCELLING_COMMAND, command.getAccountId(), commandName).getMessage();
@@ -264,17 +236,10 @@ class AccountCommandsInterceptorTest {
         verify(accountLookupRepository, times(1)).findByEmail(updatedEmail);
 
         List<ILoggingEvent> loggedEvents = listAppender.list;
-        assertEquals(2, loggedEvents.size());
+        assertEquals(1, loggedEvents.size());
         String commandName = UpdateAccountCommand.class.getSimpleName();
-        verifyInterceptedMessage(loggedEvents, commandName);
 
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("firstName", command.getFirstName())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("lastName", command.getLastName())));
-
-        loggingEvent = loggedEvents.get(1);
+        loggingEvent = loggedEvents.get(0);
         assertEquals(Level.INFO, loggingEvent.getLevel());
 
         String expectedLogMessage = MessageFormatter.format(EMAIL_FOUND_ON_ANOTHER_ACCOUNT_CANCELLING_COMMAND, existingAccountId, commandName).getMessage();
@@ -308,12 +273,7 @@ class AccountCommandsInterceptorTest {
         verify(accountLookupRepository, times(1)).findByAccountId(TEST_ACCOUNT_ID);
 
         List<ILoggingEvent> loggedEvents = listAppender.list;
-        assertEquals(1, loggedEvents.size());
-        String commandName = DeleteAccountCommand.class.getSimpleName();
-        verifyInterceptedMessage(loggedEvents, commandName);
-
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
+        assertEquals(0, loggedEvents.size());
     }
 
     @Test
@@ -338,30 +298,15 @@ class AccountCommandsInterceptorTest {
         verify(accountLookupRepository, times(1)).findByAccountId(TEST_ACCOUNT_ID);
 
         List<ILoggingEvent> loggedEvents = listAppender.list;
-        assertEquals(2, loggedEvents.size());
+        assertEquals(1, loggedEvents.size());
         String commandName = DeleteAccountCommand.class.getSimpleName();
-        verifyInterceptedMessage(loggedEvents, commandName);
 
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
-
-        loggingEvent = loggedEvents.get(1);
+        loggingEvent = loggedEvents.get(0);
         assertEquals(Level.INFO, loggingEvent.getLevel());
 
         String expectedLogMessage = MessageFormatter.format(ACCOUNT_NOT_FOUND_CANCELLING_COMMAND, command.getAccountId(), commandName).getMessage();
         assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
 
         assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
-    }
-
-    private void verifyInterceptedMessage(List<ILoggingEvent> loggedEvents, String commandName) {
-        String expectedLogMessage = MessageFormatter.format(
-                INTERCEPTED_COMMAND,
-                commandName
-        ).getMessage();
-
-        loggingEvent = loggedEvents.get(0);
-        assertTrue(loggingEvent.getLevel().equals(Level.INFO));
-        assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
     }
 }
