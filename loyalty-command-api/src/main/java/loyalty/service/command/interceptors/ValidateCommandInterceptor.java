@@ -18,27 +18,27 @@ import static loyalty.service.core.constants.LogMessages.VALIDATING_COMMAND;
 @Component
 public class ValidateCommandInterceptor implements MessageDispatchInterceptor<CommandMessage<?>> {
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(ValidateCommandInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidateCommandInterceptor.class);
 
-        @Nonnull
-        @Override
-        public BiFunction<Integer, CommandMessage<?>, CommandMessage<?>> handle(
-                @Nonnull List<? extends CommandMessage<?>> messages) {
-            return (index, genericCommand) -> {
+    @Nonnull
+    @Override
+    public BiFunction<Integer, CommandMessage<?>, CommandMessage<?>> handle(
+            @Nonnull List<? extends CommandMessage<?>> messages) {
+        return (index, genericCommand) -> {
 
-                if (AbstractCommand.class.isAssignableFrom(genericCommand.getPayloadType())) {
-                    AbstractCommand command = (AbstractCommand) genericCommand.getPayload();
+            if (AbstractCommand.class.isAssignableFrom(genericCommand.getPayloadType())) {
+                AbstractCommand command = (AbstractCommand) genericCommand.getPayload();
 
-                    LOGGER.info(
-                            Markers.append(REQUEST_ID, command.getRequestId()),
-                            VALIDATING_COMMAND,
-                            genericCommand.getPayloadType().getSimpleName()
-                    );
+                LOGGER.info(
+                        Markers.append(REQUEST_ID, command.getRequestId()),
+                        VALIDATING_COMMAND,
+                        genericCommand.getPayloadType().getSimpleName()
+                );
 
-                    command.validate();
-                }
+                command.validate();
+            }
 
-                return genericCommand;
-            };
-        }
+            return genericCommand;
+        };
     }
+}
