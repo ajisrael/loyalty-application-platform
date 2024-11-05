@@ -29,7 +29,7 @@ public class ValidateCommandInterceptor implements MessageDispatchInterceptor<Co
             if (AbstractCommand.class.isAssignableFrom(genericCommand.getPayloadType())) {
                 AbstractCommand command = (AbstractCommand) genericCommand.getPayload();
 
-                LOGGER.info(
+                LOGGER.debug(
                         Markers.append(REQUEST_ID, command.getRequestId()),
                         VALIDATING_COMMAND,
                         genericCommand.getPayloadType().getSimpleName()
