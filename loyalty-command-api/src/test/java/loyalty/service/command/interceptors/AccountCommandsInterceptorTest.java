@@ -1,5 +1,9 @@
 package loyalty.service.command.interceptors;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import loyalty.service.command.commands.CreateAccountCommand;
 import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
@@ -7,24 +11,34 @@ import loyalty.service.command.data.entities.AccountLookupEntity;
 import loyalty.service.command.data.repositories.AccountLookupRepository;
 import loyalty.service.core.exceptions.AccountNotFoundException;
 import loyalty.service.core.exceptions.EmailExistsForAccountException;
+import net.logstash.logback.marker.Markers;
 import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.commandhandling.GenericCommandMessage;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.MessageFormatter;
 
 import java.util.List;
 import java.util.UUID;
 
+import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
+import static loyalty.service.core.constants.LogMessages.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AccountCommandsInterceptorTest {
+
+    private ListAppender<ILoggingEvent> listAppender;
+    public static ILoggingEvent loggingEvent = null;
 
     @Mock
     private AccountLookupRepository accountLookupRepository;
@@ -37,6 +51,21 @@ class AccountCommandsInterceptorTest {
     private static final String TEST_FIRST_NAME = "John";
     private static final String TEST_LAST_NAME = "Doe";
     private static final String TEST_EMAIL = "john@test.com";
+
+    @BeforeEach
+    void setUp() {
+        // Set up the logback test appender
+        Logger logger = (Logger) LoggerFactory.getLogger(AccountCommandsInterceptor.class);
+        listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+    }
+
+    @AfterEach
+    void tearDown() {
+        // Stop the appender
+        listAppender.stop();
+    }
 
     @Test
     @DisplayName("Can handle valid CreateAccountCommand")
@@ -60,6 +89,16 @@ class AccountCommandsInterceptorTest {
         // Assert
         assertEquals(command, result.getPayload(), "Command should not be changed by interceptor");
         verify(accountLookupRepository, times(1)).findByEmail(TEST_EMAIL);
+
+        List<ILoggingEvent> loggedEvents = listAppender.list;
+        assertEquals(1, loggedEvents.size());
+        verifyInterceptedMessage(loggedEvents, CreateAccountCommand.class.getSimpleName());
+
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("firstName", command.getFirstName())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("lastName", command.getLastName())));
     }
 
     @Test
@@ -74,7 +113,8 @@ class AccountCommandsInterceptorTest {
                 .email(TEST_EMAIL)
                 .build();
 
-        AccountLookupEntity existingAccount = new AccountLookupEntity(UUID.randomUUID().toString(), TEST_EMAIL);
+        String existingAccountId = UUID.randomUUID().toString();
+        AccountLookupEntity existingAccount = new AccountLookupEntity(existingAccountId, TEST_EMAIL);
 
         when(accountLookupRepository.findByEmail(any(String.class))).thenReturn(existingAccount);
 
@@ -87,6 +127,27 @@ class AccountCommandsInterceptorTest {
 
         // Assert
         verify(accountLookupRepository, times(1)).findByEmail(TEST_EMAIL);
+
+        List<ILoggingEvent> loggedEvents = listAppender.list;
+        assertEquals(2, loggedEvents.size());
+        String commandName = CreateAccountCommand.class.getSimpleName();
+        verifyInterceptedMessage(loggedEvents, commandName);
+
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("firstName", command.getFirstName())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("lastName", command.getLastName())));
+
+        loggingEvent = loggedEvents.get(1);
+        assertEquals(Level.INFO, loggingEvent.getLevel());
+
+        String expectedLogMessage = MessageFormatter.format(EMAIL_FOUND_ON_ANOTHER_ACCOUNT_CANCELLING_COMMAND, existingAccountId, commandName).getMessage();
+        assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
+
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", existingAccountId)));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
     }
 
     @Test
@@ -115,6 +176,16 @@ class AccountCommandsInterceptorTest {
         assertEquals(command, result.getPayload(), "Command should not be changed by interceptor");
         verify(accountLookupRepository, times(1)).findByAccountId(TEST_ACCOUNT_ID);
         verify(accountLookupRepository, times(1)).findByEmail(TEST_EMAIL);
+
+        List<ILoggingEvent> loggedEvents = listAppender.list;
+        assertEquals(1, loggedEvents.size());
+        verifyInterceptedMessage(loggedEvents, UpdateAccountCommand.class.getSimpleName());
+
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("firstName", command.getFirstName())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("lastName", command.getLastName())));
     }
 
     @Test
@@ -140,7 +211,25 @@ class AccountCommandsInterceptorTest {
 
         // Assert
         verify(accountLookupRepository, times(1)).findByAccountId(TEST_ACCOUNT_ID);
-        verify(accountLookupRepository, times(0)).findByEmail(TEST_EMAIL);
+
+        List<ILoggingEvent> loggedEvents = listAppender.list;
+        assertEquals(2, loggedEvents.size());
+        String commandName = UpdateAccountCommand.class.getSimpleName();
+        verifyInterceptedMessage(loggedEvents, commandName);
+
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("firstName", command.getFirstName())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("lastName", command.getLastName())));
+
+        loggingEvent = loggedEvents.get(1);
+        assertEquals(Level.INFO, loggingEvent.getLevel());
+
+        String expectedLogMessage = MessageFormatter.format(ACCOUNT_NOT_FOUND_CANCELLING_COMMAND, command.getAccountId(), commandName).getMessage();
+        assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
+
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
     }
 
     @Test
@@ -157,7 +246,8 @@ class AccountCommandsInterceptorTest {
                 .build();
 
         AccountLookupEntity existingAccount = new AccountLookupEntity(TEST_ACCOUNT_ID, TEST_EMAIL);
-        AccountLookupEntity existingEmailAccount = new AccountLookupEntity(UUID.randomUUID().toString(), updatedEmail);
+        String existingAccountId = UUID.randomUUID().toString();
+        AccountLookupEntity existingEmailAccount = new AccountLookupEntity(existingAccountId, updatedEmail);
 
         when(accountLookupRepository.findByAccountId(any(String.class))).thenReturn(existingAccount);
         when(accountLookupRepository.findByEmail(any(String.class))).thenReturn(existingEmailAccount);
@@ -172,6 +262,27 @@ class AccountCommandsInterceptorTest {
         // Assert
         verify(accountLookupRepository, times(1)).findByAccountId(TEST_ACCOUNT_ID);
         verify(accountLookupRepository, times(1)).findByEmail(updatedEmail);
+
+        List<ILoggingEvent> loggedEvents = listAppender.list;
+        assertEquals(2, loggedEvents.size());
+        String commandName = UpdateAccountCommand.class.getSimpleName();
+        verifyInterceptedMessage(loggedEvents, commandName);
+
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("firstName", command.getFirstName())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("lastName", command.getLastName())));
+
+        loggingEvent = loggedEvents.get(1);
+        assertEquals(Level.INFO, loggingEvent.getLevel());
+
+        String expectedLogMessage = MessageFormatter.format(EMAIL_FOUND_ON_ANOTHER_ACCOUNT_CANCELLING_COMMAND, existingAccountId, commandName).getMessage();
+        assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
+
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", existingAccountId)));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
     }
 
     @Test
@@ -195,6 +306,14 @@ class AccountCommandsInterceptorTest {
         // Assert
         assertEquals(command, result.getPayload(), "Command should not be changed by interceptor");
         verify(accountLookupRepository, times(1)).findByAccountId(TEST_ACCOUNT_ID);
+
+        List<ILoggingEvent> loggedEvents = listAppender.list;
+        assertEquals(1, loggedEvents.size());
+        String commandName = DeleteAccountCommand.class.getSimpleName();
+        verifyInterceptedMessage(loggedEvents, commandName);
+
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
     }
 
     @Test
@@ -217,5 +336,32 @@ class AccountCommandsInterceptorTest {
 
         // Assert
         verify(accountLookupRepository, times(1)).findByAccountId(TEST_ACCOUNT_ID);
+
+        List<ILoggingEvent> loggedEvents = listAppender.list;
+        assertEquals(2, loggedEvents.size());
+        String commandName = DeleteAccountCommand.class.getSimpleName();
+        verifyInterceptedMessage(loggedEvents, commandName);
+
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", command.getAccountId())));
+
+        loggingEvent = loggedEvents.get(1);
+        assertEquals(Level.INFO, loggingEvent.getLevel());
+
+        String expectedLogMessage = MessageFormatter.format(ACCOUNT_NOT_FOUND_CANCELLING_COMMAND, command.getAccountId(), commandName).getMessage();
+        assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
+
+        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
+    }
+
+    private void verifyInterceptedMessage(List<ILoggingEvent> loggedEvents, String commandName) {
+        String expectedLogMessage = MessageFormatter.format(
+                INTERCEPTED_COMMAND,
+                commandName
+        ).getMessage();
+
+        loggingEvent = loggedEvents.get(0);
+        assertTrue(loggingEvent.getLevel().equals(Level.INFO));
+        assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
     }
 }
