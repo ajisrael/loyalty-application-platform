@@ -18,7 +18,7 @@ public class LogMessages {
     public static final String BUSINESS_NOT_FOUND_CANCELLING_COMMAND = "Business {} does not exist, cancelling command {}";
     public static final String ACCOUNT_ALREADY_ENROLLED_IN_BUSINESS_CANCELLING_COMMAND = "Account {} already enrolled in business {}, cancelling command {}";
     public static final String VALIDATING_COMMAND = "Validating command {}";
-    public static final String EXCESSIVE_POINTS_REQUEST_CANCELLING_COMMAND = "Attempting to {} more points than authorized, cancelling command";
+    public static final String EXCESSIVE_POINTS_REQUEST_CANCELLING_COMMAND = "Attempting to {} more points than authorized, cancelling command {}";
 
     public static final String INSUFFICIENT_AVAILABLE_POINTS_FOR_AUTHORIZATION = "Insufficient available points for authorization of {} points";
 

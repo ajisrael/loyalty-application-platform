@@ -37,51 +37,35 @@ public class TransactionCommandsInterceptor implements MessageDispatchIntercepto
     public BiFunction<Integer, CommandMessage<?>, CommandMessage<?>> handle(
             @Nonnull List<? extends CommandMessage<?>> messages) {
         return (index, genericCommand) -> {
+            String commandName = genericCommand.getPayloadType().getSimpleName();
+            LOGGER.debug(MarkerGenerator.generateMarker(genericCommand.getPayload()), INTERCEPTED_COMMAND, commandName);
 
             if (CreateVoidTransactionCommand.class.equals(genericCommand.getPayloadType())) {
-                CreateVoidTransactionCommand command = (CreateVoidTransactionCommand) genericCommand.getPayload();
-
-                String commandName = command.getClass().getSimpleName();
-                LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
-
-                String paymentId = command.getPaymentId();
-                RedemptionTrackerEntity redemptionTrackerEntity = redemptionTrackerRepository.findByPaymentId(paymentId);
-
-                throwExceptionIfRedemptionDoesNotExist(redemptionTrackerEntity, command.getRequestId(), paymentId, commandName);
-
-                if (redemptionTrackerEntity.getAuthorizedPoints() < command.getPoints()) {
-                    Marker marker = MarkerGenerator.generateMarker(redemptionTrackerEntity);
-                    marker.add(Markers.append(REQUEST_ID, command.getRequestId()));
-                    marker.add(Markers.append(REQUESTED_POINTS, command.getPoints()));
-                    LOGGER.info(marker, EXCESSIVE_POINTS_REQUEST_CANCELLING_COMMAND, VOID);
-
-                    throw new ExcessiveVoidPointsException();
-                }
-            }
-
-            if (CreateCapturedTransactionCommand.class.equals(genericCommand.getPayloadType())) {
-                CreateCapturedTransactionCommand command = (CreateCapturedTransactionCommand) genericCommand.getPayload();
-
-                String commandName = command.getClass().getSimpleName();
-                LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
-
-                String paymentId = command.getPaymentId();
-                RedemptionTrackerEntity redemptionTrackerEntity = redemptionTrackerRepository.findByPaymentId(paymentId);
-
-                throwExceptionIfRedemptionDoesNotExist(redemptionTrackerEntity, command.getRequestId(), paymentId, commandName);
-
-                if (redemptionTrackerEntity.getPointsAvailableForRedemption() < command.getPoints()) {
-                    Marker marker = MarkerGenerator.generateMarker(redemptionTrackerEntity);
-                    marker.add(Markers.append(REQUEST_ID, command.getRequestId()));
-                    marker.add(Markers.append(REQUESTED_POINTS, command.getPoints()));
-                    LOGGER.info(marker, EXCESSIVE_POINTS_REQUEST_CANCELLING_COMMAND, CAPTURE);
-
-                    throw new ExcessiveCapturePointsException();
-                }
+                handleCreateVoidTransactionCommand((CreateVoidTransactionCommand) genericCommand.getPayload(), commandName);
+            } else if (CreateCapturedTransactionCommand.class.equals(genericCommand.getPayloadType())) {
+                handleCreateCapturedTransactionCommand((CreateCapturedTransactionCommand) genericCommand.getPayload(), commandName);
             }
 
             return genericCommand;
         };
+    }
+
+    private void handleCreateVoidTransactionCommand(CreateVoidTransactionCommand command, String commandName) {
+        String requestId = command.getRequestId();
+        String paymentId = command.getPaymentId();
+        RedemptionTrackerEntity redemptionTrackerEntity = redemptionTrackerRepository.findByPaymentId(paymentId);
+
+        throwExceptionIfRedemptionDoesNotExist(redemptionTrackerEntity, requestId, paymentId, commandName);
+        throwExceptionIfAttemptingToVoidMorePointsThanAvailable(redemptionTrackerEntity, command.getPoints(), requestId, commandName);
+    }
+
+    private void handleCreateCapturedTransactionCommand(CreateCapturedTransactionCommand command, String commandName) {
+        String requestId = command.getRequestId();
+        String paymentId = command.getPaymentId();
+        RedemptionTrackerEntity redemptionTrackerEntity = redemptionTrackerRepository.findByPaymentId(paymentId);
+
+        throwExceptionIfRedemptionDoesNotExist(redemptionTrackerEntity, requestId, paymentId, commandName);
+        throwExceptionIfAttemptingToCaptureMorePointsThanAvailable(redemptionTrackerEntity, command.getPoints(), requestId, commandName);
     }
 
     private void throwExceptionIfRedemptionDoesNotExist(RedemptionTrackerEntity redemptionTrackerEntity, String requestId, String paymentId, String commandName) {
@@ -92,6 +76,28 @@ public class TransactionCommandsInterceptor implements MessageDispatchIntercepto
             );
 
             throw new PaymentIdNotFoundException(paymentId);
+        }
+    }
+
+    private void throwExceptionIfAttemptingToVoidMorePointsThanAvailable(RedemptionTrackerEntity redemptionTrackerEntity, int points, String requestId, String commandName) {
+        if (redemptionTrackerEntity.getAuthorizedPoints() < points) {
+            Marker marker = MarkerGenerator.generateMarker(redemptionTrackerEntity);
+            marker.add(Markers.append(REQUEST_ID, requestId));
+            marker.add(Markers.append(REQUESTED_POINTS, points));
+            LOGGER.info(marker, EXCESSIVE_POINTS_REQUEST_CANCELLING_COMMAND, VOID, commandName);
+
+            throw new ExcessiveVoidPointsException();
+        }
+    }
+
+    private void throwExceptionIfAttemptingToCaptureMorePointsThanAvailable(RedemptionTrackerEntity redemptionTrackerEntity, int points, String requestId, String commandName) {
+        if (redemptionTrackerEntity.getAuthorizedPoints() < points) {
+            Marker marker = MarkerGenerator.generateMarker(redemptionTrackerEntity);
+            marker.add(Markers.append(REQUEST_ID, requestId));
+            marker.add(Markers.append(REQUESTED_POINTS, points));
+            LOGGER.info(marker, EXCESSIVE_POINTS_REQUEST_CANCELLING_COMMAND, CAPTURE, commandName);
+
+            throw new ExcessiveCapturePointsException();
         }
     }
 }
