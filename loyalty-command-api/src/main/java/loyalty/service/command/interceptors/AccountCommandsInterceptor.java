@@ -37,64 +37,62 @@ public class AccountCommandsInterceptor implements MessageDispatchInterceptor<Co
     public BiFunction<Integer, CommandMessage<?>, CommandMessage<?>> handle(
             @Nonnull List<? extends CommandMessage<?>> messages) {
         return (index, genericCommand) -> {
+            String commandName = genericCommand.getPayloadType().getSimpleName();
+            LOGGER.debug(MarkerGenerator.generateMarker(genericCommand.getPayload()), INTERCEPTED_COMMAND, commandName);
 
             if (CreateAccountCommand.class.equals(genericCommand.getPayloadType())) {
-                CreateAccountCommand command = (CreateAccountCommand) genericCommand.getPayload();
-
-                String commandName = command.getClass().getSimpleName();
-                LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
-
-                String email = command.getEmail();
-                AccountLookupEntity accountLookupEntity = accountLookupRepository.findByEmail(email);
-
-                if (accountLookupEntity != null) {
-                    logAndThrowEmailAlreadyExistsException(accountLookupEntity, command.getRequestId(), commandName);
-                }
-            }
-
-            if (UpdateAccountCommand.class.equals(genericCommand.getPayloadType())) {
-                UpdateAccountCommand command = (UpdateAccountCommand) genericCommand.getPayload();
-
-                String commandName = command.getClass().getSimpleName();
-                LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
-
-                String accountId = command.getAccountId();
-                throwExceptionIfAccountDoesNotExist(accountId, command.getRequestId(), commandName);
-
-                String email = command.getEmail();
-                AccountLookupEntity accountLookupEntity = accountLookupRepository.findByEmail(email);
-
-                if (accountLookupEntity != null && !accountLookupEntity.getAccountId().equals(accountId)) {
-                    logAndThrowEmailAlreadyExistsException(accountLookupEntity, command.getRequestId(), commandName);
-                }
-            }
-
-            if (DeleteAccountCommand.class.equals(genericCommand.getPayloadType())) {
-                DeleteAccountCommand command = (DeleteAccountCommand) genericCommand.getPayload();
-
-                String commandName = command.getClass().getSimpleName();
-                LOGGER.info(MarkerGenerator.generateMarker(command), INTERCEPTED_COMMAND, commandName);
-
-                String accountId = command.getAccountId();
-
-                throwExceptionIfAccountDoesNotExist(accountId, command.getRequestId(), commandName);
+                handleCreateAccountCommand((CreateAccountCommand) genericCommand.getPayload(), commandName);
+            } else if (UpdateAccountCommand.class.equals(genericCommand.getPayloadType())) {
+                handleUpdateAccountCommand((UpdateAccountCommand) genericCommand.getPayload(), commandName);
+            } else if (DeleteAccountCommand.class.equals(genericCommand.getPayloadType())) {
+                handleDeleteAccountCommand((DeleteAccountCommand) genericCommand.getPayload(), commandName);
             }
 
             return genericCommand;
         };
     }
 
-    private void logAndThrowEmailAlreadyExistsException(AccountLookupEntity accountLookupEntity, String requestId, String commandName) {
-            Marker marker = MarkerGenerator.generateMarker(accountLookupEntity);
-            marker.add(Markers.append(REQUEST_ID, requestId));
-            LOGGER.info(
-                    marker,
-                    EMAIL_FOUND_ON_ANOTHER_ACCOUNT_CANCELLING_COMMAND,
-                    accountLookupEntity.getAccountId(),
-                    commandName
-            );
+    private void handleCreateAccountCommand(CreateAccountCommand command, String commandName) {
+        throwExceptionIfEmailExists(command.getEmail(), command.getRequestId(), commandName);
+    }
 
-            throw new EmailExistsForAccountException(accountLookupEntity.getEmail());
+    private void handleUpdateAccountCommand(UpdateAccountCommand command, String commandName) {
+        String accountId = command.getAccountId();
+        String requestId = command.getRequestId();
+        throwExceptionIfAccountDoesNotExist(accountId, requestId, commandName);
+        throwExceptionIfEmailExistsForAnotherAccount(command.getEmail(), accountId, requestId, commandName);
+    }
+
+    private void handleDeleteAccountCommand(DeleteAccountCommand command, String commandName) {
+        throwExceptionIfAccountDoesNotExist(command.getAccountId(), command.getRequestId(), commandName);
+    }
+
+    private void throwExceptionIfEmailExists(String email, String requestId, String commandName) {
+        AccountLookupEntity accountLookupEntity = accountLookupRepository.findByEmail(email);
+
+        if (accountLookupEntity != null) {
+            logAndThrowEmailExistsForAccountException(accountLookupEntity, requestId, commandName);
+        }
+    }
+
+    private void throwExceptionIfEmailExistsForAnotherAccount(String email, String accountId, String requestId, String commandName) {
+        AccountLookupEntity accountLookupEntity = accountLookupRepository.findByEmail(email);
+        if (accountLookupEntity != null && !accountLookupEntity.getAccountId().equals(accountId)) {
+            logAndThrowEmailExistsForAccountException(accountLookupEntity, requestId, commandName);
+        }
+    }
+
+    private void logAndThrowEmailExistsForAccountException(AccountLookupEntity accountLookupEntity, String requestId, String commandName) {
+        Marker marker = MarkerGenerator.generateMarker(accountLookupEntity);
+        marker.add(Markers.append(REQUEST_ID, requestId));
+        LOGGER.info(
+                marker,
+                EMAIL_FOUND_ON_ANOTHER_ACCOUNT_CANCELLING_COMMAND,
+                accountLookupEntity.getAccountId(),
+                commandName
+        );
+
+        throw new EmailExistsForAccountException(accountLookupEntity.getEmail());
     }
 
     private void throwExceptionIfAccountDoesNotExist(String accountId, String requestId, String commandName) {
