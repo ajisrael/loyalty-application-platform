@@ -39,6 +39,7 @@ class AccountCommandsInterceptorTest {
 
     private ListAppender<ILoggingEvent> listAppender;
     public static ILoggingEvent loggingEvent = null;
+    public static Logger logger = null;
 
     @Mock
     private AccountLookupRepository accountLookupRepository;
@@ -54,8 +55,7 @@ class AccountCommandsInterceptorTest {
 
     @BeforeEach
     void setUp() {
-        // Set up the logback test appender
-        Logger logger = (Logger) LoggerFactory.getLogger(AccountCommandsInterceptor.class);
+        logger = (Logger) LoggerFactory.getLogger(AccountCommandsInterceptor.class);
         listAppender = new ListAppender<>();
         listAppender.start();
         logger.addAppender(listAppender);
@@ -63,7 +63,7 @@ class AccountCommandsInterceptorTest {
 
     @AfterEach
     void tearDown() {
-        // Stop the appender
+        logger.detachAppender(listAppender);
         listAppender.stop();
     }
 
