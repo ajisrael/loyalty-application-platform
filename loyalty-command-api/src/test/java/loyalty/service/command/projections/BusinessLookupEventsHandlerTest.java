@@ -25,8 +25,8 @@ import org.springframework.validation.SmartValidator;
 import java.util.List;
 import java.util.UUID;
 
+import static loyalty.service.command.test.utils.LogTestHelper.logContainsMarkers;
 import static loyalty.service.core.constants.DomainConstants.*;
-import static loyalty.service.core.constants.ExceptionMessages.ACCOUNT_WITH_ID_DOES_NOT_EXIST;
 import static loyalty.service.core.constants.ExceptionMessages.BUSINESS_WITH_ID_DOES_NOT_EXIST;
 import static loyalty.service.core.constants.LogMessages.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -128,8 +128,11 @@ class BusinessLookupEventsHandlerTest {
         String expectedLogMessage = MessageFormatter.format(BUSINESS_SAVED_IN_LOOKUP_DB, TEST_BUSINESS_ID).getMessage();
         assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
 
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, event.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(BUSINESS_ID, event.getBusinessId())));
+        logContainsMarkers(
+                loggingEvent,
+                Markers.append(REQUEST_ID, event.getRequestId()),
+                Markers.append(BUSINESS_ID, event.getBusinessId())
+        );
     }
 
     @Test
@@ -190,8 +193,11 @@ class BusinessLookupEventsHandlerTest {
         String expectedLogMessage = MessageFormatter.format(BUSINESS_UPDATED_IN_LOOKUP_DB, TEST_BUSINESS_ID).getMessage();
         assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
 
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, event.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(BUSINESS_ID, event.getBusinessId())));
+        logContainsMarkers(
+                loggingEvent,
+                Markers.append(REQUEST_ID, event.getRequestId()),
+                Markers.append(BUSINESS_ID, event.getBusinessId())
+        );
     }
 
     @Test
@@ -236,7 +242,7 @@ class BusinessLookupEventsHandlerTest {
 
         doAnswer(invocation -> {
             BindingResult bindingResult = invocation.getArgument(1);
-            bindingResult.rejectValue("email", "error.invalid", exceptionMessage);
+            bindingResult.rejectValue("businessId", "error.invalid", exceptionMessage);
             return null;
         }).when(validator).validate(any(BusinessLookupEntity.class), any(BindingResult.class));
 
@@ -280,8 +286,11 @@ class BusinessLookupEventsHandlerTest {
         String expectedLogMessage = MessageFormatter.format(BUSINESS_DELETED_FROM_LOOKUP_DB, TEST_BUSINESS_ID).getMessage();
         assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
 
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, event.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(BUSINESS_ID, event.getBusinessId())));
+        logContainsMarkers(
+                loggingEvent,
+                Markers.append(REQUEST_ID, event.getRequestId()),
+                Markers.append(BUSINESS_ID, event.getBusinessId())
+        );
     }
 
     @Test
