@@ -6,6 +6,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import loyalty.service.command.data.entities.BusinessLookupEntity;
 import loyalty.service.command.data.repositories.BusinessLookupRepository;
+import loyalty.service.command.test.utils.LogTestHelper;
 import loyalty.service.core.events.*;
 import loyalty.service.core.exceptions.IllegalProjectionStateException;
 import net.logstash.logback.marker.Markers;
@@ -81,9 +82,7 @@ class BusinessLookupEventsHandlerTest {
         List<ILoggingEvent> loggedEvents = listAppender.list;
         assertEquals(1, loggedEvents.size());
 
-        loggingEvent = loggedEvents.get(0);
-        assertEquals(Level.ERROR, loggingEvent.getLevel());
-        assertEquals(testMessage, loggingEvent.getFormattedMessage());
+        LogTestHelper.assertLogMessage(loggedEvents.get(0), Level.ERROR, testMessage);
     }
 
     @Test
@@ -123,13 +122,10 @@ class BusinessLookupEventsHandlerTest {
         List<ILoggingEvent> loggedEvents = listAppender.list;
         assertEquals(1, loggedEvents.size());
 
-        loggingEvent = loggedEvents.get(0);
-        assertEquals(Level.INFO, loggingEvent.getLevel());
-        String expectedLogMessage = MessageFormatter.format(BUSINESS_SAVED_IN_LOOKUP_DB, TEST_BUSINESS_ID).getMessage();
-        assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
-
-        logContainsMarkers(
-                loggingEvent,
+        LogTestHelper.assertLogMessageWithMarkers(
+                loggedEvents.get(0),
+                Level.INFO,
+                MessageFormatter.format(BUSINESS_SAVED_IN_LOOKUP_DB, TEST_BUSINESS_ID).getMessage(),
                 Markers.append(REQUEST_ID, event.getRequestId()),
                 Markers.append(BUSINESS_ID, event.getBusinessId())
         );
