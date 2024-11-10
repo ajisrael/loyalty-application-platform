@@ -28,7 +28,8 @@ import org.slf4j.helpers.MessageFormatter;
 import java.util.List;
 import java.util.UUID;
 
-import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
+import static loyalty.service.command.test.utils.LogTestHelper.logContainsMarkers;
+import static loyalty.service.core.constants.DomainConstants.*;
 import static loyalty.service.core.constants.LogMessages.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -131,9 +132,12 @@ class AccountCommandsInterceptorTest {
         String expectedLogMessage = MessageFormatter.format(EMAIL_FOUND_ON_ANOTHER_ACCOUNT_CANCELLING_COMMAND, existingAccountId, commandName).getMessage();
         assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
 
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", existingAccountId)));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
+        logContainsMarkers(
+                loggingEvent,
+                Markers.append(REQUEST_ID, command.getRequestId()),
+                Markers.append(ACCOUNT_ID, existingAccountId),
+                Markers.append(EMAIL, command.getEmail())
+        );
     }
 
     @Test
@@ -245,9 +249,12 @@ class AccountCommandsInterceptorTest {
         String expectedLogMessage = MessageFormatter.format(EMAIL_FOUND_ON_ANOTHER_ACCOUNT_CANCELLING_COMMAND, existingAccountId, commandName).getMessage();
         assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
 
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, command.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("accountId", existingAccountId)));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append("email", command.getEmail())));
+        logContainsMarkers(
+                loggingEvent,
+                Markers.append(REQUEST_ID, command.getRequestId()),
+                Markers.append(ACCOUNT_ID, existingAccountId),
+                Markers.append(EMAIL, command.getEmail())
+        );
     }
 
     @Test

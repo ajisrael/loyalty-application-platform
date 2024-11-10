@@ -27,6 +27,7 @@ import org.springframework.validation.SmartValidator;
 import java.util.List;
 import java.util.UUID;
 
+import static loyalty.service.command.test.utils.LogTestHelper.logContainsMarkers;
 import static loyalty.service.core.constants.DomainConstants.*;
 import static loyalty.service.core.constants.ExceptionMessages.ACCOUNT_WITH_ID_DOES_NOT_EXIST;
 import static loyalty.service.core.constants.LogMessages.*;
@@ -199,9 +200,12 @@ class AccountLookupEventsHandlerTest {
         String expectedLogMessage = MessageFormatter.format(ACCOUNT_UPDATED_IN_LOOKUP_DB, TEST_ACCOUNT_ID).getMessage();
         assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
 
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, event.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(ACCOUNT_ID, event.getAccountId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(EMAIL, event.getEmail())));
+        logContainsMarkers(
+                loggingEvent,
+                Markers.append(REQUEST_ID, event.getRequestId()),
+                Markers.append(ACCOUNT_ID, event.getAccountId()),
+                Markers.append(EMAIL, event.getEmail())
+        );
     }
 
     @Test
@@ -294,9 +298,12 @@ class AccountLookupEventsHandlerTest {
         String expectedLogMessage = MessageFormatter.format(ACCOUNT_DELETED_FROM_LOOKUP_DB, TEST_ACCOUNT_ID).getMessage();
         assertEquals(expectedLogMessage, loggingEvent.getFormattedMessage());
 
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(REQUEST_ID, event.getRequestId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(ACCOUNT_ID, event.getAccountId())));
-        assertTrue(loggingEvent.getMarkerList().get(0).contains(Markers.append(EMAIL, TEST_EMAIL)));
+        logContainsMarkers(
+                loggingEvent,
+                Markers.append(REQUEST_ID, event.getRequestId()),
+                Markers.append(ACCOUNT_ID, event.getAccountId()),
+                Markers.append(EMAIL, TEST_EMAIL)
+        );
     }
 
     @Test
