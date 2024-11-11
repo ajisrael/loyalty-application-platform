@@ -28,6 +28,9 @@ import org.springframework.validation.SmartValidator;
 import java.time.Instant;
 
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
+import static loyalty.service.core.constants.ExceptionMessages.BUSINESS_WITH_ID_DOES_NOT_EXIST;
+import static loyalty.service.core.constants.ExceptionMessages.EXPIRATION_TRACKER_FOR_LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST;
+import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExist;
 
 
 @Component
@@ -160,6 +163,7 @@ public class ExpirationTrackerEventsHandler {
     @EventHandler
     public void on(LoyaltyBankDeletedEvent event) {
         ExpirationTrackerEntity expirationTrackerEntity = expirationTrackerRepository.findByLoyaltyBankId(event.getLoyaltyBankId());
+        throwExceptionIfEntityDoesNotExist(expirationTrackerEntity, String.format(EXPIRATION_TRACKER_FOR_LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST, event.getLoyaltyBankId()));
         expirationTrackerRepository.delete(expirationTrackerEntity);
 
         LOGGER.info(
