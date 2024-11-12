@@ -37,6 +37,12 @@ public class LoyaltyServiceErrorHandler {
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(value = {BusinessNotFoundException.class})
+    public ResponseEntity<Object> handleBusinessNotFoundException(BusinessNotFoundException exception, WebRequest webRequest) {
+        ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(value = {LoyaltyBankNotFoundException.class})
     public ResponseEntity<Object> handleLoyaltyBankNotFoundException(LoyaltyBankNotFoundException exception, WebRequest webRequest) {
         ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());

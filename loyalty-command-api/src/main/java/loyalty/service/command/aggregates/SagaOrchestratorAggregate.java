@@ -18,15 +18,15 @@ import org.slf4j.LoggerFactory;
 @Aggregate
 @NoArgsConstructor
 @Getter
-public class CoordinatorAggregate {
+public class SagaOrchestratorAggregate {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CoordinatorAggregate.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SagaOrchestratorAggregate.class);
 
     @AggregateIdentifier
     private String requestId;
 
     @CommandHandler
-    public CoordinatorAggregate(StartAccountAndLoyaltyBankCreationCommand command) {
+    public SagaOrchestratorAggregate(StartAccountAndLoyaltyBankCreationCommand command) {
         AccountAndLoyaltyBankCreationStartedEvent event = AccountAndLoyaltyBankCreationStartedEvent.builder()
                 .requestId(command.getRequestId())
                 .accountId(command.getAccountId())
