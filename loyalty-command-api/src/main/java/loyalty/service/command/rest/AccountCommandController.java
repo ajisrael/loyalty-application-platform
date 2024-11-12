@@ -1,19 +1,24 @@
 package loyalty.service.command.rest;
 
+import com.google.common.eventbus.EventBus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import loyalty.service.command.commands.CreateAccountCommand;
 import loyalty.service.command.commands.DeleteAccountCommand;
+import loyalty.service.command.commands.StartAccountAndLoyaltyBankCreationCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.command.projections.AccountLookupEventsHandler;
+import loyalty.service.command.rest.requests.CreateAccountAndLoyaltyBankRequestModel;
 import loyalty.service.command.rest.requests.CreateAccountRequestModel;
 import loyalty.service.command.rest.requests.DeleteAccountRequestModel;
 import loyalty.service.command.rest.requests.UpdateAccountRequestModel;
+import loyalty.service.command.rest.responses.AccountAndLoyaltyBankCreatedResponseModel;
 import loyalty.service.command.rest.responses.AccountCreatedResponseModel;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.eventhandling.gateway.EventGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -24,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_ACCOUNT;
+import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_ACCOUNT_AND_LOYALTY_BANK;
 
 @RestController
 @RequestMapping("/account")
@@ -34,6 +40,36 @@ public class AccountCommandController {
     private CommandGateway commandGateway;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountCommandController.class);
+
+    @PostMapping(path = "/loyaltyBank")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create account and loyaltyBank")
+    public AccountAndLoyaltyBankCreatedResponseModel createAccountAndLoyaltyBank(@Valid @RequestBody CreateAccountAndLoyaltyBankRequestModel request) {
+        String accountId = UUID.randomUUID().toString();
+        String loyaltyBankId = UUID.randomUUID().toString();
+        StartAccountAndLoyaltyBankCreationCommand command = StartAccountAndLoyaltyBankCreationCommand.builder()
+                .requestId(UUID.randomUUID().toString())
+                .accountId(accountId)
+                .loyaltyBankId(loyaltyBankId)
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .businessId(request.getBusinessId())
+                .build();
+
+        LOGGER.info(
+                MarkerGenerator.generateMarker(command),
+                SENDING_COMMAND_FOR_ACCOUNT_AND_LOYALTY_BANK, command.getClass().getSimpleName(), command.getAccountId()
+        );
+
+        commandGateway.sendAndWait(command);
+
+        return AccountAndLoyaltyBankCreatedResponseModel.builder()
+                .accountId(accountId)
+                .loyaltyBankId(loyaltyBankId)
+                .build();
+    }
 
     @PostMapping
     @ResponseBody

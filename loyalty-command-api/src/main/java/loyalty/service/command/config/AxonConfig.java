@@ -43,6 +43,5 @@ public class AxonConfig {
                 configuration -> new LoyaltyServiceEventsErrorHandler());
         configurer.registerListenerInvocationErrorHandler("expiration-tracker-group",
                 configuration -> new LoyaltyServiceEventsErrorHandler());
-
     }
 }

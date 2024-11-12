@@ -21,6 +21,12 @@ public class LogHelper {
         logger.info(marker, "{} received, issuing {}", command.getClass().getSimpleName(), event.getClass().getSimpleName());
     }
 
+    public static void logEventIssuingCommand(Logger logger, AbstractEvent event, AbstractCommand command) {
+        Marker marker = MarkerGenerator.generateMarker(event);
+        marker.add(Markers.append(REQUEST_ID, event.getRequestId()));
+        logger.info(marker, "{} received, issuing {}", event.getClass().getSimpleName(), command.getClass().getSimpleName());
+    }
+
     public static void logEventProcessed(Logger logger, AbstractEvent event) {
         Marker marker = MarkerGenerator.generateMarker(event);
         logger.debug(marker, "{} processed", event.getClass().getSimpleName());

@@ -10,6 +10,7 @@ public class LogMessages {
     public static final String PROCESSING_QUERY = "Processing {}";
     public static final String SENDING_COMMAND_FOR_ENTITY = "Sending command %s for %s %s";
     public static final String SENDING_COMMAND_FOR_ACCOUNT = String.format(SENDING_COMMAND_FOR_ENTITY, "{}", "account", "{}");
+    public static final String SENDING_COMMAND_FOR_ACCOUNT_AND_LOYALTY_BANK = String.format(SENDING_COMMAND_FOR_ENTITY, "{}", "account and loyalty bank", "{}");
     public static final String SENDING_COMMAND_FOR_LOYALTY_BANK = String.format(SENDING_COMMAND_FOR_ENTITY, "{}", "loyalty bank", "{}");
     public static final String SENDING_COMMAND_FOR_BUSINESS = String.format(SENDING_COMMAND_FOR_ENTITY, "{}", "business", "{}");
     public static final String EMAIL_FOUND_ON_ANOTHER_ACCOUNT_CANCELLING_COMMAND = "Existing email found on account {}. cancelling command {}";

@@ -10,23 +10,18 @@ import loyalty.service.core.events.AccountCreatedEvent;
 import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.AccountUpdatedEvent;
 import org.axonframework.commandhandling.CommandHandler;
-import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 @Aggregate
 @NoArgsConstructor
 @Getter
 public class AccountAggregate {
-
-    @Autowired
-    private CommandGateway commandGateway;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountAggregate.class);
 
