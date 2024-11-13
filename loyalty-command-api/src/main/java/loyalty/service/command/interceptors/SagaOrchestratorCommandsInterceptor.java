@@ -50,6 +50,7 @@ public class SagaOrchestratorCommandsInterceptor implements MessageDispatchInter
     }
 
     private void handleStartAccountAndLoyaltyBankCreationCommand(StartAccountAndLoyaltyBankCreationCommand command, String commandName) {
+        // TODO add checks for existing accountId and loyaltyBankId as the aggregate identifier won't reject until the saga has started
         throwExceptionIfEmailExists(command.getEmail(), command.getRequestId(), commandName);
         throwExceptionIfBusinessDoesNotExist(command.getBusinessId(), command.getRequestId(), commandName);
     }
