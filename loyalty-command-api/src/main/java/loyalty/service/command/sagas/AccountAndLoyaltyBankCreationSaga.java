@@ -145,7 +145,7 @@ public class AccountAndLoyaltyBankCreationSaga {
         try {
             commandGateway.send(command);
         } catch (Exception e) {
-            Marker marker = Markers.append(REQUEST_ID, command.getRequestId());
+            Marker marker = MarkerGenerator.generateMarker(command);
             marker.add(Markers.append("exceptionMessage", e.getLocalizedMessage()));
             LOGGER.error(marker, "RollbackLoyaltyBankCreationCommand failed to process, manual cleanup of saga and aggregate required");
         }
