@@ -1,6 +1,5 @@
 package loyalty.service.command.rest;
 
-import com.google.common.eventbus.EventBus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -8,7 +7,6 @@ import loyalty.service.command.commands.CreateAccountCommand;
 import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.commands.StartAccountAndLoyaltyBankCreationCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
-import loyalty.service.command.projections.AccountLookupEventsHandler;
 import loyalty.service.command.rest.requests.CreateAccountAndLoyaltyBankRequestModel;
 import loyalty.service.command.rest.requests.CreateAccountRequestModel;
 import loyalty.service.command.rest.requests.DeleteAccountRequestModel;
@@ -16,12 +14,9 @@ import loyalty.service.command.rest.requests.UpdateAccountRequestModel;
 import loyalty.service.command.rest.responses.AccountAndLoyaltyBankCreatedResponseModel;
 import loyalty.service.command.rest.responses.AccountCreatedResponseModel;
 import loyalty.service.core.utils.MarkerGenerator;
-import net.logstash.logback.marker.Markers;
 import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.axonframework.eventhandling.gateway.EventGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
