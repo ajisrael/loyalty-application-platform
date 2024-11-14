@@ -3,6 +3,7 @@ package loyalty.service.command.aggregates;
 import loyalty.service.command.commands.CreateAccountCommand;
 import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
+import loyalty.service.command.commands.rollbacks.RollbackAccountCreationCommand;
 import loyalty.service.core.events.AccountCreatedEvent;
 import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.AccountUpdatedEvent;
@@ -72,6 +73,11 @@ class AccountAggregateTest {
             .accountId(deleteAccountCommand.getAccountId())
             .build();
 
+    private static final RollbackAccountCreationCommand rollbackAccountCreationCommand = RollbackAccountCreationCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .accountId(TEST_ACCOUNT_ID)
+            .build();
+
     @BeforeEach
     void setup() {
         fixture = new AggregateTestFixture<>(AccountAggregate.class);
@@ -138,6 +144,24 @@ class AccountAggregateTest {
     void testDeleteAccount_whenDeleteAccountCommandHandledWithNoPriorActivity_shouldThrowException() {
         fixture.givenNoPriorActivity()
                 .when(deleteAccountCommand)
+                .expectException(AggregateNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("RollbackAccountCreationCommand results in AccountDeletedEvent")
+    void testRollbackAccountCreation_whenRollbackAccountCreationCommandHandled_ShouldIssueAccountDeletedEvent() {
+        // Arrange & Act & Assert
+        fixture.given(accountCreatedEvent)
+                .when(rollbackAccountCreationCommand)
+                .expectEvents(accountDeletedEvent)
+                .expectMarkedDeleted();
+    }
+
+    @Test
+    @DisplayName("Cannot delete an account that hasn't been created")
+    void testRollbackAccountCreation_whenRollbackAccountCreationCommandHandledWithNoPriorActivity_shouldThrowException() {
+        fixture.givenNoPriorActivity()
+                .when(rollbackAccountCreationCommand)
                 .expectException(AggregateNotFoundException.class);
     }
 }
