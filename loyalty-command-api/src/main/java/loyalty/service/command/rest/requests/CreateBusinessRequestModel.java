@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class EnrollBusinessRequestModel {
+public class CreateBusinessRequestModel {
 
     @NotBlank(message = "businessName is a required field")
     private String businessName;

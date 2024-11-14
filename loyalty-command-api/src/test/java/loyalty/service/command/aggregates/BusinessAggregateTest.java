@@ -1,7 +1,7 @@
 package loyalty.service.command.aggregates;
 
 import loyalty.service.command.commands.DeleteBusinessCommand;
-import loyalty.service.command.commands.EnrollBusinessCommand;
+import loyalty.service.command.commands.CreateBusinessCommand;
 import loyalty.service.command.commands.UpdateBusinessCommand;
 import loyalty.service.core.events.BusinessDeletedEvent;
 import loyalty.service.core.events.BusinessEnrolledEvent;
@@ -28,16 +28,16 @@ class BusinessAggregateTest {
     private static final String TEST_BUSINESS_NAME = "test-business-name";
     private static final String TEST_NEW_BUSINESS_NAME = "test-new-business-name";
 
-    private static final EnrollBusinessCommand enrollBusinessCommand = EnrollBusinessCommand.builder()
+    private static final CreateBusinessCommand CREATE_BUSINESS_COMMAND = CreateBusinessCommand.builder()
             .requestId(TEST_REQUEST_ID)
             .businessId(TEST_BUSINESS_ID)
             .businessName(TEST_BUSINESS_NAME)
             .build();
 
     private static final BusinessEnrolledEvent businessEnrolledEvent = BusinessEnrolledEvent.builder()
-            .requestId(enrollBusinessCommand.getRequestId())
-            .businessId(enrollBusinessCommand.getBusinessId())
-            .businessName(enrollBusinessCommand.getBusinessName())
+            .requestId(CREATE_BUSINESS_COMMAND.getRequestId())
+            .businessId(CREATE_BUSINESS_COMMAND.getBusinessId())
+            .businessName(CREATE_BUSINESS_COMMAND.getBusinessName())
             .build();
 
     private static final UpdateBusinessCommand updateBusinessCommand = UpdateBusinessCommand.builder()
@@ -72,7 +72,7 @@ class BusinessAggregateTest {
     void testBusinessAggregate_whenEnrollBusinessCommandHandledWithNoPriorActivity_ShouldIssueBusinessEnrolledEvent() {
         // Arrange & Act & Assert
         fixture.givenNoPriorActivity()
-                .when(enrollBusinessCommand)
+                .when(CREATE_BUSINESS_COMMAND)
                 .expectEvents(businessEnrolledEvent)
                 .expectState(state -> {
                     assertEquals(businessEnrolledEvent.getBusinessId(), state.getBusinessId(), "BusinessIds should match");
@@ -84,7 +84,7 @@ class BusinessAggregateTest {
     @DisplayName("Cannot enroll an existing business")
     void testBusinessAggregate_whenCreateBusinessCommandHandledWithPriorActivity_ShouldThrowException() {
         fixture.given(businessEnrolledEvent)
-                .when(enrollBusinessCommand)
+                .when(CREATE_BUSINESS_COMMAND)
                 .expectException(EventStoreException.class);
     }
 

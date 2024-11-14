@@ -6,14 +6,12 @@ import loyalty.service.command.commands.*;
 import loyalty.service.command.utils.LogHelper;
 import loyalty.service.core.events.*;
 import org.axonframework.commandhandling.CommandHandler;
-import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 @Aggregate
@@ -28,7 +26,7 @@ public class BusinessAggregate {
     private String businessName;
 
     @CommandHandler
-    public BusinessAggregate(EnrollBusinessCommand command) {
+    public BusinessAggregate(CreateBusinessCommand command) {
         BusinessEnrolledEvent event = BusinessEnrolledEvent.builder()
                 .requestId(command.getRequestId())
                 .businessId(command.getBusinessId())

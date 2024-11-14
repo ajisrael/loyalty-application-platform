@@ -1,9 +1,6 @@
 package loyalty.service.command.interceptors;
 
-import loyalty.service.command.commands.DeleteBusinessCommand;
-import loyalty.service.command.commands.EnrollBusinessCommand;
 import loyalty.service.command.commands.StartAccountAndLoyaltyBankCreationCommand;
-import loyalty.service.command.commands.UpdateBusinessCommand;
 import loyalty.service.command.data.entities.AccountLookupEntity;
 import loyalty.service.command.data.entities.BusinessLookupEntity;
 import loyalty.service.command.data.repositories.AccountLookupRepository;

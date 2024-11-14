@@ -9,7 +9,7 @@ import static loyalty.service.core.utils.Helper.throwExceptionIfParameterIsNullO
 
 @Getter
 @SuperBuilder
-public class EnrollBusinessCommand extends AbstractCommand {
+public class CreateBusinessCommand extends AbstractCommand {
 
     @TargetAggregateIdentifier
     private String businessId;

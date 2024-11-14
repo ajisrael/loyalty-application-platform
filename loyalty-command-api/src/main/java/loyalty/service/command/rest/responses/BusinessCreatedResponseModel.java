@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class BusinessEnrolledResponseModel {
+public class BusinessCreatedResponseModel {
 
     private String businessId;
 }

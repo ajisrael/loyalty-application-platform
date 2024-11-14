@@ -13,23 +13,23 @@ import java.util.stream.Stream;
 import static loyalty.service.core.constants.ExceptionMessages.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class EnrollBusinessCommandTest {
+class CreateBusinessCommandTest {
 
-    private EnrollBusinessCommand.EnrollBusinessCommandBuilder enrollBusinessCommandBuilder;
+    private CreateBusinessCommand.CreateBusinessCommandBuilder createBusinessCommandBuilder;
 
     @BeforeEach
     void setup() {
-        enrollBusinessCommandBuilder = EnrollBusinessCommand.builder()
+        createBusinessCommandBuilder = CreateBusinessCommand.builder()
                 .requestId("test-request-id")
                 .businessId("test-business-id")
                 .businessName("test-business-name");
     }
 
     @Test
-    @DisplayName("Can create valid EnrollBusinessCommand")
-    void testEnrollBusinessCommand_whenParametersAreValid_shouldPassValidation() {
+    @DisplayName("Can create valid CreateBusinessCommand")
+    void testCreateBusinessCommand_whenParametersAreValid_shouldPassValidation() {
         // Arrange
-        EnrollBusinessCommand createLoyaltyBankCommand = enrollBusinessCommandBuilder.build();
+        CreateBusinessCommand createLoyaltyBankCommand = createBusinessCommandBuilder.build();
 
         // Act & Assert
         assertDoesNotThrow(createLoyaltyBankCommand::validate);
@@ -37,10 +37,10 @@ class EnrollBusinessCommandTest {
 
     @ParameterizedTest
     @MethodSource(value = "invalidStringParams")
-    @DisplayName("Cannot enroll business with invalid requestId")
-    void testEnrollBusinessCommand_whenRequestIdIsInvalid_shouldThrowException(String requestId) {
+    @DisplayName("Cannot create business with invalid requestId")
+    void testCreateBusinessCommand_whenRequestIdIsInvalid_shouldThrowException(String requestId) {
         // Arrange
-        EnrollBusinessCommand createLoyaltyBankCommand = (EnrollBusinessCommand) enrollBusinessCommandBuilder
+        CreateBusinessCommand createLoyaltyBankCommand = (CreateBusinessCommand) createBusinessCommandBuilder
                 .requestId(requestId)
                 .build();
 
@@ -53,10 +53,10 @@ class EnrollBusinessCommandTest {
 
     @ParameterizedTest
     @MethodSource(value = "invalidStringParams")
-    @DisplayName("Cannot enroll business with invalid businessId")
-    void testEnrollBusinessCommand_whenBusinessIdIsInvalid_shouldThrowException(String businessId) {
+    @DisplayName("Cannot create business with invalid businessId")
+    void testCreateBusinessCommand_whenBusinessIdIsInvalid_shouldThrowException(String businessId) {
         // Arrange
-        EnrollBusinessCommand createLoyaltyBankCommand = enrollBusinessCommandBuilder
+        CreateBusinessCommand createLoyaltyBankCommand = createBusinessCommandBuilder
                 .businessId(businessId)
                 .build();
 
@@ -69,10 +69,10 @@ class EnrollBusinessCommandTest {
 
     @ParameterizedTest
     @MethodSource(value = "invalidStringParams")
-    @DisplayName("Cannot enroll business with invalid businessName")
-    void testEnrollBusinessCommand_whenBusinessNameIsInvalid_shouldThrowException(String businessName) {
+    @DisplayName("Cannot create business with invalid businessName")
+    void testCreateBusinessCommand_whenBusinessNameIsInvalid_shouldThrowException(String businessName) {
         // Arrange
-        EnrollBusinessCommand createLoyaltyBankCommand = enrollBusinessCommandBuilder
+        CreateBusinessCommand createLoyaltyBankCommand = createBusinessCommandBuilder
                 .businessName(businessName)
                 .build();
 

@@ -39,7 +39,7 @@ class BusinessCommandsInterceptorTest {
     @DisplayName("Can handle valid EnrollBusinessCommand")
     void testHandle_whenEnrollBusinessCommandHandledAndCommandIsValid_shouldReturnCommand() {
         // Arrange
-        EnrollBusinessCommand command = EnrollBusinessCommand.builder()
+        CreateBusinessCommand command = CreateBusinessCommand.builder()
                 .requestId(TEST_REQUEST_ID)
                 .businessId(TEST_BUSINESS_ID)
                 .businessName(TEST_BUSINESS_NAME)

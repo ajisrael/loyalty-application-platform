@@ -4,12 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import loyalty.service.command.commands.DeleteBusinessCommand;
-import loyalty.service.command.commands.EnrollBusinessCommand;
+import loyalty.service.command.commands.CreateBusinessCommand;
 import loyalty.service.command.commands.UpdateBusinessCommand;
 import loyalty.service.command.rest.requests.DeleteBusinessRequestModel;
-import loyalty.service.command.rest.requests.EnrollBusinessRequestModel;
+import loyalty.service.command.rest.requests.CreateBusinessRequestModel;
 import loyalty.service.command.rest.requests.UpdateBusinessRequestModel;
-import loyalty.service.command.rest.responses.BusinessEnrolledResponseModel;
+import loyalty.service.command.rest.responses.BusinessCreatedResponseModel;
 import loyalty.service.core.utils.MarkerGenerator;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.slf4j.Logger;
@@ -36,8 +36,8 @@ public class BusinessCommandController {
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create business")
-    public BusinessEnrolledResponseModel createBusiness(@Valid @RequestBody EnrollBusinessRequestModel request) {
-        EnrollBusinessCommand command = EnrollBusinessCommand.builder()
+    public BusinessCreatedResponseModel createBusiness(@Valid @RequestBody CreateBusinessRequestModel request) {
+        CreateBusinessCommand command = CreateBusinessCommand.builder()
                 .requestId(UUID.randomUUID().toString())
                 .businessId(UUID.randomUUID().toString())
                 .businessName(request.getBusinessName())
@@ -50,7 +50,7 @@ public class BusinessCommandController {
 
         String businessId = commandGateway.sendAndWait(command);
 
-        return BusinessEnrolledResponseModel.builder().businessId(businessId).build();
+        return BusinessCreatedResponseModel.builder().businessId(businessId).build();
     }
 
     @PutMapping
