@@ -17,6 +17,7 @@ import loyalty.service.core.utils.MarkerGenerator;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.messaging.MetaData;
+import org.axonframework.messaging.annotation.MetaDataValue;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import static loyalty.service.core.constants.DomainConstants.*;
 import static loyalty.service.core.constants.LogMessages.INSUFFICIENT_AVAILABLE_POINTS_FOR_AUTHORIZATION;
+import static loyalty.service.core.constants.MetaDataKeys.SKIP_POINTS_CHECK;
 
 @Aggregate
 @NoArgsConstructor
@@ -213,23 +215,11 @@ public class LoyaltyBankAggregate {
     }
 
     @CommandHandler
-    public void on(DeleteLoyaltyBankCommand command) {
-        throwExceptionIfLoyaltyBankStillHasAvailablePoints();
+    public void on(DeleteLoyaltyBankCommand command, @MetaDataValue(SKIP_POINTS_CHECK) Boolean skipPointsCheck) {
+        if (skipPointsCheck == null || !skipPointsCheck) {
+            throwExceptionIfLoyaltyBankStillHasAvailablePoints();
+        }
 
-        LoyaltyBankDeletedEvent event = LoyaltyBankDeletedEvent.builder()
-                .requestId(command.getRequestId())
-                .loyaltyBankId(command.getLoyaltyBankId())
-                .accountId(this.accountId)
-                .businessId(this.businessId)
-                .build();
-
-        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
-
-        AggregateLifecycle.apply(event);
-    }
-
-    @CommandHandler
-    public void on(UnenrollLoyaltyBankCommand command) {
         LoyaltyBankDeletedEvent event = LoyaltyBankDeletedEvent.builder()
                 .requestId(command.getRequestId())
                 .loyaltyBankId(command.getLoyaltyBankId())
