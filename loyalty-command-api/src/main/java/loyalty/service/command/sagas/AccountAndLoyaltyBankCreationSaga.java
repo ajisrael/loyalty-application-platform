@@ -3,24 +3,30 @@ package loyalty.service.command.sagas;
 import loyalty.service.command.commands.CreateAccountCommand;
 import loyalty.service.command.commands.CreateLoyaltyBankCommand;
 import loyalty.service.command.commands.EndAccountAndLoyaltyBankCreationCommand;
+import loyalty.service.command.commands.rollbacks.RollbackAccountCreationCommand;
+import loyalty.service.command.commands.rollbacks.RollbackLoyaltyBankCreationCommand;
 import loyalty.service.command.utils.LogHelper;
-import loyalty.service.core.events.AccountAndLoyaltyBankCreationEndedEvent;
-import loyalty.service.core.events.AccountAndLoyaltyBankCreationStartedEvent;
-import loyalty.service.core.events.AccountCreatedEvent;
-import loyalty.service.core.events.LoyaltyBankCreatedEvent;
+import loyalty.service.core.events.*;
 import loyalty.service.core.utils.MarkerGenerator;
+import net.logstash.logback.marker.Markers;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
+import org.axonframework.modelling.saga.SagaLifecycle;
 import org.axonframework.modelling.saga.StartSaga;
 import org.axonframework.spring.stereotype.Saga;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
+
+import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 
 @Saga
-@ProcessingGroup("account-and-loyalty-bank-creation-saga-group")
+@ProcessingGroup("account-lookup-group")
+@Order(2)
 public class AccountAndLoyaltyBankCreationSaga {
 
 
@@ -49,7 +55,15 @@ public class AccountAndLoyaltyBankCreationSaga {
 
         LogHelper.logEventIssuingCommand(LOGGER, event, command);
 
-        commandGateway.sendAndWait(command);
+        try {
+            commandGateway.send(command);
+        } catch (Exception e) {
+            Marker marker = MarkerGenerator.generateMarker(command);
+            marker.add(Markers.append("exceptionMessage", e.getLocalizedMessage()));
+            LOGGER.error(marker, "CreateAccountCommand failed for account {}", command.getAccountId());
+            issueCommandToEndSagaAndCleanupOrchestratorAggregate(command.getRequestId());
+
+        }
     }
 
     @SagaEventHandler(associationProperty = "requestId")
@@ -63,7 +77,14 @@ public class AccountAndLoyaltyBankCreationSaga {
 
         LogHelper.logEventIssuingCommand(LOGGER, event, command);
 
-        commandGateway.sendAndWait(command);
+        try {
+            commandGateway.send(command);
+        } catch (Exception e) {
+                Marker marker = MarkerGenerator.generateMarker(command);
+                marker.add(Markers.append("exceptionMessage", e.getLocalizedMessage()));
+                LOGGER.error(marker, "CreateLoyaltyBankCommand failed for account {} and loyaltyBank {}", command.getAccountId(), command.getLoyaltyBankId());
+                rollbackAccountCreation(event.getRequestId(), event.getAccountId());
+        }
     }
 
     @SagaEventHandler(associationProperty = "requestId")
@@ -74,12 +95,75 @@ public class AccountAndLoyaltyBankCreationSaga {
 
         LogHelper.logEventIssuingCommand(LOGGER, event, command);
 
-        commandGateway.sendAndWait(command);
+        try {
+            commandGateway.send(command);
+        } catch (Exception e) {
+            Marker marker = MarkerGenerator.generateMarker(command);
+            marker.add(Markers.append("exceptionMessage", e.getLocalizedMessage()));
+            LOGGER.error(marker, "EndAccountAndLoyaltyBankCreationCommand failed");
+            rollbackLoyaltyBankCreation(event.getRequestId(), event.getLoyaltyBankId());
+        }
+    }
+
+    @SagaEventHandler(associationProperty = "requestId")
+    public void handle(LoyaltyBankDeletedEvent event) {
+       rollbackAccountCreation(event.getRequestId(), event.getAccountId());
+    }
+
+    @SagaEventHandler(associationProperty = "requestId")
+    public void handle(AccountDeletedEvent event) {
+        issueCommandToEndSagaAndCleanupOrchestratorAggregate(event.getRequestId());
     }
 
     @EndSaga
     @SagaEventHandler(associationProperty = "requestId")
     public void handle(AccountAndLoyaltyBankCreationEndedEvent event) {
         LOGGER.info(MarkerGenerator.generateMarker(event), "{} event received, ending saga", event.getClass().getSimpleName());
+    }
+
+    private void rollbackAccountCreation(String requestId, String accountId) {
+        RollbackAccountCreationCommand command = RollbackAccountCreationCommand.builder()
+                .requestId(requestId)
+                .accountId(accountId)
+                .build();
+
+        try {
+            commandGateway.send(command);
+        } catch (Exception e) {
+            Marker marker = Markers.append(REQUEST_ID, command.getRequestId());
+            marker.add(Markers.append("exceptionMessage", e.getLocalizedMessage()));
+            LOGGER.error(marker, "RollbackAccountCreationCommand failed to process, manual cleanup of saga and aggregate required");
+        }
+    }
+
+    private void rollbackLoyaltyBankCreation(String requestId, String loyaltyBankId) {
+        RollbackLoyaltyBankCreationCommand command = RollbackLoyaltyBankCreationCommand.builder()
+                .requestId(requestId)
+                .loyaltyBankId(loyaltyBankId)
+                .build();
+
+        try {
+            commandGateway.send(command);
+        } catch (Exception e) {
+            Marker marker = Markers.append(REQUEST_ID, command.getRequestId());
+            marker.add(Markers.append("exceptionMessage", e.getLocalizedMessage()));
+            LOGGER.error(marker, "RollbackLoyaltyBankCreationCommand failed to process, manual cleanup of saga and aggregate required");
+        }
+    }
+
+    private void issueCommandToEndSagaAndCleanupOrchestratorAggregate(String requestId) {
+        Marker marker = Markers.append(REQUEST_ID, requestId);
+        LOGGER.info(marker, "Attempting to end saga due to command failure");
+
+        EndAccountAndLoyaltyBankCreationCommand command = EndAccountAndLoyaltyBankCreationCommand.builder()
+                .requestId(requestId)
+                .build();
+
+        try {
+            commandGateway.send(command);
+        } catch (Exception e) {
+            marker.add(Markers.append("exceptionMessage", e.getLocalizedMessage()));
+            LOGGER.error(marker, "EndAccountAndLoyaltyBankCreationCommand failed to process, manual cleanup of saga and aggregate required");
+        }
     }
 }

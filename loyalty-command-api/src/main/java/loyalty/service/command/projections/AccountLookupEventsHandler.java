@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -29,6 +30,7 @@ import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExi
 @Component
 @Validated
 @ProcessingGroup("account-lookup-group")
+@Order(1)
 public class AccountLookupEventsHandler {
 
     private final AccountLookupRepository accountLookupRepository;

@@ -3,6 +3,7 @@ package loyalty.service.command.aggregates;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import loyalty.service.command.commands.*;
+import loyalty.service.command.commands.rollbacks.RollbackLoyaltyBankCreationCommand;
 import loyalty.service.command.commands.transactions.*;
 import loyalty.service.command.utils.LogHelper;
 import loyalty.service.core.events.LoyaltyBankDeletedEvent;
@@ -15,6 +16,7 @@ import loyalty.service.core.exceptions.InsufficientPointsException;
 import loyalty.service.core.utils.MarkerGenerator;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
+import org.axonframework.messaging.MetaData;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
@@ -238,6 +240,22 @@ public class LoyaltyBankAggregate {
         LogHelper.logCommandIssuingEvent(LOGGER, command, event);
 
         AggregateLifecycle.apply(event);
+    }
+
+    @CommandHandler
+    public void on(RollbackLoyaltyBankCreationCommand command) {
+        LoyaltyBankDeletedEvent event = LoyaltyBankDeletedEvent.builder()
+                .requestId(command.getRequestId())
+                .loyaltyBankId(command.getLoyaltyBankId())
+                .accountId(this.accountId)
+                .businessId(this.businessId)
+                .build();
+
+        MetaData metaData = MetaData.with("reason", "rollback");
+
+        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
+
+        AggregateLifecycle.apply(event, metaData);
     }
 
     @EventSourcingHandler

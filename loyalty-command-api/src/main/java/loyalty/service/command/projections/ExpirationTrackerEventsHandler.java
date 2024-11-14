@@ -28,7 +28,6 @@ import org.springframework.validation.SmartValidator;
 import java.time.Instant;
 
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
-import static loyalty.service.core.constants.ExceptionMessages.BUSINESS_WITH_ID_DOES_NOT_EXIST;
 import static loyalty.service.core.constants.ExceptionMessages.EXPIRATION_TRACKER_FOR_LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST;
 import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExist;
 

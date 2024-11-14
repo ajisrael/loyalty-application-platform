@@ -5,12 +5,14 @@ import lombok.NoArgsConstructor;
 import loyalty.service.command.commands.CreateAccountCommand;
 import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
+import loyalty.service.command.commands.rollbacks.RollbackAccountCreationCommand;
 import loyalty.service.command.utils.LogHelper;
 import loyalty.service.core.events.AccountCreatedEvent;
 import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.AccountUpdatedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
+import org.axonframework.messaging.MetaData;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
@@ -71,6 +73,20 @@ public class AccountAggregate {
         LogHelper.logCommandIssuingEvent(LOGGER, command, event);
 
         AggregateLifecycle.apply(event);
+    }
+
+    @CommandHandler
+    public void rollbackAccount(RollbackAccountCreationCommand command) {
+        AccountDeletedEvent event = AccountDeletedEvent.builder()
+                .requestId(command.getRequestId())
+                .accountId(command.getAccountId())
+                .build();
+
+        MetaData metaData = MetaData.with("reason", "rollback");
+
+        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
+
+        AggregateLifecycle.apply(event, metaData);
     }
 
     @EventSourcingHandler
