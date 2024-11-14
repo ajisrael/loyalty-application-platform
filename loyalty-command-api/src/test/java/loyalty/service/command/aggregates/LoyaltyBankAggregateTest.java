@@ -9,9 +9,11 @@ import loyalty.service.core.events.AllPointsExpiredEvent;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
 import loyalty.service.core.events.LoyaltyBankDeletedEvent;
 import loyalty.service.core.events.transactions.*;
+import loyalty.service.core.exceptions.FailedToExpireLoyaltyPointsException;
 import loyalty.service.core.exceptions.IllegalLoyaltyBankStateException;
 import loyalty.service.core.exceptions.InsufficientPointsException;
 import org.axonframework.eventsourcing.eventstore.EventStoreException;
+import org.axonframework.messaging.MetaData;
 import org.axonframework.modelling.command.AggregateNotFoundException;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
@@ -23,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static loyalty.service.core.constants.DomainConstants.*;
 import static loyalty.service.core.constants.ExceptionMessages.LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE;
+import static loyalty.service.core.constants.MetaDataKeys.SKIP_POINTS_CHECK;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -595,8 +598,8 @@ class LoyaltyBankAggregateTest {
     }
 
     @Test
-    @DisplayName("DeleteLoyaltyBankCommand results in LoyaltyBankDeletedEvent")
-    void testDeleteLoyaltyBank_whenDeleteLoyaltyBankCommandHandled_shouldIssueLoyaltyBankDeletedEvent() {
+    @DisplayName("DeleteLoyaltyBankCommand results in LoyaltyBankDeletedEvent when no points are available")
+    void testDeleteLoyaltyBank_whenDeleteLoyaltyBankCommandHandledWithNoAvailablePoints_shouldIssueLoyaltyBankDeletedEvent() {
         // Arrange & Act & Assert
         fixture.given(loyaltyBankCreatedEvent)
                 .when(deleteLoyaltyBankCommand)
@@ -605,7 +608,30 @@ class LoyaltyBankAggregateTest {
     }
 
     @Test
-    @DisplayName("Cannot delete an loyaltyBank that hasn't been created")
+    @DisplayName("DeleteLoyaltyBankCommand results in LoyaltyBankDeletedEvent when points are available and available point check is skipped")
+    void testDeleteLoyaltyBank_whenDeleteLoyaltyBankCommandHandledWithAvailablePointsAndSkippingPointCheck_shouldIssueLoyaltyBankDeletedEvent() {
+        fixture.given(
+                        loyaltyBankCreatedEvent,
+                        awardedTransactionCreatedEvent
+                )
+                .when(deleteLoyaltyBankCommand, MetaData.with(SKIP_POINTS_CHECK, true))
+                .expectEvents(loyaltyBankDeletedEvent)
+                .expectMarkedDeleted();
+    }
+
+    @Test
+    @DisplayName("Cannot delete a loyaltyBank that has available points and not skipping the point check")
+    void testDeleteLoyaltyBank_whenDeleteLoyaltyBankCommandHandledWithAvailablePointsAndNotSkippingPointCheck_shouldThrowException() {
+        fixture.given(
+                        loyaltyBankCreatedEvent,
+                        awardedTransactionCreatedEvent
+                )
+                .when(deleteLoyaltyBankCommand)
+                .expectException(FailedToExpireLoyaltyPointsException.class);
+    }
+
+    @Test
+    @DisplayName("Cannot delete a loyaltyBank that hasn't been created")
     void testDeleteLoyaltyBank_whenDeleteLoyaltyBankCommandHandledWithNoPriorActivity_shouldThrowException() {
         fixture.givenNoPriorActivity()
                 .when(deleteLoyaltyBankCommand)
@@ -624,12 +650,10 @@ class LoyaltyBankAggregateTest {
     }
 
     @Test
-    @DisplayName("Cannot delete an loyaltyBank that hasn't been created")
+    @DisplayName("Cannot roll back a loyaltyBank that hasn't been created")
     void testRollbackLoyaltyBankCreation_whenRollbackLoyaltyBankCreationCommandHandledWithNoPriorActivity_shouldThrowException() {
         fixture.givenNoPriorActivity()
                 .when(rollbackLoyaltyBankCreationCommand)
                 .expectException(AggregateNotFoundException.class);
     }
-
-    // TODO: Create tests for deleting loyalty bank with points and skipping the check for available points
 }
