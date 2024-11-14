@@ -3,6 +3,7 @@ package loyalty.service.command.aggregates;
 import loyalty.service.command.commands.CreateLoyaltyBankCommand;
 import loyalty.service.command.commands.DeleteLoyaltyBankCommand;
 import loyalty.service.command.commands.ExpireAllPointsCommand;
+import loyalty.service.command.commands.rollbacks.RollbackLoyaltyBankCreationCommand;
 import loyalty.service.command.commands.transactions.*;
 import loyalty.service.core.events.AllPointsExpiredEvent;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
@@ -202,6 +203,11 @@ class LoyaltyBankAggregateTest {
             .loyaltyBankId(deleteLoyaltyBankCommand.getLoyaltyBankId())
             .accountId(TEST_ACCOUNT_ID)
             .businessId(TEST_BUSINESS_ID)
+            .build();
+
+    private static final RollbackLoyaltyBankCreationCommand rollbackLoyaltyBankCreationCommand = RollbackLoyaltyBankCreationCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .loyaltyBankId(TEST_LOYALTY_BANK_ID)
             .build();
 
     @BeforeEach
@@ -605,4 +611,25 @@ class LoyaltyBankAggregateTest {
                 .when(deleteLoyaltyBankCommand)
                 .expectException(AggregateNotFoundException.class);
     }
+
+
+    @Test
+    @DisplayName("RollbackLoyaltyBankCreationCommand results in LoyaltyBankDeletedEvent")
+    void testRollbackLoyaltyBankCreation_whenRollbackLoyaltyBankCreationCommandHandled_shouldIssueLoyaltyBankDeletedEvent() {
+        // Arrange & Act & Assert
+        fixture.given(loyaltyBankCreatedEvent)
+                .when(rollbackLoyaltyBankCreationCommand)
+                .expectEvents(loyaltyBankDeletedEvent)
+                .expectMarkedDeleted();
+    }
+
+    @Test
+    @DisplayName("Cannot delete an loyaltyBank that hasn't been created")
+    void testRollbackLoyaltyBankCreation_whenRollbackLoyaltyBankCreationCommandHandledWithNoPriorActivity_shouldThrowException() {
+        fixture.givenNoPriorActivity()
+                .when(rollbackLoyaltyBankCreationCommand)
+                .expectException(AggregateNotFoundException.class);
+    }
+
+    // TODO: Create tests for deleting loyalty bank with points and skipping the check for available points
 }
