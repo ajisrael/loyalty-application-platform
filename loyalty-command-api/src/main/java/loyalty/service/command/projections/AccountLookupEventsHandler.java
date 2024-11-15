@@ -22,6 +22,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.SmartValidator;
 import org.springframework.validation.annotation.Validated;
 
+import static loyalty.service.core.constants.DomainConstants.COMMAND_PROJECTION_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.ExceptionMessages.ACCOUNT_WITH_ID_DOES_NOT_EXIST;
 import static loyalty.service.core.constants.LogMessages.*;
@@ -29,7 +30,7 @@ import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExi
 
 @Component
 @Validated
-@ProcessingGroup("account-lookup-group")
+@ProcessingGroup(COMMAND_PROJECTION_GROUP)
 @Order(1)
 public class AccountLookupEventsHandler {
 

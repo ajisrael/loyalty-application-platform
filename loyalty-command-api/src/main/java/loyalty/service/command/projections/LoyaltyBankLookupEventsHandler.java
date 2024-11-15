@@ -1,8 +1,6 @@
 package loyalty.service.command.projections;
 
-import lombok.AllArgsConstructor;
 import loyalty.service.command.data.entities.LoyaltyBankLookupEntity;
-import loyalty.service.command.data.entities.TransactionEntity;
 import loyalty.service.command.data.repositories.LoyaltyBankLookupRepository;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
 import loyalty.service.core.events.LoyaltyBankDeletedEvent;
@@ -14,18 +12,21 @@ import org.axonframework.messaging.interceptors.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.SmartValidator;
 
+import static loyalty.service.core.constants.DomainConstants.COMMAND_PROJECTION_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.ExceptionMessages.LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST;
 import static loyalty.service.core.constants.LogMessages.*;
 import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExist;
 
 @Component
-@ProcessingGroup("loyalty-bank-lookup-group")
+@ProcessingGroup(COMMAND_PROJECTION_GROUP)
+@Order(1)
 public class LoyaltyBankLookupEventsHandler {
 
     private final LoyaltyBankLookupRepository loyaltyBankLookupRepository;

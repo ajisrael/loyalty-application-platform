@@ -21,6 +21,7 @@ public class DomainConstants {
     public static final String REQUESTED_POINTS = "requestedPoints";
     public static final String VOID = "void";
     public static final String CAPTURE = "capture";
+    public static final String COMMAND_PROJECTION_GROUP = "command-projection-group";
 
     public static final String DEFAULT_PAGE = "0";
     public static final String DEFAULT_PAGE_SIZE = "20";

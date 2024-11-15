@@ -7,9 +7,12 @@ import loyalty.service.command.data.repositories.LoyaltyBankLookupRepository;
 import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.LoyaltyBankDeletedEvent;
 import loyalty.service.core.events.AllPointsExpiredEvent;
+import loyalty.service.core.events.LoyaltyBankDeletionStartedEvent;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.config.ProcessingGroup;
+import org.axonframework.eventhandling.gateway.EventGateway;
 import org.axonframework.modelling.saga.SagaEventHandler;
 import org.axonframework.modelling.saga.SagaLifecycle;
 import org.axonframework.modelling.saga.StartSaga;
@@ -18,17 +21,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 
 import java.io.Serializable;
 import java.util.List;
 
+import static loyalty.service.core.constants.DomainConstants.COMMAND_PROJECTION_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 
 @Saga
+@ProcessingGroup(COMMAND_PROJECTION_GROUP)
+@Order(2)
 public class AccountDeletionSaga implements Serializable {
 
     @Autowired
     private transient CommandGateway commandGateway;
+    @Autowired
+    private transient EventGateway eventGateway;
     @Autowired
     private transient LoyaltyBankLookupRepository loyaltyBankLookupRepository;
 
@@ -53,34 +62,20 @@ public class AccountDeletionSaga implements Serializable {
 
         loyaltyBankLookupEntities.forEach(
                 loyaltyBankLookupEntity -> {
-                    ExpireAllPointsCommand command = ExpireAllPointsCommand.builder()
+                    LoyaltyBankDeletionStartedEvent loyaltyBankDeletionEvent = LoyaltyBankDeletionStartedEvent.builder()
                             .requestId(event.getRequestId())
                             .loyaltyBankId(loyaltyBankLookupEntity.getLoyaltyBankId())
                             .build();
 
                     LOGGER.info(
-                            MarkerGenerator.generateMarker(command),
-                            "Sending {} command",
-                            command.getClass().getSimpleName()
+                            MarkerGenerator.generateMarker(loyaltyBankDeletionEvent),
+                            "Publishing {} loyaltyBankDeletionEvent",
+                            loyaltyBankDeletionEvent.getClass().getSimpleName()
                     );
 
-                    commandGateway.send(command);
+                    eventGateway.publish(loyaltyBankDeletionEvent);
                 }
         );
-    }
-
-    @SagaEventHandler(associationProperty = "accountId")
-    public void handle(AllPointsExpiredEvent event) {
-        DeleteLoyaltyBankCommand command = DeleteLoyaltyBankCommand.builder()
-                .requestId(event.getRequestId())
-                .loyaltyBankId(event.getLoyaltyBankId())
-                .build();
-
-        Marker marker = MarkerGenerator.generateMarker(command);
-        marker.add(Markers.append(REQUEST_ID, command.getRequestId()));
-        LOGGER.info(marker, "{} received, issuing {}", event.getClass().getSimpleName(), command.getClass().getSimpleName());
-
-        commandGateway.send(command);
     }
 
     @SagaEventHandler(associationProperty = "accountId")

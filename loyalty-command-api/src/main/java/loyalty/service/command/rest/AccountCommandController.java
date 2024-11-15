@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+import static loyalty.service.core.constants.LogMessages.PUBLISHING_EVENT_FOR_ACCOUNT;
 import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_ACCOUNT;
 
 @RestController
@@ -58,9 +59,10 @@ public class AccountCommandController {
 
         LOGGER.info(
                 MarkerGenerator.generateMarker(event),
-                "Sending event {} for account {}", event.getClass().getSimpleName(), event.getAccountId()
+                PUBLISHING_EVENT_FOR_ACCOUNT, event.getClass().getSimpleName(), event.getAccountId()
         );
 
+        // TODO: figure out how to make sure the account and bank are actually created before sending the response
         eventGateway.publish(event);
 
         return AccountAndLoyaltyBankCreatedResponseModel.builder()

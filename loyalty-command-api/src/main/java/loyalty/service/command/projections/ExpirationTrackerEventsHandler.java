@@ -150,6 +150,7 @@ public class ExpirationTrackerEventsHandler {
 
         String loyaltyBankId = event.getLoyaltyBankId();
         ExpirationTrackerEntity expirationTrackerEntity = expirationTrackerRepository.findByLoyaltyBankId(loyaltyBankId);
+        // TODO: BUG clearing transaction list doesn't remove transactions from table in db
         expirationTrackerEntity.getTransactionList().clear();
         validateEntity(expirationTrackerEntity);
         expirationTrackerRepository.save(expirationTrackerEntity);

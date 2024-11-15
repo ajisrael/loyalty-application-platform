@@ -2,16 +2,14 @@ package loyalty.service.command.sagas;
 
 import loyalty.service.command.commands.DeleteLoyaltyBankCommand;
 import loyalty.service.command.commands.ExpireAllPointsCommand;
-import loyalty.service.command.commands.UnenrollLoyaltyBankCommand;
-import loyalty.service.command.data.entities.LoyaltyBankLookupEntity;
 import loyalty.service.command.data.repositories.LoyaltyBankLookupRepository;
-import loyalty.service.core.events.AccountDeletedEvent;
 import loyalty.service.core.events.AllPointsExpiredEvent;
 import loyalty.service.core.events.LoyaltyBankDeletedEvent;
-import loyalty.service.core.events.LoyaltyBankUnenrolledEvent;
+import loyalty.service.core.events.LoyaltyBankDeletionStartedEvent;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.config.ProcessingGroup;
 import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
 import org.axonframework.modelling.saga.SagaLifecycle;
@@ -21,13 +19,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 
 import java.io.Serializable;
-import java.util.List;
 
+import static loyalty.service.core.constants.DomainConstants.COMMAND_PROJECTION_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 
 @Saga
+@ProcessingGroup(COMMAND_PROJECTION_GROUP)
+@Order(3)
 public class LoyaltyBankDeletionSaga implements Serializable {
 
     @Autowired
@@ -39,7 +40,7 @@ public class LoyaltyBankDeletionSaga implements Serializable {
 
     @SagaEventHandler(associationProperty = "loyaltyBankId")
     @StartSaga
-    public void handle(LoyaltyBankUnenrolledEvent event) {
+    public void handle(LoyaltyBankDeletionStartedEvent event) {
         String loyaltyBankId = event.getLoyaltyBankId();
         SagaLifecycle.associateWith("loyaltyBankId", loyaltyBankId);
 

@@ -21,11 +21,12 @@ import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 
+import static loyalty.service.core.constants.DomainConstants.COMMAND_PROJECTION_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 
 @Saga
-@ProcessingGroup("account-lookup-group")
-@Order(2)
+@ProcessingGroup(COMMAND_PROJECTION_GROUP)
+@Order(4)
 public class AccountAndLoyaltyBankCreationSaga {
 
 
@@ -102,7 +103,8 @@ public class AccountAndLoyaltyBankCreationSaga {
             eventGateway.publish(endEvent);
         } catch (Exception e) {
             marker.add(Markers.append("exceptionMessage", e.getLocalizedMessage()));
-            LOGGER.error(marker, "AccountAndLoyaltyBankCreationEndedEvent failed to process, manual cleanup of saga required");
+            LOGGER.error(marker, "AccountAndLoyaltyBankCreationEndedEvent failed to process, rolling back loyalty bank creation");
+            rollbackLoyaltyBankCreation(event.getRequestId(), event.getLoyaltyBankId());
         }
     }
 

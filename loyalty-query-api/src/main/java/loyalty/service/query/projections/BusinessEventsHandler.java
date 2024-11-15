@@ -23,6 +23,8 @@ import static loyalty.service.core.constants.LogMessages.*;
 @Component
 @ProcessingGroup("business-group")
 public class BusinessEventsHandler {
+    // TODO: add a projection for the total amount of loyalty points available for this business,
+    //  i.e. the amount of points they need to be able to pay out to users
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BusinessEventsHandler.class);
 

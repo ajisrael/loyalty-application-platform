@@ -608,20 +608,8 @@ class LoyaltyBankAggregateTest {
     }
 
     @Test
-    @DisplayName("DeleteLoyaltyBankCommand results in LoyaltyBankDeletedEvent when points are available and available point check is skipped")
-    void testDeleteLoyaltyBank_whenDeleteLoyaltyBankCommandHandledWithAvailablePointsAndSkippingPointCheck_shouldIssueLoyaltyBankDeletedEvent() {
-        fixture.given(
-                        loyaltyBankCreatedEvent,
-                        awardedTransactionCreatedEvent
-                )
-                .when(deleteLoyaltyBankCommand, MetaData.with(SKIP_POINTS_CHECK, true))
-                .expectEvents(loyaltyBankDeletedEvent)
-                .expectMarkedDeleted();
-    }
-
-    @Test
-    @DisplayName("Cannot delete a loyaltyBank that has available points and not skipping the point check")
-    void testDeleteLoyaltyBank_whenDeleteLoyaltyBankCommandHandledWithAvailablePointsAndNotSkippingPointCheck_shouldThrowException() {
+    @DisplayName("Cannot delete a loyaltyBank that has available points")
+    void testDeleteLoyaltyBank_whenDeleteLoyaltyBankCommandHandledWithAvailablePoints_shouldThrowException() {
         fixture.given(
                         loyaltyBankCreatedEvent,
                         awardedTransactionCreatedEvent

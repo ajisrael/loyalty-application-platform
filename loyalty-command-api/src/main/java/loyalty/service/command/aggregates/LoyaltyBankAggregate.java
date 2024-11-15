@@ -216,9 +216,9 @@ public class LoyaltyBankAggregate {
 
     @CommandHandler
     public void on(DeleteLoyaltyBankCommand command, @MetaDataValue(SKIP_POINTS_CHECK) Boolean skipPointsCheck) {
-        if (skipPointsCheck == null || !skipPointsCheck) {
-            throwExceptionIfLoyaltyBankStillHasAvailablePoints();
-        }
+        // We always want to make sure all points are expired before deletion to know we have an accurate count for
+        // any outstanding balances required to hold in reserve.
+        throwExceptionIfLoyaltyBankStillHasAvailablePoints();
 
         LoyaltyBankDeletedEvent event = LoyaltyBankDeletedEvent.builder()
                 .requestId(command.getRequestId())

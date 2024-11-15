@@ -8,8 +8,10 @@ import loyalty.service.command.commands.DeleteLoyaltyBankCommand;
 import loyalty.service.command.rest.requests.CreateLoyaltyBankRequestModel;
 import loyalty.service.command.rest.requests.DeleteLoyaltyBankRequestModel;
 import loyalty.service.command.rest.responses.LoyaltyBankCreatedResponseModel;
+import loyalty.service.core.events.LoyaltyBankDeletionStartedEvent;
 import loyalty.service.core.utils.MarkerGenerator;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.eventhandling.gateway.EventGateway;
 import org.axonframework.messaging.MetaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+import static loyalty.service.core.constants.LogMessages.PUBLISHING_EVENT_FOR_LOYALTY_BANK;
 import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_LOYALTY_BANK;
 import static loyalty.service.core.constants.MetaDataKeys.SKIP_POINTS_CHECK;
 
@@ -29,6 +32,8 @@ public class LoyaltyBankCommandController {
 
     @Autowired
     private CommandGateway commandGateway;
+    @Autowired
+    private EventGateway eventGateway;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoyaltyBankCommandController.class);
 
@@ -61,18 +66,16 @@ public class LoyaltyBankCommandController {
     @Operation(summary = "Delete loyalty bank")
     public void deleteLoyaltyBank(@Valid @RequestBody DeleteLoyaltyBankRequestModel request) {
 
-        DeleteLoyaltyBankCommand command = DeleteLoyaltyBankCommand.builder()
+        LoyaltyBankDeletionStartedEvent event = LoyaltyBankDeletionStartedEvent.builder()
                 .requestId(UUID.randomUUID().toString())
                 .loyaltyBankId(request.getLoyaltyBankId())
                 .build();
 
         LOGGER.info(
-                MarkerGenerator.generateMarker(command),
-                SENDING_COMMAND_FOR_LOYALTY_BANK, command.getClass().getSimpleName(), command.getLoyaltyBankId()
+                MarkerGenerator.generateMarker(event),
+                PUBLISHING_EVENT_FOR_LOYALTY_BANK, event.getClass().getSimpleName(), event.getLoyaltyBankId()
         );
 
-        MetaData metaData = MetaData.with(SKIP_POINTS_CHECK, true);
-
-        commandGateway.sendAndWait(command, metaData);
+        eventGateway.publish(event);
     }
 }

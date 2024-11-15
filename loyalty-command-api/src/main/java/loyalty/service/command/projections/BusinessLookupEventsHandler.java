@@ -15,12 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.SmartValidator;
 import org.springframework.validation.annotation.Validated;
 
+import static loyalty.service.core.constants.DomainConstants.COMMAND_PROJECTION_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.ExceptionMessages.BUSINESS_WITH_ID_DOES_NOT_EXIST;
 import static loyalty.service.core.constants.LogMessages.*;
@@ -28,7 +30,8 @@ import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExi
 
 @Component
 @Validated
-@ProcessingGroup("business-lookup-group")
+@ProcessingGroup(COMMAND_PROJECTION_GROUP)
+@Order(1)
 public class BusinessLookupEventsHandler {
 
     private final BusinessLookupRepository businessLookupRepository;
