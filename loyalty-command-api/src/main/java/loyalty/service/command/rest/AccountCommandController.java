@@ -63,6 +63,7 @@ public class AccountCommandController {
         );
 
         // TODO: figure out how to make sure the account and bank are actually created before sending the response
+        //  - Idea: create a service/validation class that will check the lookup tables to make sure the event is valid before publishing
         eventGateway.publish(event);
 
         return AccountAndLoyaltyBankCreatedResponseModel.builder()
