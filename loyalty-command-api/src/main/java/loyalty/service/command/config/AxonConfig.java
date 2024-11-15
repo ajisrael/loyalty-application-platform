@@ -28,9 +28,6 @@ public class AxonConfig {
         commandBus.registerDispatchInterceptor(
                 context.getBean(TransactionCommandsInterceptor.class)
         );
-        commandBus.registerDispatchInterceptor(
-                context.getBean(SagaOrchestratorCommandsInterceptor.class)
-        );
     }
 
     @Autowired

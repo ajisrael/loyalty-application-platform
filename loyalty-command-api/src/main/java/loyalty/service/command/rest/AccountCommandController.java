@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import loyalty.service.command.commands.CreateAccountCommand;
 import loyalty.service.command.commands.DeleteAccountCommand;
-import loyalty.service.command.commands.StartAccountAndLoyaltyBankCreationCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.command.rest.requests.CreateAccountAndLoyaltyBankRequestModel;
 import loyalty.service.command.rest.requests.CreateAccountRequestModel;
@@ -13,8 +12,10 @@ import loyalty.service.command.rest.requests.DeleteAccountRequestModel;
 import loyalty.service.command.rest.requests.UpdateAccountRequestModel;
 import loyalty.service.command.rest.responses.AccountAndLoyaltyBankCreatedResponseModel;
 import loyalty.service.command.rest.responses.AccountCreatedResponseModel;
+import loyalty.service.core.events.AccountAndLoyaltyBankCreationStartedEvent;
 import loyalty.service.core.utils.MarkerGenerator;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.eventhandling.gateway.EventGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_ACCOUNT;
-import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_ACCOUNT_AND_LOYALTY_BANK;
 
 @RestController
 @RequestMapping("/account")
@@ -33,6 +33,9 @@ public class AccountCommandController {
 
     @Autowired
     private CommandGateway commandGateway;
+
+    @Autowired
+    private EventGateway eventGateway;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountCommandController.class);
 
@@ -43,7 +46,7 @@ public class AccountCommandController {
     public AccountAndLoyaltyBankCreatedResponseModel createAccountAndLoyaltyBank(@Valid @RequestBody CreateAccountAndLoyaltyBankRequestModel request) {
         String accountId = UUID.randomUUID().toString();
         String loyaltyBankId = UUID.randomUUID().toString();
-        StartAccountAndLoyaltyBankCreationCommand command = StartAccountAndLoyaltyBankCreationCommand.builder()
+        AccountAndLoyaltyBankCreationStartedEvent event = AccountAndLoyaltyBankCreationStartedEvent.builder()
                 .requestId(UUID.randomUUID().toString())
                 .accountId(accountId)
                 .loyaltyBankId(loyaltyBankId)
@@ -54,11 +57,11 @@ public class AccountCommandController {
                 .build();
 
         LOGGER.info(
-                MarkerGenerator.generateMarker(command),
-                SENDING_COMMAND_FOR_ACCOUNT_AND_LOYALTY_BANK, command.getClass().getSimpleName(), command.getAccountId()
+                MarkerGenerator.generateMarker(event),
+                "Sending event {} for account {}", event.getClass().getSimpleName(), event.getAccountId()
         );
 
-        commandGateway.sendAndWait(command);
+        eventGateway.publish(event);
 
         return AccountAndLoyaltyBankCreatedResponseModel.builder()
                 .accountId(accountId)

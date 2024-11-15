@@ -14,6 +14,10 @@ public class LogMessages {
     public static final String SENDING_COMMAND_FOR_REQUEST = String.format(SENDING_COMMAND_FOR_ENTITY, "{}", "request", "{}");
     public static final String SENDING_COMMAND_FOR_LOYALTY_BANK = String.format(SENDING_COMMAND_FOR_ENTITY, "{}", "loyalty bank", "{}");
     public static final String SENDING_COMMAND_FOR_BUSINESS = String.format(SENDING_COMMAND_FOR_ENTITY, "{}", "business", "{}");
+
+    public static final String PUBLISHING_EVENT_FOR_ENTITY = "Publishing event %s for %s %s";
+    public static final String PUBLISHING_EVENT_FOR_REQUEST = String.format(PUBLISHING_EVENT_FOR_ENTITY, "{}", "request", "{}");
+
     public static final String EMAIL_FOUND_ON_ANOTHER_ACCOUNT_CANCELLING_COMMAND = "Existing email found on account {}. cancelling command {}";
     public static final String ACCOUNT_NOT_FOUND_CANCELLING_COMMAND = "Account {} does not exist, cancelling command {}";
     public static final String PAYMENT_ID_NOT_FOUND_CANCELLING_COMMAND = "Payment id {} does not exist, cancelling command {}";

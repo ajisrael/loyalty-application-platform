@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class EndAccountAndLoyaltyBankCreationCommandRequestModel {
+public class AccountAndLoyaltyBankCreationEndedEventRequestModel {
 
     @NotBlank(message = "requestId is a required field")
     private String requestId;
