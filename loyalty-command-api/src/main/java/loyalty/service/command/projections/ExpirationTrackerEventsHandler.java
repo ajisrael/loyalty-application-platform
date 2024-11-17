@@ -1,7 +1,5 @@
 package loyalty.service.command.projections;
 
-import lombok.AllArgsConstructor;
-import loyalty.service.command.data.entities.BusinessLookupEntity;
 import loyalty.service.command.data.entities.ExpirationTrackerEntity;
 import loyalty.service.command.data.entities.TransactionEntity;
 import loyalty.service.command.data.repositories.ExpirationTrackerRepository;
