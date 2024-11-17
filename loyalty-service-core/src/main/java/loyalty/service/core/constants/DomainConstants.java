@@ -16,8 +16,9 @@ public class DomainConstants {
 
     public static final String REQUEST_ID = "requestId";
     public static final String ACCOUNT_ID = "accountId";
-    public static final String EMAIL = "email";
+    public static final String LOYALTY_BANK_ID = "loyaltyBankId";
     public static final String BUSINESS_ID = "businessId";
+    public static final String EMAIL = "email";
     public static final String REQUESTED_POINTS = "requestedPoints";
     public static final String VOID = "void";
     public static final String CAPTURE = "capture";
