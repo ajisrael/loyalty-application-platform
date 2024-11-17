@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 
-import static loyalty.service.core.constants.DomainConstants.COMMAND_PROJECTION_GROUP;
+import static loyalty.service.core.constants.DomainConstants.*;
 
 @Configuration
 public class AxonConfig {
@@ -34,12 +34,11 @@ public class AxonConfig {
 
     @Autowired
     public void configure(EventProcessingConfigurer configurer) {
-        // TODO: Save group strings to constants
         configurer.registerListenerInvocationErrorHandler(COMMAND_PROJECTION_GROUP,
                 configuration -> new LoyaltyServiceEventsErrorHandler());
-        configurer.registerListenerInvocationErrorHandler("redemption-tracker-group",
+        configurer.registerListenerInvocationErrorHandler(REDEMPTION_TRACKER_GROUP,
                 configuration -> new LoyaltyServiceEventsErrorHandler());
-        configurer.registerListenerInvocationErrorHandler("expiration-tracker-group",
+        configurer.registerListenerInvocationErrorHandler(EXPIRATION_TRACKER_GROUP,
                 configuration -> new LoyaltyServiceEventsErrorHandler());
     }
 }

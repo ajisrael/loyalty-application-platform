@@ -25,13 +25,14 @@ import org.springframework.validation.SmartValidator;
 
 import java.time.Instant;
 
+import static loyalty.service.core.constants.DomainConstants.EXPIRATION_TRACKER_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.ExceptionMessages.EXPIRATION_TRACKER_FOR_LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST;
 import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExist;
 
 
 @Component
-@ProcessingGroup("expiration-tracker-group")
+@ProcessingGroup(EXPIRATION_TRACKER_GROUP)
 public class ExpirationTrackerEventsHandler {
 
     private final ExpirationTrackerRepository expirationTrackerRepository;

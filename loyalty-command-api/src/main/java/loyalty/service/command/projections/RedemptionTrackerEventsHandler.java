@@ -24,11 +24,12 @@ import org.springframework.validation.SmartValidator;
 
 import java.util.List;
 
+import static loyalty.service.core.constants.DomainConstants.REDEMPTION_TRACKER_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 
 
 @Component
-@ProcessingGroup("redemption-tracker-group")
+@ProcessingGroup(REDEMPTION_TRACKER_GROUP)
 public class RedemptionTrackerEventsHandler {
 
     private final RedemptionTrackerRepository redemptionTrackerRepository;
