@@ -3,10 +3,10 @@ axon:
     enabled: 'false'
   eventhandling:
     processors:
-      account-lookup-group:
+      command-projection-group:
         mode: tracking
-      loyalty-bank-lookup-group:
-        mode: tracking
+        dlq:
+          enabled: true
       tracking:
         token-store:
           enabled: 'true'
