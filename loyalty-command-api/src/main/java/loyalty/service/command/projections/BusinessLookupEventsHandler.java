@@ -91,9 +91,10 @@ public class BusinessLookupEventsHandler {
 
         BusinessLookupEntity businessLookupEntity = businessLookupRepository.findByBusinessId(event.getBusinessId());
         throwExceptionIfEntityDoesNotExist(businessLookupEntity, String.format(BUSINESS_WITH_ID_DOES_NOT_EXIST, event.getBusinessId()));
-        businessLookupRepository.delete(businessLookupEntity);
 
         marker.add(MarkerGenerator.generateMarker(businessLookupEntity));
+
+        businessLookupRepository.delete(businessLookupEntity);
 
         LOGGER.info(marker, BUSINESS_DELETED_FROM_LOOKUP_DB, event.getBusinessId());
     }

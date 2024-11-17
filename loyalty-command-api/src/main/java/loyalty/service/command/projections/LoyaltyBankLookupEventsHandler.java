@@ -5,6 +5,7 @@ import loyalty.service.command.data.repositories.LoyaltyBankLookupRepository;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
 import loyalty.service.core.events.LoyaltyBankDeletedEvent;
 import loyalty.service.core.exceptions.IllegalProjectionStateException;
+import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
@@ -60,6 +61,8 @@ public class LoyaltyBankLookupEventsHandler {
                         event.getBusinessId()
                 );
 
+        marker.add(MarkerGenerator.generateMarker(loyaltyBankLookupEntity));
+
         validateEntity(loyaltyBankLookupEntity);
         loyaltyBankLookupRepository.save(loyaltyBankLookupEntity);
 
@@ -72,6 +75,9 @@ public class LoyaltyBankLookupEventsHandler {
 
         LoyaltyBankLookupEntity loyaltyBankLookupEntity = loyaltyBankLookupRepository.findByLoyaltyBankId(event.getLoyaltyBankId());
         throwExceptionIfEntityDoesNotExist(loyaltyBankLookupEntity, String.format(LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST, event.getLoyaltyBankId()));
+
+        marker.add(MarkerGenerator.generateMarker(loyaltyBankLookupEntity));
+
         loyaltyBankLookupRepository.delete(loyaltyBankLookupEntity);
 
         LOGGER.info(marker, LOYALTY_BANK_DELETED_FROM_LOOKUP_DB, event.getLoyaltyBankId());
