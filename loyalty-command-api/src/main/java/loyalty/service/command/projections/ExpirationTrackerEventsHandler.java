@@ -28,6 +28,8 @@ import java.time.Instant;
 import static loyalty.service.core.constants.DomainConstants.EXPIRATION_TRACKER_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.ExceptionMessages.EXPIRATION_TRACKER_FOR_LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST;
+import static loyalty.service.core.constants.LogMessages.EXPIRATION_TRACKER_CREATED_FOR_LOYALTY_BANK;
+import static loyalty.service.core.constants.LogMessages.TRANSACTION_ENTITY_CREATED_FOR_LOYALTY_BANK;
 import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExist;
 
 
@@ -70,7 +72,7 @@ public class ExpirationTrackerEventsHandler {
 
         marker.add(MarkerGenerator.generateMarker(expirationTrackerEntity));
 
-        LOGGER.info(marker, "Expiration tracker created for loyalty bank {}", loyaltyBankId);
+        LOGGER.info(marker, EXPIRATION_TRACKER_CREATED_FOR_LOYALTY_BANK, loyaltyBankId);
     }
 
     @EventHandler
@@ -184,7 +186,7 @@ public class ExpirationTrackerEventsHandler {
 
         marker.add(MarkerGenerator.generateMarker(transactionEntity));
 
-        LOGGER.info(marker, "TransactionEntity created for loyalty bank {}", loyaltyBankId);
+        LOGGER.info(marker, TRANSACTION_ENTITY_CREATED_FOR_LOYALTY_BANK, loyaltyBankId);
     }
 
     private void applyPointsToTransactions(int points, ExpirationTrackerEntity expirationTrackerEntity) {

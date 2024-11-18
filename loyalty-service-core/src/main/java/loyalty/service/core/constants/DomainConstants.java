@@ -22,6 +22,9 @@ public class DomainConstants {
     public static final String REQUESTED_POINTS = "requestedPoints";
     public static final String VOID = "void";
     public static final String CAPTURE = "capture";
+    public static final String TRANSACTION_LIST = "transactionList";
+    public static final String TRANSACTION_ID = "transactionId";
+
     public static final String COMMAND_PROJECTION_GROUP = "command-projection-group";
     public static final String EXPIRATION_TRACKER_GROUP = "expiration-tracker-group";
     public static final String REDEMPTION_TRACKER_GROUP = "redemption-tracker-group";
