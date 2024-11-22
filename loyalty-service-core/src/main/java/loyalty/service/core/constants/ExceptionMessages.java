@@ -35,6 +35,7 @@ public class ExceptionMessages {
     // TODO: fix wording with id
     public static final String PAYMENT_ID_DOES_NOT_EXIST = String.format(ENTITY_WITH_ID_DOES_NOT_EXIST, PAYMENT_ID, "%s");
     public static final String LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST = String.format(ENTITY_WITH_ID_DOES_NOT_EXIST, LOYALTY_BANK, "%s");
+    public static final String TRANSACTION_NOT_FOUND = "Transaction not found";
     public static final String THERE_ARE_NO_LOYALTY_BANKS_WITH_ACCOUNT_ID = "There are no loyalty banks with account id %s";
     public static final String THERE_ARE_NO_LOYALTY_BANKS_WITH_BUSINESS_ID = "There are no loyalty banks with businessId %s";
 

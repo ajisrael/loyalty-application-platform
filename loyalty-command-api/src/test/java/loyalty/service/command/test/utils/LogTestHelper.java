@@ -19,7 +19,7 @@ public class LogTestHelper {
 
     public static void logContainsMarkers(ILoggingEvent loggingEvent, LogstashMarker... expectedMarkers) {
         for (Marker marker : expectedMarkers) {
-            assertTrue(loggingEvent.getMarkerList().get(0).contains(marker));
+            assertTrue(loggingEvent.getMarkerList().get(0).contains(marker), "ExpectedMarker: " + marker + " not found");
         }
     }
 

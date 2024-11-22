@@ -41,6 +41,7 @@ public class LogMessages {
 
     public static final String EXPIRATION_TRACKER_CREATED_FOR_LOYALTY_BANK = "Expiration tracker created for loyalty bank {}";
     public static final String TRANSACTION_ENTITY_CREATED_FOR_LOYALTY_BANK = "TransactionEntity created for loyalty bank {}";
+    public static final String AUTHORIZED_POINTS_APPLIED_TO_TRANSACTIONS_FOR_LOYALTY_BANK = "Authorized points applied to transactions for loyalty bank {}";
 
     public static final String ACCOUNT_SAVED_IN_DB = "Account {} saved in db";
     public static final String ACCOUNT_UPDATED_IN_DB = "Account {} updated in db";

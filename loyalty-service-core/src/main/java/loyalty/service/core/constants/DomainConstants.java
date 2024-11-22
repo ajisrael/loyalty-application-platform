@@ -8,6 +8,8 @@ public class DomainConstants {
     public static final String ACCOUNT = "Account";
     public static final String LOYALTY_BANK = "Loyalty Bank";
     public static final String BUSINESS = "Business";
+    public static final String EXPIRATION_TRACKER = "Expiration Tracker";
+    public static final String TRANSACTION = "Transaction";
     public static final String PAYMENT_ID = "Payment id";
     public static final String PENDING = "Pending";
     public static final String EARNED = "Earned";
@@ -24,6 +26,8 @@ public class DomainConstants {
     public static final String CAPTURE = "capture";
     public static final String TRANSACTION_LIST = "transactionList";
     public static final String TRANSACTION_ID = "transactionId";
+    public static final String TIMESTAMP = "timestamp";
+    public static final String POINTS = "points";
 
     public static final String COMMAND_PROJECTION_GROUP = "command-projection-group";
     public static final String EXPIRATION_TRACKER_GROUP = "expiration-tracker-group";

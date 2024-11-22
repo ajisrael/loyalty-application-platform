@@ -8,7 +8,9 @@ import loyalty.service.core.events.AllPointsExpiredEvent;
 import loyalty.service.core.events.LoyaltyBankCreatedEvent;
 import loyalty.service.core.events.LoyaltyBankDeletedEvent;
 import loyalty.service.core.events.transactions.*;
+import loyalty.service.core.exceptions.ExpirationTrackerNotFoundException;
 import loyalty.service.core.exceptions.IllegalProjectionStateException;
+import loyalty.service.core.exceptions.TransactionNotFoundException;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.config.ProcessingGroup;
@@ -27,9 +29,8 @@ import java.time.Instant;
 
 import static loyalty.service.core.constants.DomainConstants.EXPIRATION_TRACKER_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
-import static loyalty.service.core.constants.ExceptionMessages.EXPIRATION_TRACKER_FOR_LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST;
-import static loyalty.service.core.constants.LogMessages.EXPIRATION_TRACKER_CREATED_FOR_LOYALTY_BANK;
-import static loyalty.service.core.constants.LogMessages.TRANSACTION_ENTITY_CREATED_FOR_LOYALTY_BANK;
+import static loyalty.service.core.constants.ExceptionMessages.*;
+import static loyalty.service.core.constants.LogMessages.*;
 import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExist;
 
 
@@ -91,13 +92,15 @@ public class ExpirationTrackerEventsHandler {
 
         String loyaltyBankId = event.getLoyaltyBankId();
         ExpirationTrackerEntity expirationTrackerEntity = expirationTrackerRepository.findByLoyaltyBankId(loyaltyBankId);
+        throwExceptionIfExpirationTrackerDoesNotExist(expirationTrackerEntity, loyaltyBankId);
+
         applyPointsToTransactions(event.getPoints(), expirationTrackerEntity);
         validateEntity(expirationTrackerEntity);
         expirationTrackerRepository.save(expirationTrackerEntity);
 
         marker.add(MarkerGenerator.generateMarker(expirationTrackerEntity));
 
-        LOGGER.info(marker, "Authorized points applied to transactions for loyalty bank {}", loyaltyBankId);
+        LOGGER.info(marker, AUTHORIZED_POINTS_APPLIED_TO_TRANSACTIONS_FOR_LOYALTY_BANK, loyaltyBankId);
     }
 
     @EventHandler
@@ -178,6 +181,8 @@ public class ExpirationTrackerEventsHandler {
         marker = Markers.append(REQUEST_ID,event.getRequestId());
 
         ExpirationTrackerEntity expirationTrackerEntity = expirationTrackerRepository.findByLoyaltyBankId(loyaltyBankId);
+        throwExceptionIfExpirationTrackerDoesNotExist(expirationTrackerEntity, event.getLoyaltyBankId());
+
         TransactionEntity transactionEntity = new TransactionEntity(event.getRequestId(), event.getPoints(), eventTimestamp, loyaltyBankId);
         validateEntity(transactionEntity);
         expirationTrackerEntity.addTransaction(transactionEntity);
@@ -192,6 +197,7 @@ public class ExpirationTrackerEventsHandler {
     private void applyPointsToTransactions(int points, ExpirationTrackerEntity expirationTrackerEntity) {
         while (points > 0) {
             TransactionEntity oldestTransaction = expirationTrackerEntity.getTransactionList().get(0);
+            throwExceptionIfTransactionDoesNotExist(oldestTransaction);
             oldestTransaction.setPoints(oldestTransaction.getPoints() - points);
             points = oldestTransaction.getPoints() * -1;
 
@@ -216,6 +222,18 @@ public class ExpirationTrackerEventsHandler {
 
         if (bindingResult.hasErrors()) {
             throw new IllegalProjectionStateException(bindingResult.getFieldError().getDefaultMessage());
+        }
+    }
+
+    private void throwExceptionIfExpirationTrackerDoesNotExist(ExpirationTrackerEntity entity, String loyaltyBankId) {
+        if (entity == null) {
+            throw new ExpirationTrackerNotFoundException(loyaltyBankId);
+        }
+    }
+
+    private void throwExceptionIfTransactionDoesNotExist(TransactionEntity entity) {
+        if (entity == null) {
+            throw new TransactionNotFoundException();
         }
     }
 }
