@@ -2,6 +2,7 @@ package loyalty.service.command.sagas;
 
 import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.core.events.AccountCreatedEvent;
+import loyalty.service.core.events.AccountUpdatedEvent;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.deadline.DeadlineManager;
@@ -30,6 +31,8 @@ public class AccountLifecycleSaga {
     @StartSaga
     @SagaEventHandler(associationProperty = "accountId")
     public void on(AccountCreatedEvent event, @Autowired DeadlineManager deadlineManager) {
+        String accountId = event.getAccountId();
+
         deadlineId = deadlineManager.schedule(
                 Duration.ofSeconds(20),
                 "delete-account-deadline",
@@ -39,7 +42,18 @@ public class AccountLifecycleSaga {
         Marker marker = generateMarker(event);
         marker.add(Markers.append("deadlineId", deadlineId));
 
-        LOGGER.info(marker, "Deadline {} created for {}", deadlineId, event.getAccountId());
+        LOGGER.info(marker, "Deadline {} created for {}", deadlineId, accountId);
+    }
+
+    @EndSaga
+    @SagaEventHandler(associationProperty = "accountId")
+    public void on(AccountUpdatedEvent event, @Autowired DeadlineManager deadlineManager) {
+        deadlineManager.cancelSchedule("delete-account-deadline", deadlineId);
+
+        Marker marker = generateMarker(event);
+        marker.add(Markers.append("deadlineId", deadlineId));
+
+        LOGGER.info(marker, "Deadline {} cancelled for {}", deadlineId, event.getAccountId());
     }
 
     @EndSaga
