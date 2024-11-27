@@ -20,12 +20,12 @@ import java.time.Duration;
 import static loyalty.service.core.utils.MarkerGenerator.generateMarker;
 
 @Saga
-public class AccountLifecycleSage {
+public class AccountLifecycleSaga {
     @Autowired
     private transient CommandGateway commandGateway;
     private String deadlineId = null;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AccountLifecycleSage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountLifecycleSaga.class);
 
     @StartSaga
     @SagaEventHandler(associationProperty = "accountId")
