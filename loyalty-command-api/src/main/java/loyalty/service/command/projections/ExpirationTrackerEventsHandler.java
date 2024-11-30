@@ -86,6 +86,7 @@ public class ExpirationTrackerEventsHandler {
         createAndSaveTransactionForLoyaltyBank(event, eventTimestamp, event.getLoyaltyBankId());
     }
 
+    // TODO: add timestamp to event handler to make sure the authorization event is after the transaction it is being applied to
     @EventHandler
     public void on(AuthorizedTransactionCreatedEvent event) {
         marker = Markers.append(REQUEST_ID,event.getRequestId());
