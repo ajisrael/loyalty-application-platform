@@ -106,19 +106,30 @@ public class ExpirationTrackerEventsHandler {
 
     @EventHandler
     public void on(VoidTransactionCreatedEvent event, @Timestamp Instant eventTimeStamp) {
-        marker = Markers.append(REQUEST_ID,event.getRequestId());
+        marker = Markers.append(REQUEST_ID, event.getRequestId());
 
         String loyaltyBankId = event.getLoyaltyBankId();
         ExpirationTrackerEntity expirationTrackerEntity = expirationTrackerRepository.findByLoyaltyBankId(loyaltyBankId);
 
         if (expirationTrackerEntity.getTransactionList().isEmpty()) {
-            TransactionEntity transactionEntity = new TransactionEntity(event.getRequestId(), event.getPoints(), eventTimeStamp, loyaltyBankId);
+            String transactionId = event.getRequestId();
+            TransactionEntity transactionEntity = new TransactionEntity(transactionId, event.getPoints(), eventTimeStamp, loyaltyBankId);
+
             validateEntity(transactionEntity);
+
+            Marker transactionMarker = Markers.append(REQUEST_ID, event.getRequestId());
+            transactionMarker.add(generateMarker(transactionEntity));
+            LOGGER.info(transactionMarker, CREATING_NEW_TRANSACTION_FOR_EXPIRATION_TRACKER, transactionId, loyaltyBankId);
+
             expirationTrackerEntity.getTransactionList().add(transactionEntity);
         } else {
             TransactionEntity transactionEntity = expirationTrackerEntity.getTransactionList().get(0);
             transactionEntity.addPoints(event.getPoints());
             validateEntity(transactionEntity);
+
+            Marker transactionMarker = Markers.append(REQUEST_ID, event.getRequestId());
+            transactionMarker.add(generateMarker(transactionEntity));
+            LOGGER.info(transactionMarker, ADDING_POINTS_TO_OLDEST_TRANSACTION, transactionEntity.getTransactionId(), loyaltyBankId);
         }
 
         validateEntity(expirationTrackerEntity);
@@ -126,7 +137,7 @@ public class ExpirationTrackerEventsHandler {
 
         marker.add(generateMarker(expirationTrackerEntity));
 
-        LOGGER.info(marker, "Voided points applied to transactions for loyalty bank {}", loyaltyBankId);
+        LOGGER.info(marker, VOIDED_POINTS_APPLIED_TO_EXPIRATION_TRACKER_FOR_LOYALTY_BANK, loyaltyBankId);
     }
 
     @EventHandler

@@ -44,6 +44,9 @@ public class LogMessages {
     public static final String APPLYING_REMAINING_AUTHORIZED_POINTS_TO_POINTS_ON_OLDEST_TRANSACTION = "Applying {} remaining authorized points to {} points on oldest transaction {}";
     public static final String ALL_POINTS_USED_FOR_TRANSACTION_REMOVING_TRANSACTION_FROM_EXPIRATION_TRACKER = "All points used for transaction {}, removing transaction from expiration tracker";
     public static final String AUTHORIZED_POINTS_APPLIED_TO_TRANSACTIONS_FOR_LOYALTY_BANK = "Authorized points applied to transactions for loyalty bank {}";
+    public static final String CREATING_NEW_TRANSACTION_FOR_EXPIRATION_TRACKER = "Creating new transaction {} for expirationTracker of loyaltyBank {} to account for void transaction due to empty transaction list";
+    public static final String ADDING_POINTS_TO_OLDEST_TRANSACTION = "Adding points to oldest transaction {} for expirationTracker of loyaltyBank {} to account for void transaction";
+    public static final String VOIDED_POINTS_APPLIED_TO_EXPIRATION_TRACKER_FOR_LOYALTY_BANK = "Voided points applied to expirationTracker for loyalty bank {}";
 
     public static final String ACCOUNT_SAVED_IN_DB = "Account {} saved in db";
     public static final String ACCOUNT_UPDATED_IN_DB = "Account {} updated in db";
