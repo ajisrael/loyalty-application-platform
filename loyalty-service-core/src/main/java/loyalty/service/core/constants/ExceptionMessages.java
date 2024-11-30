@@ -46,4 +46,6 @@ public class ExceptionMessages {
 
     public static final String CANNOT_VOID_MORE_POINTS_THAN_AVAILABLE = "Cannot void more points than available";
     public static final String CANNOT_CAPTURE_MORE_POINTS_THAN_AVAILABLE = "Cannot capture more points than available";
+
+    public static final String AUTHORIZED_MORE_POINTS_THAN_EARNED_CANNOT_PROCESS_AUTHORIZATION_EVENT_FOR_EXPIRATION_TRACKER = "Authorized more points than earned, unable to process authorization event for expiration tracker %s";
 }

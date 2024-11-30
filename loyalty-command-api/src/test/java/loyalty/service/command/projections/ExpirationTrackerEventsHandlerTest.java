@@ -15,8 +15,6 @@ import loyalty.service.core.events.transactions.AwardedTransactionCreatedEvent;
 import loyalty.service.core.events.transactions.EarnedTransactionCreatedEvent;
 import loyalty.service.core.exceptions.ExpirationTrackerNotFoundException;
 import loyalty.service.core.exceptions.IllegalProjectionStateException;
-import loyalty.service.core.exceptions.LoyaltyBankNotFoundException;
-import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -521,5 +519,95 @@ class ExpirationTrackerEventsHandlerTest {
                 Markers.append(PAYMENT_ID, event.getPaymentId()),
                 Markers.append(POINTS, event.getPoints())
         );
+    }
+
+    @Test
+    @DisplayName("Cannot update ExpirationTrackerEntity on valid AuthorizedTransactionCreatedEvent for more than available points in loyaltyBank")
+    void testOn_whenValidAuthorizedTransactionCreatedEventReceivedForMoreThanAvailablePointsInLoyaltyBank_shouldThrowException() {
+        // Arrange
+        AuthorizedTransactionCreatedEvent event = AuthorizedTransactionCreatedEvent.builder()
+                .requestId(TEST_REQUEST_ID)
+                .loyaltyBankId(TEST_LOYALTY_BANK_ID)
+                .paymentId(TEST_PAYMENT_ID)
+                .points(TEST_POINTS)
+                .build();
+
+        int availablePoints = TEST_POINTS / 2;
+
+        ExpirationTrackerEntity expirationTrackerEntity = new ExpirationTrackerEntity(TEST_LOYALTY_BANK_ID);
+        TransactionEntity transactionEntity = new TransactionEntity();
+        transactionEntity.setTransactionId(TEST_TRANSACTION_ID);
+        transactionEntity.setTimestamp(timestamp);
+        transactionEntity.setLoyaltyBankId(TEST_LOYALTY_BANK_ID);
+        transactionEntity.setPoints(availablePoints);
+        expirationTrackerEntity.addTransaction(transactionEntity);
+
+        when(expirationTrackerRepository.findByLoyaltyBankId(TEST_LOYALTY_BANK_ID)).thenReturn(expirationTrackerEntity);
+
+        // Act & Assert
+        IllegalProjectionStateException exception = assertThrows(IllegalProjectionStateException.class, () -> {
+            expirationTrackerEventsHandler.on(event);
+        });
+
+        // Assert
+        verify(expirationTrackerRepository, times(1)).findByLoyaltyBankId(TEST_LOYALTY_BANK_ID);
+        verify(expirationTrackerRepository, times(0)).save(any(ExpirationTrackerEntity.class));
+
+        String expectedMessage = String.format(
+                AUTHORIZED_MORE_POINTS_THAN_EARNED_CANNOT_PROCESS_AUTHORIZATION_EVENT_FOR_EXPIRATION_TRACKER,
+                TEST_LOYALTY_BANK_ID
+        );
+        assertEquals(expectedMessage, exception.getLocalizedMessage(), "Exception did not have expected message");
+
+        List<ILoggingEvent> loggedEvents = listAppender.list;
+        assertEquals(2, loggedEvents.size());
+
+        assertLogMessageWithMarkers(
+                loggedEvents.get(0),
+                Level.INFO,
+                MessageFormatter.arrayFormat(
+                        APPLYING_REMAINING_AUTHORIZED_POINTS_TO_POINTS_ON_OLDEST_TRANSACTION,
+                        Arguments.of(TEST_POINTS, availablePoints, TEST_TRANSACTION_ID).get()).getMessage(),
+                Markers.append(REQUEST_ID, event.getRequestId()),
+                Markers.append(LOYALTY_BANK_ID, event.getLoyaltyBankId()),
+                Markers.append(TRANSACTION_ID, TEST_TRANSACTION_ID)
+        );
+
+        assertLogMessageWithMarkers(
+                loggedEvents.get(1),
+                Level.INFO,
+                MessageFormatter.format(ALL_POINTS_USED_FOR_TRANSACTION_REMOVING_TRANSACTION_FROM_EXPIRATION_TRACKER, TEST_TRANSACTION_ID).getMessage(),
+                Markers.append(REQUEST_ID, event.getRequestId()),
+                Markers.append(LOYALTY_BANK_ID, event.getLoyaltyBankId()),
+                Markers.append(TRANSACTION_ID, TEST_TRANSACTION_ID)
+        );
+    }
+
+    @Test
+    @DisplayName("Cannot update ExpirationTrackerEntity on valid AuthorizedTransactionCreatedEvent for non existing loyaltyBank")
+    void testOn_whenValidAuthorizedTransactionCreatedEventReceivedForNonExistingLoyaltyBank_shouldThrowException() {
+        // Arrange
+        AuthorizedTransactionCreatedEvent event = AuthorizedTransactionCreatedEvent.builder()
+                .requestId(TEST_REQUEST_ID)
+                .loyaltyBankId(TEST_LOYALTY_BANK_ID)
+                .paymentId(TEST_PAYMENT_ID)
+                .points(TEST_POINTS)
+                .build();
+
+        when(expirationTrackerRepository.findByLoyaltyBankId(TEST_LOYALTY_BANK_ID)).thenReturn(null);
+
+
+        // Act & Assert
+        ExpirationTrackerNotFoundException exception = assertThrows(ExpirationTrackerNotFoundException.class, () -> {
+            expirationTrackerEventsHandler.on(event);
+        });
+
+        // Assert
+        assertEquals(String.format(EXPIRATION_TRACKER_FOR_LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST, event.getLoyaltyBankId()), exception.getLocalizedMessage());
+        verify(expirationTrackerRepository, times(0)).save(any(ExpirationTrackerEntity.class));
+        verify(transactionRepository, times(0)).save(any(TransactionEntity.class));
+
+        List<ILoggingEvent> loggedEvents = listAppender.list;
+        assertEquals(0, loggedEvents.size());
     }
 }

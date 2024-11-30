@@ -199,7 +199,11 @@ public class ExpirationTrackerEventsHandler {
             List<TransactionEntity> transactions = expirationTrackerEntity.getTransactionList();
 
             if (transactions.isEmpty()) {
-                throw new IllegalProjectionStateException("Authorized more points than earned, unable to process authorization event for expiration tracker");
+                String exceptionMessage = String.format(
+                        AUTHORIZED_MORE_POINTS_THAN_EARNED_CANNOT_PROCESS_AUTHORIZATION_EVENT_FOR_EXPIRATION_TRACKER,
+                        expirationTrackerEntity.getLoyaltyBankId()
+                );
+                throw new IllegalProjectionStateException(exceptionMessage);
             }
 
             TransactionEntity oldestTransaction = expirationTrackerEntity.getTransactionList().get(0);
