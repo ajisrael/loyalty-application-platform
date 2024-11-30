@@ -11,7 +11,6 @@ import loyalty.service.core.events.transactions.*;
 import loyalty.service.core.exceptions.ExpirationTrackerNotFoundException;
 import loyalty.service.core.exceptions.IllegalProjectionStateException;
 import loyalty.service.core.exceptions.TransactionNotFoundException;
-import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
@@ -26,12 +25,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.SmartValidator;
 
 import java.time.Instant;
+import java.util.List;
 
-import static loyalty.service.core.constants.DomainConstants.EXPIRATION_TRACKER_GROUP;
-import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
+import static loyalty.service.core.constants.DomainConstants.*;
 import static loyalty.service.core.constants.ExceptionMessages.*;
 import static loyalty.service.core.constants.LogMessages.*;
 import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExist;
+import static loyalty.service.core.utils.MarkerGenerator.generateMarker;
 
 
 @Component
@@ -71,7 +71,7 @@ public class ExpirationTrackerEventsHandler {
         validateEntity(expirationTrackerEntity);
         expirationTrackerRepository.save(expirationTrackerEntity);
 
-        marker.add(MarkerGenerator.generateMarker(expirationTrackerEntity));
+        marker.add(generateMarker(expirationTrackerEntity));
 
         LOGGER.info(marker, EXPIRATION_TRACKER_CREATED_FOR_LOYALTY_BANK, loyaltyBankId);
     }
@@ -98,7 +98,7 @@ public class ExpirationTrackerEventsHandler {
         validateEntity(expirationTrackerEntity);
         expirationTrackerRepository.save(expirationTrackerEntity);
 
-        marker.add(MarkerGenerator.generateMarker(expirationTrackerEntity));
+        marker = generateMarker(event);
 
         LOGGER.info(marker, AUTHORIZED_POINTS_APPLIED_TO_TRANSACTIONS_FOR_LOYALTY_BANK, loyaltyBankId);
     }
@@ -123,7 +123,7 @@ public class ExpirationTrackerEventsHandler {
         validateEntity(expirationTrackerEntity);
         expirationTrackerRepository.save(expirationTrackerEntity);
 
-        marker.add(MarkerGenerator.generateMarker(expirationTrackerEntity));
+        marker.add(generateMarker(expirationTrackerEntity));
 
         LOGGER.info(marker, "Voided points applied to transactions for loyalty bank {}", loyaltyBankId);
     }
@@ -136,14 +136,14 @@ public class ExpirationTrackerEventsHandler {
         TransactionEntity transactionEntity = transactionRepository.findByTransactionId(event.getTargetTransactionId());
 
         if (transactionEntity.getPoints() != event.getPoints()) {
-            marker.add(MarkerGenerator.generateMarker(transactionEntity));
-            marker.add(MarkerGenerator.generateMarker(event));
+            marker.add(generateMarker(transactionEntity));
+            marker.add(generateMarker(event));
             LOGGER.error(marker, "Points expired do not match transaction");
         }
 
         transactionRepository.deleteById(event.getTargetTransactionId());
 
-        marker.add(MarkerGenerator.generateMarker(transactionEntity));
+        marker.add(generateMarker(transactionEntity));
 
         LOGGER.info(marker, "Removed transaction for loyalty bank {} due to expiration", loyaltyBankId);
     }
@@ -159,7 +159,7 @@ public class ExpirationTrackerEventsHandler {
         validateEntity(expirationTrackerEntity);
         expirationTrackerRepository.save(expirationTrackerEntity);
 
-        marker.add(MarkerGenerator.generateMarker(expirationTrackerEntity));
+        marker.add(generateMarker(expirationTrackerEntity));
 
         LOGGER.info(marker, "Transactions cleared for loyalty bank {}", loyaltyBankId);
     }
@@ -171,7 +171,7 @@ public class ExpirationTrackerEventsHandler {
         expirationTrackerRepository.delete(expirationTrackerEntity);
 
         LOGGER.info(
-                MarkerGenerator.generateMarker(event),
+                generateMarker(event),
                 "Deleted expiration tracker due to {}",
                 event.getClass().getSimpleName()
         );
@@ -189,19 +189,34 @@ public class ExpirationTrackerEventsHandler {
         validateEntity(expirationTrackerEntity);
         expirationTrackerRepository.save(expirationTrackerEntity);
 
-        marker.add(MarkerGenerator.generateMarker(transactionEntity));
+        marker.add(generateMarker(transactionEntity));
 
         LOGGER.info(marker, TRANSACTION_ENTITY_CREATED_FOR_LOYALTY_BANK, loyaltyBankId);
     }
 
     private void applyPointsToTransactions(int points, ExpirationTrackerEntity expirationTrackerEntity) {
         while (points > 0) {
-            TransactionEntity oldestTransaction = expirationTrackerEntity.getTransactionList().get(0);
-            throwExceptionIfTransactionDoesNotExist(oldestTransaction);
-            oldestTransaction.setPoints(oldestTransaction.getPoints() - points);
-            points = oldestTransaction.getPoints() * -1;
+            List<TransactionEntity> transactions = expirationTrackerEntity.getTransactionList();
 
-            if (oldestTransaction.getPoints() < 0) {
+            if (transactions.isEmpty()) {
+                throw new IllegalProjectionStateException("Authorized more points than earned, unable to process authorization event for expiration tracker");
+            }
+
+            TransactionEntity oldestTransaction = expirationTrackerEntity.getTransactionList().get(0);
+            String transactionId = oldestTransaction.getTransactionId();
+            int transactionPoints = oldestTransaction.getPoints();
+
+            marker.add(Markers.append(LOYALTY_BANK_ID, oldestTransaction.getLoyaltyBankId()));
+            marker.add(Markers.append(TRANSACTION_ID, transactionId));
+
+            LOGGER.info(marker, APPLYING_REMAINING_AUTHORIZED_POINTS_TO_POINTS_ON_OLDEST_TRANSACTION, points, transactionPoints, transactionId);
+
+            transactionPoints -= points;
+            oldestTransaction.setPoints(transactionPoints);
+            points = transactionPoints * -1;
+
+            if (transactionPoints <= 0) {
+                LOGGER.info(marker, ALL_POINTS_USED_FOR_TRANSACTION_REMOVING_TRANSACTION_FROM_EXPIRATION_TRACKER, transactionId);
                 expirationTrackerEntity.removeTransaction(oldestTransaction);
             }
         }

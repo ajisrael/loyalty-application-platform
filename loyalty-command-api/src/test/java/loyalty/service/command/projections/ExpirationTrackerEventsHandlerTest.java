@@ -23,6 +23,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.provider.Arguments;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -72,6 +74,7 @@ class ExpirationTrackerEventsHandlerTest {
     private static final String TEST_BUSINESS_ID = UUID.randomUUID().toString();
     private static final int TEST_POINTS = 100;
     private static final String TEST_TRANSACTION_ID = UUID.randomUUID().toString();
+    private static final String TEST_PAYMENT_ID = UUID.randomUUID().toString();
     private Instant timestamp = Instant.now();
 
 
@@ -388,12 +391,13 @@ class ExpirationTrackerEventsHandlerTest {
     }
 
     @Test
-    @DisplayName("Can update ExpirationTrackerEntity on valid AuthorizedTransactionCreatedEvent")
-    void testOn_whenValidAuthorizedTransactionCreatedEventReceived_shouldUpdateExpirationTrackerEntity() {
+    @DisplayName("Can update ExpirationTrackerEntity on valid AuthorizedTransactionCreatedEvent for all available points in loyaltyBank")
+    void testOn_whenValidAuthorizedTransactionCreatedEventReceivedForAllAvailablePointsInLoyaltyBank_shouldUpdateExpirationTrackerEntity() {
         // Arrange
         AuthorizedTransactionCreatedEvent event = AuthorizedTransactionCreatedEvent.builder()
                 .requestId(TEST_REQUEST_ID)
                 .loyaltyBankId(TEST_LOYALTY_BANK_ID)
+                .paymentId(TEST_PAYMENT_ID)
                 .points(TEST_POINTS)
                 .build();
 
@@ -414,19 +418,108 @@ class ExpirationTrackerEventsHandlerTest {
         verify(expirationTrackerRepository, times(1)).findByLoyaltyBankId(TEST_LOYALTY_BANK_ID);
         verify(expirationTrackerRepository, times(1)).save(any(ExpirationTrackerEntity.class));
 
+        ArgumentCaptor<ExpirationTrackerEntity> captor = ArgumentCaptor.forClass(ExpirationTrackerEntity.class);
+        verify(expirationTrackerRepository).save(captor.capture());
+
+        ExpirationTrackerEntity savedEntity = captor.getValue();
+        assertNotNull(savedEntity, "Saved entity should not be null");
+        assertEquals(TEST_LOYALTY_BANK_ID, savedEntity.getLoyaltyBankId());
+        assertTrue(savedEntity.getTransactionList().isEmpty(), "Transaction list should be empty");
+
         List<ILoggingEvent> loggedEvents = listAppender.list;
-        assertEquals(1, loggedEvents.size());
+        assertEquals(3, loggedEvents.size());
 
         assertLogMessageWithMarkers(
                 loggedEvents.get(0),
                 Level.INFO,
+                MessageFormatter.arrayFormat(
+                        APPLYING_REMAINING_AUTHORIZED_POINTS_TO_POINTS_ON_OLDEST_TRANSACTION,
+                        Arguments.of(TEST_POINTS, TEST_POINTS, TEST_TRANSACTION_ID).get()).getMessage(),
+                Markers.append(REQUEST_ID, event.getRequestId()),
+                Markers.append(LOYALTY_BANK_ID, event.getLoyaltyBankId()),
+                Markers.append(TRANSACTION_ID, TEST_TRANSACTION_ID)
+        );
+
+        assertLogMessageWithMarkers(
+                loggedEvents.get(1),
+                Level.INFO,
+                MessageFormatter.format(ALL_POINTS_USED_FOR_TRANSACTION_REMOVING_TRANSACTION_FROM_EXPIRATION_TRACKER, TEST_TRANSACTION_ID).getMessage(),
+                Markers.append(REQUEST_ID, event.getRequestId()),
+                Markers.append(LOYALTY_BANK_ID, event.getLoyaltyBankId()),
+                Markers.append(TRANSACTION_ID, TEST_TRANSACTION_ID)
+        );
+
+        assertLogMessageWithMarkers(
+                loggedEvents.get(2),
+                Level.INFO,
                 MessageFormatter.format(AUTHORIZED_POINTS_APPLIED_TO_TRANSACTIONS_FOR_LOYALTY_BANK, TEST_LOYALTY_BANK_ID).getMessage(),
                 Markers.append(REQUEST_ID, event.getRequestId()),
-                Markers.append(LOYALTY_BANK_ID, event.getLoyaltyBankId())
-                // TODO: complete test and figure out how to check for nested marker objects
-//                Markers.append("transactionList", any(Object.class)),
-//                Markers.append(TIMESTAMP, formatTimestamp(timestamp)),
-//                Markers.append(POINTS, TEST_POINTS)
+                Markers.append(LOYALTY_BANK_ID, event.getLoyaltyBankId()),
+                Markers.append(PAYMENT_ID, event.getPaymentId()),
+                Markers.append(POINTS, event.getPoints())
+        );
+    }
+
+    @Test
+    @DisplayName("Can update ExpirationTrackerEntity on valid AuthorizedTransactionCreatedEvent for some available points in loyaltyBank")
+    void testOn_whenValidAuthorizedTransactionCreatedEventReceivedForSomeAvailablePointsInLoyaltyBank_shouldUpdateExpirationTrackerEntity() {
+        // Arrange
+        AuthorizedTransactionCreatedEvent event = AuthorizedTransactionCreatedEvent.builder()
+                .requestId(TEST_REQUEST_ID)
+                .loyaltyBankId(TEST_LOYALTY_BANK_ID)
+                .paymentId(TEST_PAYMENT_ID)
+                .points(TEST_POINTS)
+                .build();
+
+        int availablePoints = TEST_POINTS * 2;
+
+        ExpirationTrackerEntity expirationTrackerEntity = new ExpirationTrackerEntity(TEST_LOYALTY_BANK_ID);
+        TransactionEntity transactionEntity = new TransactionEntity();
+        transactionEntity.setTransactionId(TEST_TRANSACTION_ID);
+        transactionEntity.setTimestamp(timestamp);
+        transactionEntity.setLoyaltyBankId(TEST_LOYALTY_BANK_ID);
+        transactionEntity.setPoints(availablePoints);
+        expirationTrackerEntity.addTransaction(transactionEntity);
+
+        when(expirationTrackerRepository.findByLoyaltyBankId(TEST_LOYALTY_BANK_ID)).thenReturn(expirationTrackerEntity);
+
+        // Act
+        expirationTrackerEventsHandler.on(event);
+
+        // Assert
+        verify(expirationTrackerRepository, times(1)).findByLoyaltyBankId(TEST_LOYALTY_BANK_ID);
+        verify(expirationTrackerRepository, times(1)).save(any(ExpirationTrackerEntity.class));
+
+        ArgumentCaptor<ExpirationTrackerEntity> captor = ArgumentCaptor.forClass(ExpirationTrackerEntity.class);
+        verify(expirationTrackerRepository).save(captor.capture());
+
+        ExpirationTrackerEntity savedEntity = captor.getValue();
+        assertNotNull(savedEntity, "Saved entity should not be null");
+        assertEquals(TEST_LOYALTY_BANK_ID, savedEntity.getLoyaltyBankId());
+        assertEquals(1, savedEntity.getTransactionList().size(), "Transaction list should have one transaction");
+
+        List<ILoggingEvent> loggedEvents = listAppender.list;
+        assertEquals(2, loggedEvents.size());
+
+        assertLogMessageWithMarkers(
+                loggedEvents.get(0),
+                Level.INFO,
+                MessageFormatter.arrayFormat(
+                        APPLYING_REMAINING_AUTHORIZED_POINTS_TO_POINTS_ON_OLDEST_TRANSACTION,
+                        Arguments.of(TEST_POINTS, availablePoints, TEST_TRANSACTION_ID).get()).getMessage(),
+                Markers.append(REQUEST_ID, event.getRequestId()),
+                Markers.append(LOYALTY_BANK_ID, event.getLoyaltyBankId()),
+                Markers.append(TRANSACTION_ID, TEST_TRANSACTION_ID)
+        );
+
+        assertLogMessageWithMarkers(
+                loggedEvents.get(1),
+                Level.INFO,
+                MessageFormatter.format(AUTHORIZED_POINTS_APPLIED_TO_TRANSACTIONS_FOR_LOYALTY_BANK, TEST_LOYALTY_BANK_ID).getMessage(),
+                Markers.append(REQUEST_ID, event.getRequestId()),
+                Markers.append(LOYALTY_BANK_ID, event.getLoyaltyBankId()),
+                Markers.append(PAYMENT_ID, event.getPaymentId()),
+                Markers.append(POINTS, event.getPoints())
         );
     }
 }

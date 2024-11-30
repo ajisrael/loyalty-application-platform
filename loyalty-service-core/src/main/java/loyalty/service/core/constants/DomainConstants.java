@@ -10,7 +10,6 @@ public class DomainConstants {
     public static final String BUSINESS = "Business";
     public static final String EXPIRATION_TRACKER = "Expiration Tracker";
     public static final String TRANSACTION = "Transaction";
-    public static final String PAYMENT_ID = "Payment id";
     public static final String PENDING = "Pending";
     public static final String EARNED = "Earned";
     public static final String AUTHORIZED = "Authorized";
@@ -20,6 +19,7 @@ public class DomainConstants {
     public static final String ACCOUNT_ID = "accountId";
     public static final String LOYALTY_BANK_ID = "loyaltyBankId";
     public static final String BUSINESS_ID = "businessId";
+    public static final String PAYMENT_ID = "paymentId";
     public static final String EMAIL = "email";
     public static final String REQUESTED_POINTS = "requestedPoints";
     public static final String VOID = "void";
