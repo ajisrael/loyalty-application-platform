@@ -146,17 +146,19 @@ public class ExpirationTrackerEventsHandler {
         marker = Markers.append(REQUEST_ID,event.getRequestId());
 
         String loyaltyBankId = event.getLoyaltyBankId();
-        TransactionEntity transactionEntity = transactionRepository.findByTransactionId(event.getTargetTransactionId());
+        String targetTransactionId = event.getTargetTransactionId();
+
+        TransactionEntity transactionEntity = transactionRepository.findByTransactionId(targetTransactionId);
+        throwExceptionIfTransactionDoesNotExist(transactionEntity, targetTransactionId, loyaltyBankId);
+
+        marker.add(generateMarker(transactionEntity));
 
         if (transactionEntity.getPoints() != event.getPoints()) {
-            marker.add(generateMarker(transactionEntity));
             marker.add(generateMarker(event));
             LOGGER.error(marker, "Points expired do not match transaction");
         }
 
         transactionRepository.deleteById(event.getTargetTransactionId());
-
-        marker.add(generateMarker(transactionEntity));
 
         LOGGER.info(marker, "Removed transaction for loyalty bank {} due to expiration", loyaltyBankId);
     }
@@ -263,9 +265,9 @@ public class ExpirationTrackerEventsHandler {
         }
     }
 
-    private void throwExceptionIfTransactionDoesNotExist(TransactionEntity entity) {
+    private void throwExceptionIfTransactionDoesNotExist(TransactionEntity entity, String transactionId, String loyaltyBankId) {
         if (entity == null) {
-            throw new TransactionNotFoundException();
+            throw new TransactionNotFoundException(transactionId, loyaltyBankId);
         }
     }
 }
