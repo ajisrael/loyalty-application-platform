@@ -733,4 +733,32 @@ class ExpirationTrackerEventsHandlerTest {
                 Markers.append(LOYALTY_BANK_ID, event.getLoyaltyBankId())
         );
     }
+
+    @Test
+    @DisplayName("Cannot update ExpirationTrackerEntity on valid VoidTransactionCreatedEvent for non existing loyaltyBank")
+    void testOn_whenValidVoidTransactionCreatedEventReceivedForNonExistingLoyaltyBank_shouldThrowException() {
+        // Arrange
+        VoidTransactionCreatedEvent event = VoidTransactionCreatedEvent.builder()
+                .requestId(TEST_REQUEST_ID)
+                .loyaltyBankId(TEST_LOYALTY_BANK_ID)
+                .paymentId(TEST_PAYMENT_ID)
+                .points(TEST_POINTS)
+                .build();
+
+        when(expirationTrackerRepository.findByLoyaltyBankId(TEST_LOYALTY_BANK_ID)).thenReturn(null);
+
+
+        // Act & Assert
+        ExpirationTrackerNotFoundException exception = assertThrows(ExpirationTrackerNotFoundException.class, () -> {
+            expirationTrackerEventsHandler.on(event, timestamp);
+        });
+
+        // Assert
+        assertEquals(String.format(EXPIRATION_TRACKER_FOR_LOYALTY_BANK_WITH_ID_DOES_NOT_EXIST, event.getLoyaltyBankId()), exception.getLocalizedMessage());
+        verify(expirationTrackerRepository, times(0)).save(any(ExpirationTrackerEntity.class));
+        verify(transactionRepository, times(0)).save(any(TransactionEntity.class));
+
+        List<ILoggingEvent> loggedEvents = listAppender.list;
+        assertEquals(0, loggedEvents.size());
+    }
 }

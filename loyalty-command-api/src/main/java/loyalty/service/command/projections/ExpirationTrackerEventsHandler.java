@@ -110,6 +110,7 @@ public class ExpirationTrackerEventsHandler {
 
         String loyaltyBankId = event.getLoyaltyBankId();
         ExpirationTrackerEntity expirationTrackerEntity = expirationTrackerRepository.findByLoyaltyBankId(loyaltyBankId);
+        throwExceptionIfExpirationTrackerDoesNotExist(expirationTrackerEntity, loyaltyBankId);
 
         if (expirationTrackerEntity.getTransactionList().isEmpty()) {
             String transactionId = event.getRequestId();
