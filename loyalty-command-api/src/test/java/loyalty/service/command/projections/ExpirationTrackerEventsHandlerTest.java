@@ -244,7 +244,6 @@ class ExpirationTrackerEventsHandlerTest {
 
         when(expirationTrackerRepository.findByLoyaltyBankId(TEST_LOYALTY_BANK_ID)).thenReturn(null);
 
-
         // Act & Assert
         ExpirationTrackerNotFoundException exception = assertThrows(ExpirationTrackerNotFoundException.class, () -> {
             expirationTrackerEventsHandler.on(event, timestamp);
@@ -339,7 +338,6 @@ class ExpirationTrackerEventsHandlerTest {
                 .build();
 
         when(expirationTrackerRepository.findByLoyaltyBankId(TEST_LOYALTY_BANK_ID)).thenReturn(null);
-
 
         // Act & Assert
         ExpirationTrackerNotFoundException exception = assertThrows(ExpirationTrackerNotFoundException.class, () -> {
@@ -597,7 +595,6 @@ class ExpirationTrackerEventsHandlerTest {
 
         when(expirationTrackerRepository.findByLoyaltyBankId(TEST_LOYALTY_BANK_ID)).thenReturn(null);
 
-
         // Act & Assert
         ExpirationTrackerNotFoundException exception = assertThrows(ExpirationTrackerNotFoundException.class, () -> {
             expirationTrackerEventsHandler.on(event);
@@ -746,7 +743,6 @@ class ExpirationTrackerEventsHandlerTest {
                 .build();
 
         when(expirationTrackerRepository.findByLoyaltyBankId(TEST_LOYALTY_BANK_ID)).thenReturn(null);
-
 
         // Act & Assert
         ExpirationTrackerNotFoundException exception = assertThrows(ExpirationTrackerNotFoundException.class, () -> {
