@@ -1,17 +1,30 @@
 package loyalty.service.command.config;
 
+import loyalty.service.command.aggregates.AccountAggregate;
 import loyalty.service.command.interceptors.*;
 import loyalty.service.core.errorhandling.LoyaltyServiceEventsErrorHandler;
 import org.axonframework.commandhandling.CommandBus;
+import org.axonframework.config.AggregateConfigurer;
+import org.axonframework.config.Configurer;
+import org.axonframework.config.DefaultConfigurer;
 import org.axonframework.config.EventProcessingConfigurer;
+import org.axonframework.eventsourcing.EventCountSnapshotTriggerDefinition;
+import org.axonframework.eventsourcing.SnapshotTriggerDefinition;
+import org.axonframework.eventsourcing.Snapshotter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import static loyalty.service.core.constants.DomainConstants.*;
 
 @Configuration
 public class AxonConfig {
+
+    @Bean
+    public SnapshotTriggerDefinition accountSnapshotTrigger(Snapshotter snapshotter) {
+        return new EventCountSnapshotTriggerDefinition(snapshotter, 10);
+    }
 
     @Autowired
     public void registerAccountCommandInterceptors(ApplicationContext context, CommandBus commandBus) {
