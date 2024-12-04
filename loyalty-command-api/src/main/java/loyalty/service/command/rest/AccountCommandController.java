@@ -19,6 +19,7 @@ import org.axonframework.eventhandling.gateway.EventGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +34,7 @@ import static loyalty.service.core.constants.LogMessages.SENDING_COMMAND_FOR_ACC
 public class AccountCommandController {
 
     @Autowired
-    private CommandGateway commandGateway;
+    private @Lazy CommandGateway commandGateway;
 
     @Autowired
     private EventGateway eventGateway;

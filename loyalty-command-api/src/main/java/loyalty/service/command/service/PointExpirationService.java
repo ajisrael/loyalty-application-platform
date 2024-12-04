@@ -9,6 +9,7 @@ import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -23,7 +24,7 @@ public class PointExpirationService {
     private final TransactionRepository transactionRepository;
     private final CommandGateway commandGateway;
 
-    public PointExpirationService(TransactionRepository transactionRepository, CommandGateway commandGateway) {
+    public PointExpirationService(TransactionRepository transactionRepository, @Lazy CommandGateway commandGateway) {
         this.transactionRepository = transactionRepository;
         this.commandGateway = commandGateway;
     }
