@@ -7,6 +7,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
+import static loyalty.service.core.constants.DomainConstants.*;
+
 @EnableDiscoveryClient
 @SpringBootApplication
 public class LoyaltyQueryApiApplication {
@@ -23,9 +25,13 @@ public class LoyaltyQueryApiApplication {
 	@Autowired
 	public void configure(EventProcessingConfigurer configurer) {
 		// TODO: Save group strings to constants
-		configurer.registerListenerInvocationErrorHandler("account-group",
+		configurer.registerListenerInvocationErrorHandler(ACCOUNT_GROUP,
 				configuration -> new LoyaltyServiceEventsErrorHandler());
-		configurer.registerListenerInvocationErrorHandler("loyalty-bank-group",
+		configurer.registerListenerInvocationErrorHandler(BUSINESS_GROUP,
+				configuration -> new LoyaltyServiceEventsErrorHandler());
+		configurer.registerListenerInvocationErrorHandler(LOYALTY_BANK_GROUP,
+				configuration -> new LoyaltyServiceEventsErrorHandler());
+		configurer.registerListenerInvocationErrorHandler(ACTIVITY_LOG_GROUP,
 				configuration -> new LoyaltyServiceEventsErrorHandler());
 	}
 }

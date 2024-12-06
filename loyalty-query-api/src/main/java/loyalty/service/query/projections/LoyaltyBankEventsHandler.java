@@ -19,11 +19,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static loyalty.service.core.constants.DomainConstants.LOYALTY_BANK_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.LogMessages.*;
 
 @Component
-@ProcessingGroup("loyalty-bank-group")
+@ProcessingGroup(LOYALTY_BANK_GROUP)
 public class LoyaltyBankEventsHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoyaltyBankEventsHandler.class);

@@ -17,11 +17,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static loyalty.service.core.constants.DomainConstants.BUSINESS_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.LogMessages.*;
 
 @Component
-@ProcessingGroup("business-group")
+@ProcessingGroup(BUSINESS_GROUP)
 public class BusinessEventsHandler {
     // TODO: add a projection for the total amount of loyalty points available for this business,
     //  i.e. the amount of points they need to be able to pay out to users

@@ -17,11 +17,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static loyalty.service.core.constants.DomainConstants.ACCOUNT_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 import static loyalty.service.core.constants.LogMessages.*;
 
 @Component
-@ProcessingGroup("account-group")
+@ProcessingGroup(ACCOUNT_GROUP)
 public class AccountEventsHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountEventsHandler.class);
