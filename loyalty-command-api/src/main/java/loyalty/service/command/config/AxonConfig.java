@@ -1,12 +1,8 @@
 package loyalty.service.command.config;
 
-import loyalty.service.command.aggregates.AccountAggregate;
 import loyalty.service.command.interceptors.*;
 import loyalty.service.core.errorhandling.LoyaltyServiceEventsErrorHandler;
 import org.axonframework.commandhandling.CommandBus;
-import org.axonframework.config.AggregateConfigurer;
-import org.axonframework.config.Configurer;
-import org.axonframework.config.DefaultConfigurer;
 import org.axonframework.config.EventProcessingConfigurer;
 import org.axonframework.eventsourcing.EventCountSnapshotTriggerDefinition;
 import org.axonframework.eventsourcing.SnapshotTriggerDefinition;
