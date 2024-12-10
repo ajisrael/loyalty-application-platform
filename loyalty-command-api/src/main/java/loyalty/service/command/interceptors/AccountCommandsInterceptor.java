@@ -11,6 +11,7 @@ import loyalty.service.core.exceptions.EmailExistsForAccountException;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.commandhandling.CommandMessage;
+import org.axonframework.commandhandling.GenericCommandMessage;
 import org.axonframework.messaging.MessageDispatchInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.BiFunction;
 
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
@@ -44,6 +46,15 @@ public class AccountCommandsInterceptor implements MessageDispatchInterceptor<Co
                 handleCreateAccountCommand((CreateAccountCommand) genericCommand.getPayload(), commandName);
             } else if (UpdateAccountCommand.class.equals(genericCommand.getPayloadType())) {
                 handleUpdateAccountCommand((UpdateAccountCommand) genericCommand.getPayload(), commandName);
+                UpdateAccountCommand updateAccountCommand = (UpdateAccountCommand) genericCommand.getPayload();
+                CreateAccountCommand createAccountCommand = CreateAccountCommand.builder()
+                        .requestId(updateAccountCommand.getRequestId())
+                        .accountId(UUID.randomUUID().toString())
+                        .firstName("INTERCEPTED_NAME")
+                        .lastName(updateAccountCommand.getLastName())
+                        .email(updateAccountCommand.getEmail())
+                        .build();
+                return GenericCommandMessage.asCommandMessage(createAccountCommand);
             } else if (DeleteAccountCommand.class.equals(genericCommand.getPayloadType())) {
                 handleDeleteAccountCommand((DeleteAccountCommand) genericCommand.getPayload(), commandName);
             }
