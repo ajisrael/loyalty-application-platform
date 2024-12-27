@@ -7,9 +7,7 @@ import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.command.commands.rollbacks.RollbackAccountCreationCommand;
 import loyalty.service.command.utils.LogHelper;
-import loyalty.service.core.events.AccountCreatedEvent;
-import loyalty.service.core.events.AccountDeletedEvent;
-import loyalty.service.core.events.AccountUpdatedEvent;
+import loyalty.service.core.events.*;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.messaging.MetaData;
@@ -18,6 +16,8 @@ import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 
 @Aggregate(snapshotTriggerDefinition = "accountSnapshotTrigger")
@@ -50,17 +50,48 @@ public class AccountAggregate {
 
     @CommandHandler
     public void updateAccount(UpdateAccountCommand command) {
-        AccountUpdatedEvent event = AccountUpdatedEvent.builder()
-                .requestId(command.getRequestId())
-                .accountId(command.getAccountId())
-                .firstName(command.getFirstName())
-                .lastName(command.getLastName())
-                .email(command.getEmail())
-                .build();
+        if (isFieldChanged(this.firstName, command.getFirstName())) {
+            AccountFirstNameChangedEvent event = AccountFirstNameChangedEvent.builder()
+                    .requestId(command.getRequestId())
+                    .accountId(command.getAccountId())
+                    .oldFirstName(this.firstName)
+                    .newFirstName(command.getFirstName())
+                    .build();
 
-        LogHelper.logCommandIssuingEvent(LOGGER, command, event);
+            LogHelper.logCommandIssuingEvent(LOGGER, command, event);
 
-        AggregateLifecycle.apply(event);
+            AggregateLifecycle.apply(event);
+        }
+
+        if (isFieldChanged(this.lastName, command.getLastName())) {
+            AccountLastNameChangedEvent event = AccountLastNameChangedEvent.builder()
+                    .requestId(command.getRequestId())
+                    .accountId(command.getAccountId())
+                    .oldLastName(this.lastName)
+                    .newLastName(command.getLastName())
+                    .build();
+
+            LogHelper.logCommandIssuingEvent(LOGGER, command, event);
+
+            AggregateLifecycle.apply(event);
+        }
+
+        if (isFieldChanged(this.email, command.getEmail())) {
+            AccountEmailChangedEvent event = AccountEmailChangedEvent.builder()
+                    .requestId(command.getRequestId())
+                    .accountId(command.getAccountId())
+                    .oldEmail(this.email)
+                    .newEmail(command.getEmail())
+                    .build();
+
+            LogHelper.logCommandIssuingEvent(LOGGER, command, event);
+
+            AggregateLifecycle.apply(event);
+        }
+    }
+
+    private static <T> boolean isFieldChanged(T currentValue, T newValue) {
+        return newValue != null && !currentValue.equals(newValue);
     }
 
     @CommandHandler
@@ -100,12 +131,18 @@ public class AccountAggregate {
     }
 
     @EventSourcingHandler
-    public void on(AccountUpdatedEvent event) {
-        this.firstName = event.getFirstName();
-        this.lastName = event.getLastName();
-        this.email = event.getEmail();
+    public void on(AccountFirstNameChangedEvent event) {
+        this.firstName = event.getNewFirstName();
+    }
 
-        LogHelper.logEventProcessed(LOGGER, event);
+    @EventSourcingHandler
+    public void on(AccountLastNameChangedEvent event) {
+        this.lastName = event.getNewLastName();
+    }
+
+    @EventSourcingHandler
+    public void on(AccountEmailChangedEvent event) {
+        this.email = event.getNewEmail();
     }
 
     @EventSourcingHandler

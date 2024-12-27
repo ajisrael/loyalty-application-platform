@@ -8,7 +8,7 @@ import loyalty.service.command.data.entities.AccountLookupEntity;
 import loyalty.service.command.data.repositories.AccountLookupRepository;
 import loyalty.service.core.events.AccountCreatedEvent;
 import loyalty.service.core.events.AccountDeletedEvent;
-import loyalty.service.core.events.AccountUpdatedEvent;
+import loyalty.service.core.events.AccountEmailChangedEvent;
 import loyalty.service.core.exceptions.IllegalProjectionStateException;
 import net.logstash.logback.marker.Markers;
 import org.junit.jupiter.api.AfterEach;
@@ -166,15 +166,16 @@ class AccountLookupEventsHandlerTest {
     }
 
     @Test
-    @DisplayName("Can update existing AccountLookupEntity on valid AccountUpdatedEvent")
-    void testOn_whenValidAccountUpdatedEventReceived_shouldUpdateAccountLookupEntity() {
+    @DisplayName("Can update existing AccountLookupEntity on valid AccountEmailChangedEvent")
+    void testOn_whenValidAccountEmailChangedEventReceived_shouldUpdateAccountLookupEntity() {
         // Arrange
-        AccountUpdatedEvent event = AccountUpdatedEvent.builder()
+        String newEmail = "new@email.com";
+
+        AccountEmailChangedEvent event = AccountEmailChangedEvent.builder()
                 .requestId(TEST_REQUEST_ID)
                 .accountId(TEST_ACCOUNT_ID)
-                .firstName("John")
-                .lastName("Doe")
-                .email(TEST_EMAIL)
+                .oldEmail(TEST_EMAIL)
+                .newEmail(newEmail)
                 .build();
 
         when(accountLookupRepository.findByAccountId(TEST_ACCOUNT_ID)).thenReturn(new AccountLookupEntity(TEST_ACCOUNT_ID, TEST_EMAIL));
@@ -184,7 +185,7 @@ class AccountLookupEventsHandlerTest {
 
         // Assert
         verify(accountLookupRepository, times(1)).findByAccountId(TEST_ACCOUNT_ID);
-        verify(accountLookupRepository, times(1)).save(any(AccountLookupEntity.class));
+        verify(accountLookupRepository, times(1)).save(new AccountLookupEntity(TEST_ACCOUNT_ID, newEmail));
 
         List<ILoggingEvent> loggedEvents = listAppender.list;
         assertEquals(1, loggedEvents.size());
@@ -195,20 +196,19 @@ class AccountLookupEventsHandlerTest {
                 MessageFormatter.format(ACCOUNT_UPDATED_IN_LOOKUP_DB, TEST_ACCOUNT_ID).getMessage(),
                 Markers.append(REQUEST_ID, event.getRequestId()),
                 Markers.append(ACCOUNT_ID, event.getAccountId()),
-                Markers.append(EMAIL, event.getEmail())
+                Markers.append(EMAIL, event.getNewEmail())
         );
     }
 
     @Test
     @DisplayName("Cannot update AccountLookupEntity for account that doesn't exist")
-    void testOn_whenAccountUpdatedEventReceivedForNonExistingAccount_shouldThrowException() {
+    void testOn_whenAccountEmailChangedEventReceivedForNonExistingAccount_shouldThrowException() {
         // Arrange
-        AccountUpdatedEvent event = AccountUpdatedEvent.builder()
+        AccountEmailChangedEvent event = AccountEmailChangedEvent.builder()
                 .requestId(TEST_REQUEST_ID)
                 .accountId(TEST_ACCOUNT_ID)
-                .firstName("John")
-                .lastName("Doe")
-                .email(TEST_EMAIL)
+                .oldEmail(TEST_EMAIL)
+                .newEmail(TEST_EMAIL) // Doesn't actually matter as the mock invocation is what triggers the exception
                 .build();
 
         when(accountLookupRepository.findByAccountId(TEST_ACCOUNT_ID)).thenReturn(null);
@@ -228,15 +228,14 @@ class AccountLookupEventsHandlerTest {
     }
 
     @Test
-    @DisplayName("Cannot update existing AccountLookupEntity on invalid AccountUpdatedEvent")
-    void testOn_whenInvalidAccountUpdatedEventReceived_shouldThrowException() {
+    @DisplayName("Cannot update existing AccountLookupEntity on invalid AccountEmailChangedEvent")
+    void testOn_whenInvalidAccountEmailChangedEventReceived_shouldThrowException() {
         // Arrange
-        AccountUpdatedEvent event = AccountUpdatedEvent.builder()
+        AccountEmailChangedEvent event = AccountEmailChangedEvent.builder()
                 .requestId(TEST_REQUEST_ID)
                 .accountId(TEST_ACCOUNT_ID)
-                .firstName("John")
-                .lastName("Doe")
-                .email("invalid-email") // Doesn't actually matter as the mock invocation is what triggers the exception
+                .oldEmail(TEST_EMAIL)
+                .newEmail("invalid-email") // Doesn't actually matter as the mock invocation is what triggers the exception
                 .build();
 
         String exceptionMessage = "Invalid email format";

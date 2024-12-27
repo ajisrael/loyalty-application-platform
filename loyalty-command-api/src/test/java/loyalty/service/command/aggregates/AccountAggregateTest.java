@@ -4,9 +4,7 @@ import loyalty.service.command.commands.CreateAccountCommand;
 import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.command.commands.rollbacks.RollbackAccountCreationCommand;
-import loyalty.service.core.events.AccountCreatedEvent;
-import loyalty.service.core.events.AccountDeletedEvent;
-import loyalty.service.core.events.AccountUpdatedEvent;
+import loyalty.service.core.events.*;
 import org.axonframework.eventsourcing.eventstore.EventStoreException;
 import org.axonframework.modelling.command.AggregateNotFoundException;
 import org.axonframework.test.aggregate.AggregateTestFixture;
@@ -30,6 +28,8 @@ class AccountAggregateTest {
     private static final String TEST_LAST_NAME = "Doe";
     private static final String TEST_EMAIL = "john.doe@test.com";
     private static final String TEST_NEW_FIRST_NAME = "Johnathan";
+    private static final String TEST_NEW_LAST_NAME = "Doent";
+    private static final String TEST_NEW_EMAIL = "new@email.com";
 
     private static final CreateAccountCommand createAccountCommand = CreateAccountCommand.builder()
             .requestId(TEST_REQUEST_ID)
@@ -51,16 +51,55 @@ class AccountAggregateTest {
             .requestId(TEST_REQUEST_ID)
             .accountId(TEST_ACCOUNT_ID)
             .firstName(TEST_NEW_FIRST_NAME)
+            .lastName(TEST_NEW_LAST_NAME)
+            .email(TEST_NEW_EMAIL)
+            .build();
+
+    private static final UpdateAccountCommand updateAccountFirstNameCommand = UpdateAccountCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .accountId(TEST_ACCOUNT_ID)
+            .firstName(TEST_NEW_FIRST_NAME)
+            .build();
+
+    private static final UpdateAccountCommand updateAccountLastNameCommand = UpdateAccountCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .accountId(TEST_ACCOUNT_ID)
+            .lastName(TEST_NEW_LAST_NAME)
+            .build();
+
+    private static final UpdateAccountCommand updateAccountEmailCommand = UpdateAccountCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .accountId(TEST_ACCOUNT_ID)
+            .email(TEST_NEW_EMAIL)
+            .build();
+
+    private static final UpdateAccountCommand updateNoAccountAttributesCommand = UpdateAccountCommand.builder()
+            .requestId(TEST_REQUEST_ID)
+            .accountId(TEST_ACCOUNT_ID)
+            .firstName(TEST_FIRST_NAME)
             .lastName(TEST_LAST_NAME)
             .email(TEST_EMAIL)
             .build();
 
-    private static final AccountUpdatedEvent accountUpdatedEvent = AccountUpdatedEvent.builder()
+    private static final AccountFirstNameChangedEvent accountFirstNameChangedEvent = AccountFirstNameChangedEvent.builder()
             .requestId(updateAccountCommand.getRequestId())
             .accountId(updateAccountCommand.getAccountId())
-            .firstName(updateAccountCommand.getFirstName())
-            .lastName(updateAccountCommand.getLastName())
-            .email(updateAccountCommand.getEmail())
+            .oldFirstName(TEST_FIRST_NAME)
+            .newFirstName(updateAccountCommand.getFirstName())
+            .build();
+
+    private static final AccountLastNameChangedEvent accountLastNameChangedEvent = AccountLastNameChangedEvent.builder()
+            .requestId(updateAccountCommand.getRequestId())
+            .accountId(updateAccountCommand.getAccountId())
+            .oldLastName(TEST_LAST_NAME)
+            .newLastName(updateAccountCommand.getLastName())
+            .build();
+
+    private static final AccountEmailChangedEvent accountEmailChangedEvent = AccountEmailChangedEvent.builder()
+            .requestId(updateAccountCommand.getRequestId())
+            .accountId(updateAccountCommand.getAccountId())
+            .oldEmail(TEST_EMAIL)
+            .newEmail(updateAccountCommand.getEmail())
             .build();
 
     private static final DeleteAccountCommand deleteAccountCommand = DeleteAccountCommand.builder()
@@ -107,19 +146,88 @@ class AccountAggregateTest {
     }
 
     @Test
-    @DisplayName("UpdateAccountCommand results in AccountUpdatedEvent")
-    void testUpdateAccount_whenUpdateAccountCommandHandled_ShouldIssueAccountUpdatedEvent() {
+    @DisplayName("UpdateAccountCommand results in individual events for each change")
+    void testUpdateAccount_whenUpdateAccountCommandHandled_ShouldIssueAccountUpdatedEvents() {
         // Arrange & Act & Assert
         fixture.given(accountCreatedEvent)
                 .when(updateAccountCommand)
-                .expectEvents(accountUpdatedEvent)
+                .expectEvents(accountFirstNameChangedEvent, accountLastNameChangedEvent, accountEmailChangedEvent)
                 .expectState(state -> {
-                    assertEquals(accountUpdatedEvent.getAccountId(), state.getAccountId(), "AccountIds should match");
-                    assertEquals(accountUpdatedEvent.getFirstName(), state.getFirstName(), "FirstNames should match");
-                    assertEquals(accountUpdatedEvent.getLastName(), state.getLastName(), "LastNames should match");
-                    assertEquals(accountUpdatedEvent.getEmail(), state.getEmail(), "Emails should match");
+                    assertEquals(accountFirstNameChangedEvent.getAccountId(), state.getAccountId(), "AccountIds should match");
+                    assertEquals(accountFirstNameChangedEvent.getNewFirstName(), state.getFirstName(), "FirstNames should match");
+                    assertEquals(accountFirstNameChangedEvent.getOldFirstName(), accountCreatedEvent.getFirstName(), "Old FirstName should match");
+                    assertEquals(accountLastNameChangedEvent.getAccountId(), state.getAccountId(), "AccountIds should match");
+                    assertEquals(accountLastNameChangedEvent.getNewLastName(), state.getLastName(), "LastNames should match");
+                    assertEquals(accountLastNameChangedEvent.getOldLastName(), accountCreatedEvent.getLastName(), "Old LastName should match");
+                    assertEquals(accountEmailChangedEvent.getAccountId(), state.getAccountId(), "AccountIds should match");
+                    assertEquals(accountEmailChangedEvent.getNewEmail(), state.getEmail(), "Emails should match");
+                    assertEquals(accountEmailChangedEvent.getOldEmail(), accountCreatedEvent.getEmail(), "Old Email should match");
                 });
     }
+
+    @Test
+    @DisplayName("UpdateAccountCommand for first name results in AccountFirstNameChangedEvent")
+    void testUpdateAccount_whenUpdateAccountCommandForFirstNameHandled_ShouldIssueAccountFirstNameChangedEvent() {
+        // Arrange & Act & Assert
+        fixture.given(accountCreatedEvent)
+                .when(updateAccountFirstNameCommand)
+                .expectEvents(accountFirstNameChangedEvent)
+                .expectState(state -> {
+                    assertEquals(accountFirstNameChangedEvent.getAccountId(), state.getAccountId(), "AccountIds should match");
+                    assertEquals(accountFirstNameChangedEvent.getNewFirstName(), state.getFirstName(), "FirstNames should match");
+                    assertEquals(accountFirstNameChangedEvent.getOldFirstName(), accountCreatedEvent.getFirstName(), "Old FirstName should match");
+                    assertEquals(accountCreatedEvent.getLastName(), state.getLastName(), "LastName should not change");
+                    assertEquals(accountCreatedEvent.getEmail(), state.getEmail(), "Email should not change");
+                });
+    }
+
+    @Test
+    @DisplayName("UpdateAccountCommand for first name results in AccountLastNameChangedEvent")
+    void testUpdateAccount_whenUpdateAccountCommandForLastNameHandled_ShouldIssueAccountLastNameChangedEvent() {
+        // Arrange & Act & Assert
+        fixture.given(accountCreatedEvent)
+                .when(updateAccountLastNameCommand)
+                .expectEvents(accountLastNameChangedEvent)
+                .expectState(state -> {
+                    assertEquals(accountLastNameChangedEvent.getAccountId(), state.getAccountId(), "AccountIds should match");
+                    assertEquals(accountLastNameChangedEvent.getNewLastName(), state.getLastName(), "LastNames should match");
+                    assertEquals(accountLastNameChangedEvent.getOldLastName(), accountCreatedEvent.getLastName(), "Old LastName should match");
+                    assertEquals(accountCreatedEvent.getFirstName(), state.getFirstName(), "FirstName should not change");
+                    assertEquals(accountCreatedEvent.getEmail(), state.getEmail(), "Email should not change");
+                });
+    }
+
+    @Test
+    @DisplayName("UpdateAccountCommand for first name results in AccountEmailChangedEvent")
+    void testUpdateAccount_whenUpdateAccountCommandForEmailHandled_ShouldIssueAccountEmailChangedEvent() {
+        // Arrange & Act & Assert
+        fixture.given(accountCreatedEvent)
+                .when(updateAccountEmailCommand)
+                .expectEvents(accountEmailChangedEvent)
+                .expectState(state -> {
+                    assertEquals(accountEmailChangedEvent.getAccountId(), state.getAccountId(), "AccountIds should match");
+                    assertEquals(accountEmailChangedEvent.getNewEmail(), state.getEmail(), "Emails should match");
+                    assertEquals(accountEmailChangedEvent.getOldEmail(), accountCreatedEvent.getEmail(), "Old Email should match");
+                    assertEquals(accountCreatedEvent.getFirstName(), state.getFirstName(), "FirstName should not change");
+                    assertEquals(accountCreatedEvent.getLastName(), state.getLastName(), "LastName should not change");
+                });
+    }
+
+    @Test
+    @DisplayName("UpdateAccountCommand with no changes results in no events")
+    void testUpdateAccount_whenUpdateAccountCommandWithNoChangesHandled_ShouldNotIssueAnyEvents() {
+        // Arrange & Act & Assert
+        fixture.given(accountCreatedEvent)
+                .when(updateNoAccountAttributesCommand)
+                .expectEvents()
+                .expectState(state -> {
+                    assertEquals(accountCreatedEvent.getAccountId(), state.getAccountId(), "AccountId should not change");
+                    assertEquals(accountCreatedEvent.getFirstName(), state.getFirstName(), "FirstName should not change");
+                    assertEquals(accountCreatedEvent.getLastName(), state.getLastName(), "LastName should not change");
+                    assertEquals(accountCreatedEvent.getEmail(), state.getEmail(), "Email should not change");
+                });
+    }
+
 
     @Test
     @DisplayName("Cannot update an account that hasn't been created")

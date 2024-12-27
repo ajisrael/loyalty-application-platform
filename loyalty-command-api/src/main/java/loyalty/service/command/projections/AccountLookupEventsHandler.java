@@ -2,10 +2,8 @@ package loyalty.service.command.projections;
 
 import loyalty.service.command.data.entities.AccountLookupEntity;
 import loyalty.service.command.data.repositories.AccountLookupRepository;
+import loyalty.service.core.events.*;
 import loyalty.service.core.exceptions.IllegalProjectionStateException;
-import loyalty.service.core.events.AccountCreatedEvent;
-import loyalty.service.core.events.AccountDeletedEvent;
-import loyalty.service.core.events.AccountUpdatedEvent;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.config.ProcessingGroup;
@@ -70,13 +68,13 @@ public class AccountLookupEventsHandler {
     }
 
     @EventHandler
-    public void on(AccountUpdatedEvent event) {
+    public void on(AccountEmailChangedEvent event) {
         marker = Markers.append(REQUEST_ID, event.getRequestId());
 
         AccountLookupEntity accountLookupEntity = accountLookupRepository.findByAccountId(event.getAccountId());
         throwExceptionIfEntityDoesNotExist(accountLookupEntity, String.format(ACCOUNT_WITH_ID_DOES_NOT_EXIST, event.getAccountId()));
 
-        BeanUtils.copyProperties(event, accountLookupEntity);
+        accountLookupEntity.setEmail(event.getNewEmail());
 
         marker.add(MarkerGenerator.generateMarker(accountLookupEntity));
 
