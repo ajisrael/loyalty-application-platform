@@ -5,9 +5,8 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class AccountCreatedEvent extends AbstractEvent {
+public class AccountCreatedEvent extends AbstractAccountEvent {
 
-    private String accountId;
     private String firstName;
     private String lastName;
     private String email;

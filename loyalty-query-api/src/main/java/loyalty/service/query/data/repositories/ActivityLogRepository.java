@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface ActivityLogRepository extends MongoRepository<ActivityLogEntryEntity, String> {
 
+    Optional<ActivityLogEntryEntity> findByRequestId(String requestId);
     Optional<ActivityLogEntryEntity> findByActivityLogId(String activityLogId);
     void deleteAllByActivityLogId(String activityLogId);
 }

@@ -1,10 +1,8 @@
 package loyalty.service.query.projections;
 
+import loyalty.service.core.events.*;
 import loyalty.service.query.data.entities.AccountEntity;
 import loyalty.service.query.data.repositories.AccountRepository;
-import loyalty.service.core.events.AccountCreatedEvent;
-import loyalty.service.core.events.AccountDeletedEvent;
-import loyalty.service.core.events.AccountUpdatedEvent;
 import loyalty.service.core.exceptions.AccountNotFoundException;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.config.ProcessingGroup;
@@ -53,15 +51,47 @@ public class AccountEventsHandler {
     }
 
     @EventHandler
-    public void on(AccountUpdatedEvent event) {
+    public void on(AccountFirstNameChangedEvent event) {
         Optional<AccountEntity> accountEntityOptional = accountRepository.findByAccountId(event.getAccountId());
 
         if (accountEntityOptional.isPresent()) {
             AccountEntity accountEntity = accountEntityOptional.get();
-            BeanUtils.copyProperties(event, accountEntity);
+            accountEntity.setFirstName(event.getNewFirstName());
             accountRepository.save(accountEntity);
 
-            LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_UPDATED_IN_DB, event.getAccountId());
+            LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_UPDATED_IN_DB, event.getAccountId(), event.getClass().getSimpleName());
+        } else {
+            LOGGER.error(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_NOT_FOUND_IN_DB, event.getAccountId());
+            throw new AccountNotFoundException(event.getAccountId());
+        }
+    }
+
+    @EventHandler
+    public void on(AccountLastNameChangedEvent event) {
+        Optional<AccountEntity> accountEntityOptional = accountRepository.findByAccountId(event.getAccountId());
+
+        if (accountEntityOptional.isPresent()) {
+            AccountEntity accountEntity = accountEntityOptional.get();
+            accountEntity.setLastName(event.getNewLastName());
+            accountRepository.save(accountEntity);
+
+            LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_UPDATED_IN_DB, event.getAccountId(), event.getClass().getSimpleName());
+        } else {
+            LOGGER.error(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_NOT_FOUND_IN_DB, event.getAccountId());
+            throw new AccountNotFoundException(event.getAccountId());
+        }
+    }
+
+    @EventHandler
+    public void on(AccountEmailChangedEvent event) {
+        Optional<AccountEntity> accountEntityOptional = accountRepository.findByAccountId(event.getAccountId());
+
+        if (accountEntityOptional.isPresent()) {
+            AccountEntity accountEntity = accountEntityOptional.get();
+            accountEntity.setEmail(event.getNewEmail());
+            accountRepository.save(accountEntity);
+
+            LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_UPDATED_IN_DB, event.getAccountId(), event.getClass().getSimpleName());
         } else {
             LOGGER.error(Markers.append(REQUEST_ID, event.getRequestId()), ACCOUNT_NOT_FOUND_IN_DB, event.getAccountId());
             throw new AccountNotFoundException(event.getAccountId());

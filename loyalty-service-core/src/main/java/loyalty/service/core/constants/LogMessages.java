@@ -49,7 +49,7 @@ public class LogMessages {
     public static final String VOIDED_POINTS_APPLIED_TO_EXPIRATION_TRACKER_FOR_LOYALTY_BANK = "Voided points applied to expirationTracker for loyalty bank {}";
 
     public static final String ACCOUNT_SAVED_IN_DB = "Account {} saved in db";
-    public static final String ACCOUNT_UPDATED_IN_DB = "Account {} updated in db";
+    public static final String ACCOUNT_UPDATED_IN_DB = "Account {} updated in db on {} event";
     public static final String ACCOUNT_DELETED_FROM_DB = "Account {} deleted from db";
     public static final String ACCOUNT_NOT_FOUND_IN_DB = "Account {} not found in db";
 
