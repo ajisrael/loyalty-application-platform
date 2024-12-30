@@ -10,6 +10,7 @@ public class DomainConstants {
     public static final String BUSINESS = "Business";
     public static final String EXPIRATION_TRACKER = "Expiration Tracker";
     public static final String TRANSACTION = "Transaction";
+    public static final String ACTIVITY_LOG = "Activity Log";
     public static final String PENDING = "Pending";
     public static final String EARNED = "Earned";
     public static final String AUTHORIZED = "Authorized";

@@ -71,5 +71,7 @@ public class LogMessages {
     public static final String LOYALTY_BANK_ADDED_TO_ACCOUNT_TO_LOYALTY_BANK_IN_DB = "Loyalty bank {} added to account to loyalty bank relationship for accountId {} in db";
     public static final String LOYALTY_BANK_REMOVED_FROM_ACCOUNT_TO_LOYALTY_BANK_IN_DB = "Loyalty bank {} removed from account to loyalty bank relationship for accountId {} in db";
 
+    public static final String ACTIVITY_LOG_NOT_FOUND_IN_DB = "Activity log {} not found in db";
+
     public static final String SENDING_QUERY = "Sending query {}";
 }
