@@ -5,9 +5,8 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class AllPointsExpiredEvent extends AbstractEvent {
+public class AllPointsExpiredEvent extends AbstractLoyaltyBankEvent {
 
-    private String loyaltyBankId;
     private String accountId;
     private String businessId;
     private int pendingPointsRemoved;

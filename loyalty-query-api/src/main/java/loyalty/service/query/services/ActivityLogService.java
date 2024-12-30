@@ -1,7 +1,12 @@
 package loyalty.service.query.services;
 
 import lombok.AllArgsConstructor;
+import loyalty.service.core.events.AllPointsExpiredEvent;
+import loyalty.service.core.events.LoyaltyBankCreatedEvent;
+import loyalty.service.core.events.LoyaltyBankDeletedEvent;
 import loyalty.service.core.events.account.*;
+import loyalty.service.core.events.AbstractLoyaltyBankEvent;
+import loyalty.service.core.events.transactions.*;
 import loyalty.service.query.data.entities.ActivityLogEntryEntity;
 import loyalty.service.query.data.enums.ActivityLogType;
 import loyalty.service.query.data.enums.Actor;
@@ -26,7 +31,8 @@ public class ActivityLogService {
     private final ActivityLogRepository activityLogRepository;
 
     public void saveActivityLogEntryFromEvent(AbstractAccountEvent event, Instant timestamp) {
-        Optional<ActivityLogEntryEntity> activityLogEntryEntityOptional = activityLogRepository.findByRequestId(event.getRequestId());
+        Optional<ActivityLogEntryEntity> activityLogEntryEntityOptional =
+                activityLogRepository.findByRequestIdAndActivityLogType(event.getRequestId(), ActivityLogType.ACCOUNT);
 
         ActivityLogEntryEntity activityLogEntry;
 
@@ -63,6 +69,64 @@ public class ActivityLogService {
 
     public void deleteActivityLogEntries(AccountDeletedEvent event) {
         activityLogRepository.deleteAllByActivityLogId(event.getAccountId());
+        LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), "Activity log entries deleted for {} on {} event", event.getAccountId(), event.getClass().getSimpleName());
+    }
+
+    public void saveActivityLogEntryFromEvent(AbstractLoyaltyBankEvent event, Instant timestamp) {
+        Optional<ActivityLogEntryEntity> activityLogEntryEntityOptional =
+                activityLogRepository.findByRequestIdAndActivityLogType(event.getRequestId(), ActivityLogType.LOYALTY_BANK);
+
+        ActivityLogEntryEntity activityLogEntry;
+
+        if (activityLogEntryEntityOptional.isPresent()) {
+            activityLogEntry = activityLogEntryEntityOptional.get();
+        } else {
+            activityLogEntry = new ActivityLogEntryEntity();
+            activityLogEntry.setRequestId(event.getRequestId());
+            activityLogEntry.setTimestamp(timestamp);
+            activityLogEntry.setActor(Actor.USER);
+            activityLogEntry.setActivityLogType(ActivityLogType.LOYALTY_BANK);
+            activityLogEntry.setActivityLogId(event.getLoyaltyBankId());
+        }
+
+        // TODO: show points in message and save messages as a constant
+        if (event instanceof LoyaltyBankCreatedEvent) {
+            activityLogEntry.getMessages().add("Loyalty Bank created");
+        } else if (event instanceof LoyaltyBankDeletedEvent) {
+            activityLogEntry.getMessages().add("Loyalty Bank deleted");
+        } else if (event instanceof AllPointsExpiredEvent) {
+            activityLogEntry.getMessages().add("All points expired for Loyalty Bank");
+        } else if (event instanceof AuthorizedTransactionCreatedEvent) {
+            activityLogEntry.getMessages().add("Authorize transaction created");
+        } else if (event instanceof AwardedTransactionCreatedEvent) {
+            activityLogEntry.getMessages().add("Awarded transaction created");
+        } else if (event instanceof CapturedTransactionCreatedEvent) {
+            activityLogEntry.getMessages().add("Captured transaction created");
+        } else if (event instanceof EarnedTransactionCreatedEvent) {
+            activityLogEntry.getMessages().add("Earned transaction created");
+        } else if (event instanceof ExpiredTransactionCreatedEvent expiredTransactionCreatedEvent) {
+            activityLogEntry.getMessages().add(String.format(
+                    "%d points expired from %s transaction",
+                    expiredTransactionCreatedEvent.getPoints(),
+                    expiredTransactionCreatedEvent.getTargetTransactionId()
+            ));
+        } else if (event instanceof PendingTransactionCreatedEvent) {
+            activityLogEntry.getMessages().add("Pending transaction created");
+        } else if (event instanceof VoidTransactionCreatedEvent) {
+            activityLogEntry.getMessages().add("Void transaction created");
+        } else {
+            throw new IllegalArgumentException("Invalid event type");
+        }
+
+        activityLogRepository.save(activityLogEntry);
+        LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()),
+                "Activity log entry saved for {} on {} event",
+                event.getLoyaltyBankId(),
+                event.getClass().getSimpleName());
+    }
+
+    public void deleteActivityLogEntries(LoyaltyBankDeletedEvent event) {
+        activityLogRepository.deleteAllByActivityLogId(event.getLoyaltyBankId());
         LOGGER.info(Markers.append(REQUEST_ID, event.getRequestId()), "Activity log entries deleted for {} on {} event", event.getAccountId(), event.getClass().getSimpleName());
     }
 }
