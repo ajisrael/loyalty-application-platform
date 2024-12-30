@@ -163,13 +163,13 @@ class BusinessLookupEventsHandlerTest {
     }
 
     @Test
-    @DisplayName("Can update existing BusinessLookupEntity on valid BusinessUpdatedEvent")
+    @DisplayName("Can update existing BusinessLookupEntity on valid BusinessNameChangedEvent")
     void testOn_whenValidBusinessUpdatedEventReceived_shouldUpdateBusinessLookupEntity() {
         // Arrange
-        BusinessUpdatedEvent event = BusinessUpdatedEvent.builder()
+        BusinessNameChangedEvent event = BusinessNameChangedEvent.builder()
                 .requestId(TEST_REQUEST_ID)
                 .businessId(TEST_BUSINESS_ID)
-                .businessName(TEST_BUSINESS_NAME)
+                .newBusinessName(TEST_BUSINESS_NAME)
                 .build();
 
         when(businessLookupRepository.findByBusinessId(TEST_BUSINESS_ID)).thenReturn(new BusinessLookupEntity(TEST_BUSINESS_ID));
@@ -200,10 +200,10 @@ class BusinessLookupEventsHandlerTest {
     @DisplayName("Cannot update BusinessLookupEntity for business that doesn't exist")
     void testOn_whenBusinessUpdatedEventReceivedForNonExistingBusiness_shouldThrowException() {
         // Arrange
-        BusinessUpdatedEvent event = BusinessUpdatedEvent.builder()
+        BusinessNameChangedEvent event = BusinessNameChangedEvent.builder()
                 .requestId(TEST_REQUEST_ID)
                 .businessId(TEST_BUSINESS_ID)
-                .businessName(TEST_BUSINESS_NAME)
+                .newBusinessName(TEST_BUSINESS_NAME)
                 .build();
 
         when(businessLookupRepository.findByBusinessId(TEST_BUSINESS_ID)).thenReturn(null);
@@ -223,13 +223,13 @@ class BusinessLookupEventsHandlerTest {
     }
 
     @Test
-    @DisplayName("Cannot update existing BusinessLookupEntity on invalid BusinessUpdatedEvent")
+    @DisplayName("Cannot update existing BusinessLookupEntity on invalid BusinessNameChangedEvent")
     void testOn_whenInvalidBusinessUpdatedEventReceived_shouldThrowException() {
         // Arrange
-        BusinessUpdatedEvent event = BusinessUpdatedEvent.builder()
+        BusinessNameChangedEvent event = BusinessNameChangedEvent.builder()
                 .requestId(TEST_REQUEST_ID)
                 .businessId(TEST_BUSINESS_ID)
-                .businessName(TEST_BUSINESS_NAME)
+                .newBusinessName(TEST_BUSINESS_NAME)
                 .build();
 
         String exceptionMessage = "Invalid business id";

@@ -4,7 +4,7 @@ import loyalty.service.command.data.entities.BusinessLookupEntity;
 import loyalty.service.command.data.repositories.BusinessLookupRepository;
 import loyalty.service.core.events.BusinessDeletedEvent;
 import loyalty.service.core.events.BusinessEnrolledEvent;
-import loyalty.service.core.events.BusinessUpdatedEvent;
+import loyalty.service.core.events.BusinessNameChangedEvent;
 import loyalty.service.core.exceptions.IllegalProjectionStateException;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
@@ -70,7 +70,7 @@ public class BusinessLookupEventsHandler {
     }
 
     @EventHandler
-    public void on(BusinessUpdatedEvent event) {
+    public void on(BusinessNameChangedEvent event) {
         marker = Markers.append(REQUEST_ID, event.getRequestId());
 
         BusinessLookupEntity businessLookupEntity = businessLookupRepository.findByBusinessId(event.getBusinessId());

@@ -1,11 +1,11 @@
 package loyalty.service.query.projections;
 
+import loyalty.service.core.events.loyalty.bank.transactions.*;
 import loyalty.service.query.data.entities.LoyaltyBankEntity;
 import loyalty.service.query.data.repositories.LoyaltyBankRepository;
-import loyalty.service.core.events.AllPointsExpiredEvent;
-import loyalty.service.core.events.LoyaltyBankDeletedEvent;
-import loyalty.service.core.events.transactions.*;
-import loyalty.service.core.events.LoyaltyBankCreatedEvent;
+import loyalty.service.core.events.loyalty.bank.AllPointsExpiredEvent;
+import loyalty.service.core.events.loyalty.bank.LoyaltyBankDeletedEvent;
+import loyalty.service.core.events.loyalty.bank.LoyaltyBankCreatedEvent;
 import loyalty.service.core.exceptions.LoyaltyBankNotFoundException;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;

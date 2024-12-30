@@ -1,13 +1,11 @@
 package loyalty.service.command.projections;
 
-import lombok.AllArgsConstructor;
-import loyalty.service.command.data.entities.LoyaltyBankLookupEntity;
 import loyalty.service.command.data.entities.RedemptionTrackerEntity;
 import loyalty.service.command.data.repositories.RedemptionTrackerRepository;
-import loyalty.service.core.events.LoyaltyBankDeletedEvent;
-import loyalty.service.core.events.transactions.AuthorizedTransactionCreatedEvent;
-import loyalty.service.core.events.transactions.CapturedTransactionCreatedEvent;
-import loyalty.service.core.events.transactions.VoidTransactionCreatedEvent;
+import loyalty.service.core.events.loyalty.bank.LoyaltyBankDeletedEvent;
+import loyalty.service.core.events.loyalty.bank.transactions.AuthorizedTransactionCreatedEvent;
+import loyalty.service.core.events.loyalty.bank.transactions.CapturedTransactionCreatedEvent;
+import loyalty.service.core.events.loyalty.bank.transactions.VoidTransactionCreatedEvent;
 import loyalty.service.core.exceptions.IllegalProjectionStateException;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;

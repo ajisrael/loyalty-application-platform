@@ -40,10 +40,11 @@ public class BusinessAggregate {
 
     @CommandHandler
     public void updateBusiness(UpdateBusinessCommand command) {
-        BusinessUpdatedEvent event = BusinessUpdatedEvent.builder()
+        BusinessNameChangedEvent event = BusinessNameChangedEvent.builder()
                 .requestId(command.getRequestId())
                 .businessId(command.getBusinessId())
-                .businessName(command.getBusinessName())
+                .oldBusinessName(this.businessName)
+                .newBusinessName(command.getBusinessName())
                 .build();
 
         LogHelper.logCommandIssuingEvent(LOGGER, command, event);
@@ -72,9 +73,8 @@ public class BusinessAggregate {
     }
 
     @EventSourcingHandler
-    public void on(BusinessUpdatedEvent event) {
-        this.businessId = event.getBusinessId();
-        this.businessName = event.getBusinessName();
+    public void on(BusinessNameChangedEvent event) {
+        this.businessName = event.getNewBusinessName();
 
         LogHelper.logEventProcessed(LOGGER, event);
     }

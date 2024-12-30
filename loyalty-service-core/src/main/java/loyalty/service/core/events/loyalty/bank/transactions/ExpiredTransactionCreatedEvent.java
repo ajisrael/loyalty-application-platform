@@ -1,4 +1,4 @@
-package loyalty.service.core.events.transactions;
+package loyalty.service.core.events.loyalty.bank.transactions;
 
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;

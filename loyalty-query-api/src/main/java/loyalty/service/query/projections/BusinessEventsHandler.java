@@ -2,7 +2,7 @@ package loyalty.service.query.projections;
 
 import loyalty.service.core.events.BusinessDeletedEvent;
 import loyalty.service.core.events.BusinessEnrolledEvent;
-import loyalty.service.core.events.BusinessUpdatedEvent;
+import loyalty.service.core.events.BusinessNameChangedEvent;
 import loyalty.service.core.exceptions.BusinessNotFoundException;
 import loyalty.service.query.data.entities.BusinessEntity;
 import loyalty.service.query.data.repositories.BusinessRepository;
@@ -55,7 +55,7 @@ public class BusinessEventsHandler {
     }
 
     @EventHandler
-    public void on(BusinessUpdatedEvent event) {
+    public void on(BusinessNameChangedEvent event) {
         Optional<BusinessEntity> businessEntityOptional = businessRepository.findByBusinessId(event.getBusinessId());
 
         if (businessEntityOptional.isPresent()) {

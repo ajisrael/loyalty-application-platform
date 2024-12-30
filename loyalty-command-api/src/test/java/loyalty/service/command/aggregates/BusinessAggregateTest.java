@@ -5,7 +5,7 @@ import loyalty.service.command.commands.CreateBusinessCommand;
 import loyalty.service.command.commands.UpdateBusinessCommand;
 import loyalty.service.core.events.BusinessDeletedEvent;
 import loyalty.service.core.events.BusinessEnrolledEvent;
-import loyalty.service.core.events.BusinessUpdatedEvent;
+import loyalty.service.core.events.BusinessNameChangedEvent;
 import org.axonframework.eventsourcing.eventstore.EventStoreException;
 import org.axonframework.modelling.command.AggregateNotFoundException;
 import org.axonframework.test.aggregate.AggregateTestFixture;
@@ -46,10 +46,11 @@ class BusinessAggregateTest {
             .businessName(TEST_NEW_BUSINESS_NAME)
             .build();
 
-    private static final BusinessUpdatedEvent businessUpdatedEvent = BusinessUpdatedEvent.builder()
+    private static final BusinessNameChangedEvent BUSINESS_NAME_CHANGED_EVENT = BusinessNameChangedEvent.builder()
             .requestId(updateBusinessCommand.getRequestId())
             .businessId(updateBusinessCommand.getBusinessId())
-            .businessName(updateBusinessCommand.getBusinessName())
+            .oldBusinessName(TEST_BUSINESS_NAME)
+            .newBusinessName(updateBusinessCommand.getBusinessName())
             .build();
 
     private static final DeleteBusinessCommand deleteBusinessCommand = DeleteBusinessCommand.builder()
@@ -89,15 +90,16 @@ class BusinessAggregateTest {
     }
 
     @Test
-    @DisplayName("UpdateBusinessCommand results in BusinessUpdatedEvent")
+    @DisplayName("UpdateBusinessCommand results in BusinessNameChangedEvent")
     void testUpdateBusiness_whenUpdateBusinessCommandHandled_ShouldIssueBusinessUpdatedEvent() {
         // Arrange & Act & Assert
         fixture.given(businessEnrolledEvent)
                 .when(updateBusinessCommand)
-                .expectEvents(businessUpdatedEvent)
+                .expectEvents(BUSINESS_NAME_CHANGED_EVENT)
                 .expectState(state -> {
-                    assertEquals(businessUpdatedEvent.getBusinessId(), state.getBusinessId(), "BusinessIds should match");
-                    assertEquals(businessUpdatedEvent.getBusinessName(), state.getBusinessName(), "BusinessNames should match");
+                    assertEquals(BUSINESS_NAME_CHANGED_EVENT.getBusinessId(), state.getBusinessId(), "BusinessIds should match");
+                    assertEquals(BUSINESS_NAME_CHANGED_EVENT.getNewBusinessName(), state.getBusinessName(), "New BusinessNames should match");
+                    assertEquals(BUSINESS_NAME_CHANGED_EVENT.getOldBusinessName(), businessEnrolledEvent.getBusinessName(), "Old BusinessNames should match");
                 });
     }
 

@@ -5,8 +5,7 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class BusinessUpdatedEvent extends AbstractEvent {
+public abstract class AbstractBusinessEvent extends AbstractEvent {
 
     private String businessId;
-    private String businessName;
 }

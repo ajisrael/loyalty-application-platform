@@ -8,6 +8,8 @@ import loyalty.service.command.utils.LogHelper;
 import loyalty.service.core.events.*;
 import loyalty.service.core.events.account.AccountCreatedEvent;
 import loyalty.service.core.events.account.AccountDeletedEvent;
+import loyalty.service.core.events.loyalty.bank.LoyaltyBankCreatedEvent;
+import loyalty.service.core.events.loyalty.bank.LoyaltyBankDeletedEvent;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.commandhandling.gateway.CommandGateway;

@@ -5,15 +5,15 @@ import loyalty.service.command.commands.DeleteLoyaltyBankCommand;
 import loyalty.service.command.commands.ExpireAllPointsCommand;
 import loyalty.service.command.commands.rollbacks.RollbackLoyaltyBankCreationCommand;
 import loyalty.service.command.commands.transactions.*;
-import loyalty.service.core.events.AllPointsExpiredEvent;
-import loyalty.service.core.events.LoyaltyBankCreatedEvent;
-import loyalty.service.core.events.LoyaltyBankDeletedEvent;
+import loyalty.service.core.events.loyalty.bank.AllPointsExpiredEvent;
+import loyalty.service.core.events.loyalty.bank.LoyaltyBankCreatedEvent;
+import loyalty.service.core.events.loyalty.bank.LoyaltyBankDeletedEvent;
+import loyalty.service.core.events.loyalty.bank.transactions.*;
 import loyalty.service.core.events.transactions.*;
 import loyalty.service.core.exceptions.FailedToExpireLoyaltyPointsException;
 import loyalty.service.core.exceptions.IllegalLoyaltyBankStateException;
 import loyalty.service.core.exceptions.InsufficientPointsException;
 import org.axonframework.eventsourcing.eventstore.EventStoreException;
-import org.axonframework.messaging.MetaData;
 import org.axonframework.modelling.command.AggregateNotFoundException;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
@@ -25,7 +25,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static loyalty.service.core.constants.DomainConstants.*;
 import static loyalty.service.core.constants.ExceptionMessages.LOYALTY_BANK_PROPERTY_BALANCE_CANNOT_BE_NEGATIVE;
-import static loyalty.service.core.constants.MetaDataKeys.SKIP_POINTS_CHECK;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)

@@ -49,6 +49,12 @@ public class LoyaltyServiceErrorHandler {
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(value = {ActivityLogNotFoundException.class})
+    public ResponseEntity<Object> handleActivityLogNotFoundException(ActivityLogNotFoundException exception, WebRequest webRequest) {
+        ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(value = {NoLoyaltyBanksForAccountFoundException.class})
     public ResponseEntity<Object> handleLoyaltyBankWithAccountIdNotFoundException(NoLoyaltyBanksForAccountFoundException exception, WebRequest webRequest) {
         ErrorMessage errorResponse = new ErrorMessage(new Date(), exception.getLocalizedMessage());

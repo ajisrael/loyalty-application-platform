@@ -1,7 +1,9 @@
 package loyalty.service.query.projections;
 
-import loyalty.service.core.events.AbstractLoyaltyBankEvent;
-import loyalty.service.core.events.LoyaltyBankDeletedEvent;
+import loyalty.service.core.events.AbstractBusinessEvent;
+import loyalty.service.core.events.BusinessDeletedEvent;
+import loyalty.service.core.events.loyalty.bank.AbstractLoyaltyBankEvent;
+import loyalty.service.core.events.loyalty.bank.LoyaltyBankDeletedEvent;
 import loyalty.service.core.events.account.AbstractAccountEvent;
 import loyalty.service.core.events.account.AccountDeletedEvent;
 import loyalty.service.query.services.ActivityLogService;
@@ -55,6 +57,16 @@ public class ActivityLogEventsHandler {
 
     @EventHandler
     public void on(LoyaltyBankDeletedEvent event) {
+        activityLogService.deleteActivityLogEntries(event);
+    }
+
+    @EventHandler
+    public void on(AbstractBusinessEvent event, @Timestamp Instant timestamp) {
+        activityLogService.saveActivityLogEntryFromEvent(event, timestamp);
+    }
+
+    @EventHandler
+    public void on(BusinessDeletedEvent event) {
         activityLogService.deleteActivityLogEntries(event);
     }
 }
