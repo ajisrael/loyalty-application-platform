@@ -1,6 +1,7 @@
 package loyalty.service.core.constants;
 
 public class LogMessages {
+    // TODO: Separate log messages that are only required on a single api to their respective apis
 
     private LogMessages() {
         throw new IllegalStateException("Constants class");
