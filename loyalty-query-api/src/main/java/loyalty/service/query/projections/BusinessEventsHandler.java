@@ -1,8 +1,8 @@
 package loyalty.service.query.projections;
 
-import loyalty.service.core.events.BusinessDeletedEvent;
-import loyalty.service.core.events.BusinessEnrolledEvent;
-import loyalty.service.core.events.BusinessNameChangedEvent;
+import loyalty.service.core.events.business.BusinessDeletedEvent;
+import loyalty.service.core.events.business.BusinessEnrolledEvent;
+import loyalty.service.core.events.business.BusinessNameChangedEvent;
 import loyalty.service.core.exceptions.BusinessNotFoundException;
 import loyalty.service.query.data.entities.BusinessEntity;
 import loyalty.service.query.data.repositories.BusinessRepository;

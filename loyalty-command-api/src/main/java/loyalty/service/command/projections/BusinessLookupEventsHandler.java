@@ -2,9 +2,9 @@ package loyalty.service.command.projections;
 
 import loyalty.service.command.data.entities.BusinessLookupEntity;
 import loyalty.service.command.data.repositories.BusinessLookupRepository;
-import loyalty.service.core.events.BusinessDeletedEvent;
-import loyalty.service.core.events.BusinessEnrolledEvent;
-import loyalty.service.core.events.BusinessNameChangedEvent;
+import loyalty.service.core.events.business.BusinessDeletedEvent;
+import loyalty.service.core.events.business.BusinessEnrolledEvent;
+import loyalty.service.core.events.business.BusinessNameChangedEvent;
 import loyalty.service.core.exceptions.IllegalProjectionStateException;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;

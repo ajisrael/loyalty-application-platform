@@ -2,7 +2,7 @@ package loyalty.service.command.sagas;
 
 import loyalty.service.command.data.entities.LoyaltyBankLookupEntity;
 import loyalty.service.command.data.repositories.LoyaltyBankLookupRepository;
-import loyalty.service.core.events.BusinessDeletedEvent;
+import loyalty.service.core.events.business.BusinessDeletedEvent;
 import loyalty.service.core.events.loyalty.bank.LoyaltyBankDeletedEvent;
 import loyalty.service.core.events.LoyaltyBankDeletionStartedEvent;
 import loyalty.service.core.utils.MarkerGenerator;

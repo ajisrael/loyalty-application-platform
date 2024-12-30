@@ -1,7 +1,7 @@
 package loyalty.service.query.projections;
 
-import loyalty.service.core.events.AbstractBusinessEvent;
-import loyalty.service.core.events.BusinessDeletedEvent;
+import loyalty.service.core.events.business.AbstractBusinessEvent;
+import loyalty.service.core.events.business.BusinessDeletedEvent;
 import loyalty.service.core.events.loyalty.bank.AbstractLoyaltyBankEvent;
 import loyalty.service.core.events.loyalty.bank.LoyaltyBankDeletedEvent;
 import loyalty.service.core.events.account.AbstractAccountEvent;

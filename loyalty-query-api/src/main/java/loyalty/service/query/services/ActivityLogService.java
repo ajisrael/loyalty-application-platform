@@ -1,10 +1,10 @@
 package loyalty.service.query.services;
 
 import lombok.AllArgsConstructor;
-import loyalty.service.core.events.AbstractBusinessEvent;
-import loyalty.service.core.events.BusinessDeletedEvent;
-import loyalty.service.core.events.BusinessEnrolledEvent;
-import loyalty.service.core.events.BusinessNameChangedEvent;
+import loyalty.service.core.events.business.AbstractBusinessEvent;
+import loyalty.service.core.events.business.BusinessDeletedEvent;
+import loyalty.service.core.events.business.BusinessEnrolledEvent;
+import loyalty.service.core.events.business.BusinessNameChangedEvent;
 import loyalty.service.core.events.loyalty.bank.AllPointsExpiredEvent;
 import loyalty.service.core.events.loyalty.bank.LoyaltyBankCreatedEvent;
 import loyalty.service.core.events.loyalty.bank.LoyaltyBankDeletedEvent;

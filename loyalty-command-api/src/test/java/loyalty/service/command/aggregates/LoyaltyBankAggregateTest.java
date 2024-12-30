@@ -9,7 +9,6 @@ import loyalty.service.core.events.loyalty.bank.AllPointsExpiredEvent;
 import loyalty.service.core.events.loyalty.bank.LoyaltyBankCreatedEvent;
 import loyalty.service.core.events.loyalty.bank.LoyaltyBankDeletedEvent;
 import loyalty.service.core.events.loyalty.bank.transactions.*;
-import loyalty.service.core.events.transactions.*;
 import loyalty.service.core.exceptions.FailedToExpireLoyaltyPointsException;
 import loyalty.service.core.exceptions.IllegalLoyaltyBankStateException;
 import loyalty.service.core.exceptions.InsufficientPointsException;
