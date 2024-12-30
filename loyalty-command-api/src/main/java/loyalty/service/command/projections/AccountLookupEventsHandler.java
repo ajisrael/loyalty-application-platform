@@ -2,7 +2,9 @@ package loyalty.service.command.projections;
 
 import loyalty.service.command.data.entities.AccountLookupEntity;
 import loyalty.service.command.data.repositories.AccountLookupRepository;
-import loyalty.service.core.events.*;
+import loyalty.service.core.events.account.AccountCreatedEvent;
+import loyalty.service.core.events.account.AccountDeletedEvent;
+import loyalty.service.core.events.account.AccountEmailChangedEvent;
 import loyalty.service.core.exceptions.IllegalProjectionStateException;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
@@ -12,7 +14,6 @@ import org.axonframework.messaging.interceptors.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
-import org.springframework.beans.BeanUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;

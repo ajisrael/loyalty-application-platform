@@ -4,7 +4,7 @@ import loyalty.service.command.commands.CreateAccountCommand;
 import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.command.commands.rollbacks.RollbackAccountCreationCommand;
-import loyalty.service.core.events.*;
+import loyalty.service.core.events.account.*;
 import org.axonframework.eventsourcing.eventstore.EventStoreException;
 import org.axonframework.modelling.command.AggregateNotFoundException;
 import org.axonframework.test.aggregate.AggregateTestFixture;

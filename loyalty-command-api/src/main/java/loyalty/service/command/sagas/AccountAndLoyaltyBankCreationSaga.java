@@ -6,6 +6,8 @@ import loyalty.service.command.commands.rollbacks.RollbackAccountCreationCommand
 import loyalty.service.command.commands.rollbacks.RollbackLoyaltyBankCreationCommand;
 import loyalty.service.command.utils.LogHelper;
 import loyalty.service.core.events.*;
+import loyalty.service.core.events.account.AccountCreatedEvent;
+import loyalty.service.core.events.account.AccountDeletedEvent;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;
 import org.axonframework.commandhandling.gateway.CommandGateway;

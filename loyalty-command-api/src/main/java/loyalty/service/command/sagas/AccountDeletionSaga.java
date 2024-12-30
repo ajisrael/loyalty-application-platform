@@ -1,12 +1,9 @@
 package loyalty.service.command.sagas;
 
-import loyalty.service.command.commands.DeleteLoyaltyBankCommand;
-import loyalty.service.command.commands.ExpireAllPointsCommand;
 import loyalty.service.command.data.entities.LoyaltyBankLookupEntity;
 import loyalty.service.command.data.repositories.LoyaltyBankLookupRepository;
-import loyalty.service.core.events.AccountDeletedEvent;
+import loyalty.service.core.events.account.AccountDeletedEvent;
 import loyalty.service.core.events.LoyaltyBankDeletedEvent;
-import loyalty.service.core.events.AllPointsExpiredEvent;
 import loyalty.service.core.events.LoyaltyBankDeletionStartedEvent;
 import loyalty.service.core.utils.MarkerGenerator;
 import net.logstash.logback.marker.Markers;

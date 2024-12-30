@@ -1,7 +1,7 @@
 package loyalty.service.query.services;
 
 import lombok.AllArgsConstructor;
-import loyalty.service.core.events.*;
+import loyalty.service.core.events.account.*;
 import loyalty.service.query.data.entities.ActivityLogEntryEntity;
 import loyalty.service.query.data.enums.ActivityLogType;
 import loyalty.service.query.data.enums.Actor;

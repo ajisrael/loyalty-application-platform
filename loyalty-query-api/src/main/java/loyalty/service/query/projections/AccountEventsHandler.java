@@ -1,6 +1,6 @@
 package loyalty.service.query.projections;
 
-import loyalty.service.core.events.*;
+import loyalty.service.core.events.account.*;
 import loyalty.service.query.data.entities.AccountEntity;
 import loyalty.service.query.data.repositories.AccountRepository;
 import loyalty.service.core.exceptions.AccountNotFoundException;

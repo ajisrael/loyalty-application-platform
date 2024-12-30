@@ -7,7 +7,7 @@ import loyalty.service.command.commands.DeleteAccountCommand;
 import loyalty.service.command.commands.UpdateAccountCommand;
 import loyalty.service.command.commands.rollbacks.RollbackAccountCreationCommand;
 import loyalty.service.command.utils.LogHelper;
-import loyalty.service.core.events.*;
+import loyalty.service.core.events.account.*;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.messaging.MetaData;
@@ -16,8 +16,6 @@ import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 
 
 @Aggregate(snapshotTriggerDefinition = "accountSnapshotTrigger")

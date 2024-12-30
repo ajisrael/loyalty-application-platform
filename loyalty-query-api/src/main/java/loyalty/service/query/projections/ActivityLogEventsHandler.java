@@ -1,6 +1,7 @@
 package loyalty.service.query.projections;
 
-import loyalty.service.core.events.*;
+import loyalty.service.core.events.account.AbstractAccountEvent;
+import loyalty.service.core.events.account.AccountDeletedEvent;
 import loyalty.service.query.services.ActivityLogService;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
@@ -8,7 +9,6 @@ import org.axonframework.eventhandling.Timestamp;
 import org.axonframework.messaging.interceptors.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
