@@ -40,6 +40,14 @@ public class LogMessages {
     public static final String BUSINESS_UPDATED_IN_LOOKUP_DB = "Business {} updated in lookup db";
     public static final String BUSINESS_DELETED_FROM_LOOKUP_DB = "Business {} deleted from lookup db";
 
+    public static final String AUTHORIZE_TRANSACTION_TRACKED = "Authorize transaction tracked";
+    public static final String VOID_TRANSACTION_TRACKED_DELETING_TRACKER = "Void transaction tracked, no more points available, deleting tracker";
+    public static final String VOID_TRANSACTION_TRACKED = "Void transaction tracked";
+    public static final String CAPTURE_TRANSACTION_TRACKED_DELETING_TRACKER = "Capture transaction tracked, no more points available, deleting tracker";
+    public static final String CAPTURE_TRANSACTION_TRACKED = "Capture transaction tracked";
+    public static final String DELETED_REDEMPTION_TRACKERS = "Deleted {} redemption trackers due to {}";
+
+
     public static final String EXPIRATION_TRACKER_CREATED_FOR_LOYALTY_BANK = "Expiration tracker created for loyalty bank {}";
     public static final String TRANSACTION_ENTITY_CREATED_FOR_LOYALTY_BANK = "TransactionEntity created for loyalty bank {}";
     public static final String APPLYING_REMAINING_AUTHORIZED_POINTS_TO_POINTS_ON_OLDEST_TRANSACTION = "Applying {} remaining authorized points to {} points on oldest transaction {}";

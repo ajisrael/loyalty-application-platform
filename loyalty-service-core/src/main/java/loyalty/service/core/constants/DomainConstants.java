@@ -30,6 +30,10 @@ public class DomainConstants {
     public static final String TIMESTAMP = "timestamp";
     public static final String POINTS = "points";
 
+    public static final String AUTHORIZED_POINTS = "authorizedPoints";
+    public static final String CAPTURED_POINTS = "capturedPoints";
+    public static final String POINTS_AVAILABLE_FOR_REDEMPTION = "pointsAvailableForRedemption";
+
     // Processing groups for command api
     public static final String COMMAND_PROJECTION_GROUP = "command-projection-group";
     public static final String EXPIRATION_TRACKER_GROUP = "expiration-tracker-group";

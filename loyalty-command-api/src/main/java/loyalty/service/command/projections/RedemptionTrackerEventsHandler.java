@@ -24,6 +24,7 @@ import java.util.List;
 
 import static loyalty.service.core.constants.DomainConstants.REDEMPTION_TRACKER_GROUP;
 import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
+import static loyalty.service.core.constants.LogMessages.*;
 
 
 @Component
@@ -67,7 +68,7 @@ public class RedemptionTrackerEventsHandler {
 
         marker.add(MarkerGenerator.generateMarker(redemptionTrackerEntity));
 
-        LOGGER.info(marker, "Authorize transaction tracked");
+        LOGGER.info(marker, AUTHORIZE_TRANSACTION_TRACKED);
     }
 
     @EventHandler
@@ -88,11 +89,11 @@ public class RedemptionTrackerEventsHandler {
 
         if (availablePoints == 0) {
             redemptionTrackerRepository.delete(redemptionTrackerEntity);
-            LOGGER.info(marker, "Void transaction tracked, no more points available, deleting tracker");
+            LOGGER.info(marker, VOID_TRANSACTION_TRACKED_DELETING_TRACKER);
         } else {
             validateEntity(redemptionTrackerEntity);
             redemptionTrackerRepository.save(redemptionTrackerEntity);
-            LOGGER.info(marker, "Void transaction tracked");
+            LOGGER.info(marker, VOID_TRANSACTION_TRACKED);
         }
     }
 
@@ -114,11 +115,11 @@ public class RedemptionTrackerEventsHandler {
 
         if (availablePoints == 0) {
             redemptionTrackerRepository.delete(redemptionTrackerEntity);
-            LOGGER.info(marker, "Capture transaction tracked, no more points available, deleting tracker");
+            LOGGER.info(marker, CAPTURE_TRANSACTION_TRACKED_DELETING_TRACKER);
         } else {
             validateEntity(redemptionTrackerEntity);
             redemptionTrackerRepository.save(redemptionTrackerEntity);
-            LOGGER.info(marker, "Capture transaction tracked");
+            LOGGER.info(marker, CAPTURE_TRANSACTION_TRACKED);
         }
     }
 
@@ -131,7 +132,7 @@ public class RedemptionTrackerEventsHandler {
 
         LOGGER.info(
                 marker,
-                "Deleted {} redemption trackers due to {}",
+                DELETED_REDEMPTION_TRACKERS,
                 redemptionTrackerEntities.size(),
                 event.getClass().getSimpleName()
         );
