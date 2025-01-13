@@ -5,7 +5,6 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class AccountCreatedResponseModel extends AbstractResponseModel {
-
-    private String accountId;
+public abstract class AbstractResponseModel {
+    private String requestId;
 }

@@ -77,8 +77,9 @@ public class AccountCommandController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create account")
     public AccountCreatedResponseModel createAccount(@Valid @RequestBody CreateAccountRequestModel request) {
+        String requestId = UUID.randomUUID().toString();
         CreateAccountCommand command = CreateAccountCommand.builder()
-                .requestId(UUID.randomUUID().toString())
+                .requestId(requestId)
                 .accountId(UUID.randomUUID().toString())
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
@@ -92,7 +93,10 @@ public class AccountCommandController {
 
         String accountId = commandGateway.sendAndWait(command);
 
-        return AccountCreatedResponseModel.builder().accountId(accountId).build();
+        return AccountCreatedResponseModel.builder()
+                .requestId(requestId)
+                .accountId(accountId)
+                .build();
     }
 
     @PutMapping
