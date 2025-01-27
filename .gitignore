@@ -3,4 +3,4 @@
 *.key
 run_postman_test.sh
 *.iml
-prompts.txt
+prompts.md
