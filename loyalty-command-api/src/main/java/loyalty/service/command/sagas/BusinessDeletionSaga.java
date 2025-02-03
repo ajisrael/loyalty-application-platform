@@ -28,7 +28,7 @@ import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
 
 @Saga
 @ProcessingGroup(COMMAND_PROJECTION_GROUP)
-@Order(2)
+@Order(1)
 public class BusinessDeletionSaga implements Serializable {
     // TODO:
     //  - move strings to constants

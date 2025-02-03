@@ -31,7 +31,7 @@ import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExi
 @Component
 @Validated
 @ProcessingGroup(COMMAND_PROJECTION_GROUP)
-@Order(1)
+@Order(2)
 public class BusinessLookupEventsHandler {
 
     private final BusinessLookupRepository businessLookupRepository;
