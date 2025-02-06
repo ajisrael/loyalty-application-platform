@@ -36,6 +36,7 @@ public class DomainConstants {
 
     // Processing groups for command api
     public static final String COMMAND_PROJECTION_GROUP = "command-projection-group";
+    public static final String BUSINESS_PROJECTION_GROUP = "business-projection-group";
     public static final String EXPIRATION_TRACKER_GROUP = "expiration-tracker-group";
     public static final String REDEMPTION_TRACKER_GROUP = "redemption-tracker-group";
 

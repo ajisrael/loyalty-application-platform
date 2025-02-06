@@ -22,16 +22,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.SmartValidator;
 import org.springframework.validation.annotation.Validated;
 
-import static loyalty.service.core.constants.DomainConstants.COMMAND_PROJECTION_GROUP;
-import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
+import static loyalty.service.core.constants.DomainConstants.*;
 import static loyalty.service.core.constants.ExceptionMessages.BUSINESS_WITH_ID_DOES_NOT_EXIST;
 import static loyalty.service.core.constants.LogMessages.*;
 import static loyalty.service.core.utils.Helper.throwExceptionIfEntityDoesNotExist;
 
 @Component
 @Validated
-@ProcessingGroup(COMMAND_PROJECTION_GROUP)
-@Order(2)
 public class BusinessLookupEventsHandler {
 
     private final BusinessLookupRepository businessLookupRepository;

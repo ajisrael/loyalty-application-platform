@@ -23,17 +23,10 @@ import org.springframework.core.annotation.Order;
 import java.io.Serializable;
 import java.util.List;
 
-import static loyalty.service.core.constants.DomainConstants.COMMAND_PROJECTION_GROUP;
-import static loyalty.service.core.constants.DomainConstants.REQUEST_ID;
+import static loyalty.service.core.constants.DomainConstants.*;
 
 @Saga
-@ProcessingGroup(COMMAND_PROJECTION_GROUP)
-@Order(1)
 public class BusinessDeletionSaga implements Serializable {
-    // TODO:
-    //  - move strings to constants
-    //  - add error handling to log if something went wrong with loyalty bank deletion
-    //  - add deadline manager for if something goes wrong with loyalty bank deletion
 
     @Autowired
     private transient CommandGateway commandGateway;
